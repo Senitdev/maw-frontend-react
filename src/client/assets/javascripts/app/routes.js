@@ -3,7 +3,7 @@ import { Route, IndexRedirect, Redirect } from 'react-router';
 
 import App from './App';
 import NotFoundView from 'components/NotFound';
-import ManagementLayout from 'components/ManagementLayout';
+import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/display-management/components/DisplayManagementContainer';
 import MediaLibraryContainer from 'features/display-management/components/MediaLibraryContainer';
