@@ -1,9 +1,12 @@
 import React, { PropTypes } from 'react';
+import { Layout } from 'antd';
+const { Header } = Layout;
 
 const App = (props) => (
-  <div className="page-container">
-    {React.cloneElement({...props}.children, {...props})}
-  </div>
+  <Layout style={{height:'100%'}}>
+    <Header>My Access Web</Header>
+    {props.children}
+  </Layout>
 );
 
 App.propTypes = {

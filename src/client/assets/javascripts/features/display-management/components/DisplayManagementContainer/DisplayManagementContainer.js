@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
-
-import { Button } from 'antd';
+import { Component, PropTypes } from 'react';
 
 export default class DisplayManagementContainer extends Component {
 
   render() {
     return (
-      <div>
-        DisplayManagementContainer
-        <Button>Mon Bouton Ant</Button>
-      </div>
+      this.props.children
     );
   }
 }
+
+DisplayManagementContainer.propTypes = {
+  children: PropTypes.element.isRequired
+};
