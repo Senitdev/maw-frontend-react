@@ -23,10 +23,10 @@ export default class ManagementLayout extends Component {
 
     return (
       <Layout>
-        <Sider collapsible collapsed={collapsedSideMenu} onCollapse={collapseSideMenu}>
+        <Sider collapsible collapsed={collapsedSideMenu} onCollapse={collapseSideMenu} style={{zIndex: '2'}}>
           <SideMenu collapsed={collapsedSideMenu} />
         </Sider>
-        <Content>
+        <Content style={{zIndex: '1'}}>
           {this.props.children}
         </Content>
       </Layout>
