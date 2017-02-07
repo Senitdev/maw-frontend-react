@@ -26,7 +26,7 @@ export default class ManagementLayout extends Component {
         <Sider collapsible collapsed={collapsedSideMenu} onCollapse={collapseSideMenu}>
           <SideMenu collapsed={collapsedSideMenu} />
         </Sider>
-        <Content style={{ margin: '16px 16px' }}>
+        <Content>
           {this.props.children}
         </Content>
       </Layout>
