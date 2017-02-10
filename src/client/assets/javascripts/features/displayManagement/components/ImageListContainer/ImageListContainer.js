@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Table, Input, Button } from 'antd';
 
 import { actionCreators as displayManagementActions, selector, NAME as displayManagementName } from '../../';
+import DataTable from 'components/DataTable';
 
 const mapStateToProps = (state) => {
   const { mediaById, mediaByType } = state[displayManagementName];
@@ -21,7 +22,7 @@ const mapStateToProps = (state) => {
 @connect(mapStateToProps, (dispatch) => ({
   actions: bindActionCreators(displayManagementActions, dispatch)
 }))
-export default class ImageList extends Component {
+export default class ImageListContainer extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -29,8 +30,32 @@ export default class ImageList extends Component {
     images: PropTypes.array.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedRows: []
+    };
+  }
+
   componentDidMount() {
     this.props.actions.fetchMedia('image');
+  }
+
+  onSelectionChange = (selectedRowKeys, selectedRows) => {
+    this.setState({ selectedRows: selectedRowKeys });
+  }
+
+  onRefresh = () => {
+    this.props.actions.fetchMedia('image');
+  }
+
+  onDelete = (id) => {
+
+  }
+
+  onDeleteSelection = () => {
+
   }
 
   render() {
@@ -44,16 +69,28 @@ export default class ImageList extends Component {
         title: 'Nom',
         dataIndex: 'name',
         key: 'name',
+        sorter: (a, b) => a.id - b.id
       },
       {
         title: 'Date de création',
         dataIndex: 'createdAt',
         key: 'createdAt',
+        sorter: (a, b) => a.id - b.id
       },
     ];
 
+    const rowSelection = {
+      onChange: this.onSelectionChange
+    };
+
     return (
-      <Table title={()=><h1>Bite</h1>} isLoading={this.props.isFetching} columns={columns} dataSource={this.props.images} rowKey={image => image.id} />
+      <DataTable
+        title="Images"
+        loading={this.props.isFetching}
+        columns={columns}
+        dataSource={this.props.images}
+        rowSelection={rowSelection}
+        onRefresh={this.onRefresh} />
     );
   }
 }

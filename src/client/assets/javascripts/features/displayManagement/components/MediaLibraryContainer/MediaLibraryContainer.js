@@ -17,7 +17,7 @@ export default class MediaLibraryContainer extends Component {
           <Layout.Sider style={{backgroundColor: '#fff'}}>
             <MediaTypeMenu />
           </Layout.Sider>
-          <Layout.Content>
+          <Layout.Content style={{paddingTop: '8px'}}>
             {this.props.children}
           </Layout.Content>
         </Layout>

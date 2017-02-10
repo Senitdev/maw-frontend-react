@@ -7,7 +7,7 @@ import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
 import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
-import ImageList from 'features/displayManagement/components/ImageList';
+import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
 
 // Temporaire
 const LoginContainer = () => <div>Login</div>;
@@ -33,7 +33,7 @@ export default (
       <Route path="display-management" component={DisplayManagementContainer}>
         <IndexRedirect to="image" />
         <Route component={MediaLibraryContainer}>
-          <Route path="image" component={ImageList} />
+          <Route path="image" component={ImageListContainer} />
           <Route path="video" component={VideoList} />
         </Route>
         <Route path="display" component={DisplayList} />
