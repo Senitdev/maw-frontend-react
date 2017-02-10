@@ -4,6 +4,8 @@ import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import { AppContainer } from 'react-hot-loader';
 import Redbox from 'redbox-react';
+import { LocaleProvider } from 'antd';
+import frBE from 'antd/lib/locale-provider/fr_BE';
 
 import Root from './Root';
 import configureStore from './store/configureStore';
@@ -19,9 +21,11 @@ const rootEl = document.getElementById('app');
 
 // Render the React application to the DOM
 render(
-  <AppContainer errorReporter={Redbox}>
-    <Root store={store} history={history} />
-  </AppContainer>,
+  <LocaleProvider locale={frBE}>
+    <AppContainer errorReporter={Redbox}>
+      <Root store={store} history={history} />
+    </AppContainer>
+  </LocaleProvider>,
   rootEl
 );
 
