@@ -9,7 +9,7 @@ export default class MediaTypeMenu extends Component {
       <Menu mode="inline">
         <Menu.ItemGroup title="Fichiers">
           <Menu.Item key="image">
-            <Icon type="picture" />Images
+            <Link to="/display-management/image"><Icon type="picture" /> Images</Link>
           </Menu.Item>
           <Menu.Item key="video">
             <Link to="/display-management/video"><Icon type="video-camera" /> Vidéos</Link>

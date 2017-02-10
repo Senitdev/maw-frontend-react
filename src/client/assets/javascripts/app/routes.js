@@ -5,13 +5,13 @@ import App from './App';
 import NotFoundView from 'components/NotFound';
 import ManagementLayout from 'features/core/components/ManagementLayout';
 
-import DisplayManagementContainer from 'features/display-management/components/DisplayManagementContainer';
-import MediaLibraryContainer from 'features/display-management/components/MediaLibraryContainer';
+import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
+import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
+import ImageList from 'features/displayManagement/components/ImageList';
 
 // Temporaire
 const LoginContainer = () => <div>Login</div>;
 const RegisterContainer = () => <div>Register</div>;
-const ImageList = () => <div>Image list</div>;
 const VideoList = () => <div>Video list</div>;
 const DisplayList = () => <div>Display list</div>;
 const PlanningList = () => <div>Planning list</div>;
