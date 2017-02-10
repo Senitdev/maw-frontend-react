@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { persistState } from 'redux-devtools';
 import promiseMiddleware from 'redux-promise';
 import createLogger from 'redux-logger';
+import thunkMiddleware from 'redux-thunk';
 
 import rootReducer from '../reducer';
 import DevTools from '../DevTools';
@@ -14,7 +15,7 @@ import DevTools from '../DevTools';
  */
 const logger = createLogger();
 
-const middlewares = [promiseMiddleware, logger, require('redux-immutable-state-invariant')()];
+const middlewares = [thunkMiddleware, promiseMiddleware, logger, require('redux-immutable-state-invariant')()];
 
 // By default we try to read the key from ?debug_session=<key> in the address bar
 const getDebugSessionKey = function () {
