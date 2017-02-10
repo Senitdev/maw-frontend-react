@@ -7,7 +7,7 @@ import { State } from 'models/core';
 // Action Types
 
 const COLLAPSE_SIDE_MENU = 'maw/core/COLLAPSE_SIDE_MENU';
-const TOGGLE_SIDE_MENU = 'maw/core/COLLAPSE_SIDE_MENU';
+const TOGGLE_SIDE_MENU = 'maw/core/TOGGLE_SIDE_MENU';
 
 // This will be used in our root reducer and selectors
 
