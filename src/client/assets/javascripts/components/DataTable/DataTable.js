@@ -1,7 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Table, Input, Button, Row, Col, Tooltip } from 'antd';
 
 export default class DataTable extends Component {
+
+  static propTypes = {
+    columns: PropTypes.arrayOf(PropTypes.object),
+    dataSource: PropTypes.arrayOf(PropTypes.object),
+    loading: PropTypes.bool,
+    onRefresh: PropTypes.func,
+    rowSelection: PropTypes.object,
+    title: PropTypes.string,
+  };
 
   constructor(props) {
     super(props);
@@ -30,17 +39,8 @@ export default class DataTable extends Component {
       if (!match) {
         return null;
       }
-      return {
-        ...record,
-        name: (
-          <span>
-            {record.name.split(reg).map((text, i) => (
-              i > 0 ? [<span className="highlight">{match[0]}</span>, text] : text
-            ))}
-          </span>
-        )
-      };
-    }).filter(record => !!record);
+      return record;
+    }).filter((record) => !!record);
   }
 
   render() {
@@ -56,14 +56,12 @@ export default class DataTable extends Component {
           </Col>
         </Row>
         <Row style={{marginTop: '6px'}}>
+          { this.props.onRefresh &&
           <Col offset={1} span={1}>
             <Tooltip placement="right" title="Rafraichir les données">
               <Button loading={this.props.loading} icon="reload" onClick={this.props.onRefresh} />
             </Tooltip>
-          </Col>
-          <Col>
-
-          </Col>
+          </Col> }
           <Col offset={18} span={3}>
             <Input
               placeholder="Recherche"
@@ -79,7 +77,7 @@ export default class DataTable extends Component {
               loading={this.props.loading}
               columns={this.props.columns}
               dataSource={data}
-              rowKey={data => data.id}
+              rowKey={(data) => data.id}
               rowSelection={this.props.rowSelection} />
           </Col>
         </Row>

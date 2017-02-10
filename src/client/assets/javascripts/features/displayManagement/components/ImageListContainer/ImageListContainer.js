@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Table, Input, Button } from 'antd';
 
-import { actionCreators as displayManagementActions, selector, NAME as displayManagementName } from '../../';
+import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 import DataTable from 'components/DataTable';
 
 const mapStateToProps = (state) => {
@@ -16,7 +15,7 @@ const mapStateToProps = (state) => {
   return {
     isFetching,
     images
-  }
+  };
 };
 
 @connect(mapStateToProps, (dispatch) => ({
@@ -26,8 +25,8 @@ export default class ImageListContainer extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    isFetching: PropTypes.bool.isRequired,
     images: PropTypes.array.isRequired,
+    isFetching: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -42,7 +41,7 @@ export default class ImageListContainer extends Component {
     this.props.actions.fetchMedia('image');
   }
 
-  onSelectionChange = (selectedRowKeys, selectedRows) => {
+  onSelectionChange = (selectedRowKeys) => {
     this.setState({ selectedRows: selectedRowKeys });
   }
 

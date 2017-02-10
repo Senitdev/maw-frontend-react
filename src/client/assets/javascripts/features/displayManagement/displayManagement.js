@@ -46,11 +46,11 @@ function invalidateMedia(type) {
 }
 
 function fetchMedia(type) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(requestMedia(type));
     return fetch('http://localhost:3001/' + 'entities/1/modules/1/medias/' + type)
-      .then(response => response.json())
-      .then(mediaList => dispatch(receiveMedia(type, mediaList)));
+      .then((response) => response.json())
+      .then((mediaList) => dispatch(receiveMedia(type, mediaList)));
   };
 }
 
