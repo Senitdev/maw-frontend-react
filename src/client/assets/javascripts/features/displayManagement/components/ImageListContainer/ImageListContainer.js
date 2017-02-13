@@ -50,7 +50,7 @@ export default class ImageListContainer extends Component {
   }
 
   onDelete = (id) => {
-
+    this.props.actions.deleteMedia('image', id);
   }
 
   onDeleteSelection = () => {
@@ -89,7 +89,9 @@ export default class ImageListContainer extends Component {
         columns={columns}
         dataSource={this.props.images}
         rowSelection={rowSelection}
-        onRefresh={this.onRefresh} />
+        onRefresh={this.onRefresh}
+        onDelete={this.onDelete}
+        onDeleteSelection={this.onDeleteSelection}/>
     );
   }
 }

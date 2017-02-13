@@ -12,7 +12,8 @@ export const NAME = 'displayManagement';
 const REQUEST_MEDIA = 'maw/displayManagement/REQUEST_MEDIA';
 const RECEIVE_MEDIA = 'maw/displayManagement/RECEIVE_MEDIA';
 const INVALIDATE_MEDIA = 'maw/displayManagement/INVALIDATE_MEDIA';
-
+const DELETE_MEDIA_SUCESS = 'maw/displayManagement/DELETE_MEDIA_SUCESS';
+const DELETE_MEDIA_QUERY = 'maw/displayManagement/DELETE_MEDIA_QUERY';
 // Action creators
 
 function requestMedia(type) {
@@ -54,7 +55,34 @@ function fetchMedia(type) {
   };
 }
 
+/* TODO Actuellement, on rappele fetchMedia après un delete, on devrait simplement
+   supprimer le media supprimé de la liste des médias. Mais j'ai pas réussi a flitrer correctement
+   la liste dans le reducer de l'action DELETE_MEDIA_SUCESS*/
+function deleteMediaSucess(type, id) {
+  return (dispatch) => {
+    dispatch(fetchMedia(type));
+  };
+}
+
+function deleteMediaQuery(type) {
+  return {
+    type: DELETE_MEDIA_QUERY,
+    payload: { type }
+  };
+}
+
+function deleteMedia(type, id) {
+  return (dispatch) => {
+    dispatch(deleteMediaQuery(type));
+    return fetch('http://localhost:3001/' + 'medias/' + id, {
+      method: 'DELETE'
+    }).then(() => dispatch(deleteMediaSucess(type, id)))
+      .catch((error) => console.log("ERROR: " + error));
+  };
+}
+
 export const actionCreators = {
+  deleteMedia,
   invalidateMedia,
   fetchMedia
 };
@@ -80,6 +108,17 @@ const initialState: State = {
 // Reducer
 
 export default function reducer(state: State = initialState, action: any = {}): State {
+  /*function filterObj(obj, id) {
+    var newObj = {};
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if(obj[key].id !== id) {
+          newObj[key] = obj[id];
+        }
+      }
+    }
+    return newObj;
+  }*/
 
   if (!action.payload || !state.mediaByType[action.payload.type]) {
     return state;
@@ -130,11 +169,43 @@ export default function reducer(state: State = initialState, action: any = {}): 
         }
       };
 
+    case DELETE_MEDIA_QUERY:
+      return {
+        ...state,
+        mediaByType: {
+          ...state.mediaByType,
+          [action.payload.type]: {
+            ...state.mediaByType[action.payload.type],
+            isFetching: true,
+            didInvalidate: false
+          }
+        }
+      };
+
+    /* TODO À corriger. Voirs l'action DELETE_MEDIA_SUCESS pour plus d'info */
+    case DELETE_MEDIA_SUCESS:
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById
+        },
+        mediaByType: {
+          ...state.mediaByType,
+          [action.payload.type]: {
+            ...state.mediaByType[action.payload.type],
+            isFetching: false,
+            didInvalidate: false,
+            items: [
+              ...state.mediaByType[action.payload.type].items.filter((id) => id !== action.payload.id)
+            ]
+          }
+        }
+      };
+
     default:
       return state;
   }
 }
-
 // Selectors
 
 const displayManagement = (state) => state[NAME];
