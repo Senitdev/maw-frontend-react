@@ -8,10 +8,10 @@ import ManagementLayout from 'features/core/components/ManagementLayout';
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
 import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
+import LoginContainer from 'features/auth/components/login/LoginContainer';
+import RegisterContainer from 'features/auth/components/register/RegisterContainer';
 
 // Temporaire
-const LoginContainer = () => <div>Login</div>;
-const RegisterContainer = () => <div>Register</div>;
 const VideoList = () => <div>Video list</div>;
 const DisplayList = () => <div>Display list</div>;
 const PlanningList = () => <div>Planning list</div>;
