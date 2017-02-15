@@ -112,6 +112,11 @@ const initialState: State = {
       didInvalidate: true,
       items: []
     },
+    planning: {
+      isFetching: false,
+      didInvalidate: true,
+      items: []
+    },
   },
 };
 
