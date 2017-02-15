@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
+import { Link } from 'react-router';
 
 export default class DataTable extends Component {
 
@@ -9,7 +10,10 @@ export default class DataTable extends Component {
     loading: PropTypes.bool,
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
-    onEdit: PropTypes.func,
+    onEdit: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.string,
+    ]),
     onRefresh: PropTypes.func,
     rowSelection: PropTypes.object,
     title: PropTypes.string,
@@ -65,7 +69,10 @@ export default class DataTable extends Component {
             </Tooltip>
             { this.props.onEdit &&
             <Tooltip placement="bottom" title="Modifier le média">
-              <Button icon="edit" />
+              { typeof this.props.onEdit == 'string' ?
+                <Link to={this.props.onEdit + record.id}><Button icon="edit" /></Link> :
+                <Button icon="edit" onClick={() => {this.props.onEdit(record.id);}} />
+              }
             </Tooltip> }
             { this.props.onDelete &&
             <Tooltip placement="bottom" title="Supprimer le média">

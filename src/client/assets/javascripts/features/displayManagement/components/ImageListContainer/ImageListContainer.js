@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Router } from 'react-router';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 import DataTable from 'components/DataTable';
@@ -38,7 +39,8 @@ export default class ImageListContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.fetchMedia('image');
+    if (this.props.images.length == 0)
+      this.props.actions.fetchMedia('image');
   }
 
   onSelectionChange = (selectedRowKeys) => {
@@ -52,6 +54,8 @@ export default class ImageListContainer extends Component {
   onDelete = (id) => {
     this.props.actions.deleteMedia('image', id);
   }
+
+  onEdit = '/display-management/image/';
 
   onDeleteSelection = () => {
 
@@ -91,6 +95,7 @@ export default class ImageListContainer extends Component {
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
+        onEdit={this.onEdit}
         onDeleteSelection={this.onDeleteSelection}/>
     );
   }
