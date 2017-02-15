@@ -7,6 +7,7 @@ import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
 import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
+import DisplayListContainer from 'features/displayManagement/components/DisplayListContainer';
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
 import VideoListContainer from 'features/displayManagement/components/VideoListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
@@ -14,7 +15,6 @@ import RegisterContainer from 'features/auth/components/register/RegisterContain
 import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
 
 // Temporaire
-const DisplayList = () => <div>Display list</div>;
 const PlanningList = () => <div>Planning list</div>;
 
 export default (
@@ -40,7 +40,7 @@ export default (
           </Route>
           <Route path="video" component={VideoListContainer} />
         </Route>
-        <Route path="display" component={DisplayList} />
+        <Route path="display" component={DisplayListContainer} />
         <Route path="planning" component={PlanningList} />
       </Route>
 
