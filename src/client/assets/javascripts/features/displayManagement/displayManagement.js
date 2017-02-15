@@ -102,6 +102,11 @@ const initialState: State = {
       didInvalidate: true,
       items: []
     },
+    scene: {
+      isFetching: false,
+      didInvalidate: true,
+      items: []
+    },
     display: {
       isFetching: false,
       didInvalidate: true,

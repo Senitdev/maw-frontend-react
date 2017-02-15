@@ -17,7 +17,7 @@ export default class MediaTypeMenu extends Component {
         </Menu.ItemGroup>
         <Menu.Divider />
         <Menu.Item key="scene">
-          <Link to="/display-management/scene"><Icon type="movie" />Scènes</Link>
+          <Link to="/display-management/scene"><Icon type="appstore" />Scènes</Link>
         </Menu.Item>
       </Menu>
     );

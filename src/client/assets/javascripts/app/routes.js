@@ -9,6 +9,7 @@ import DisplayManagementContainer from 'features/displayManagement/components/Di
 import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
 import DisplayListContainer from 'features/displayManagement/components/DisplayListContainer';
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
+import SceneListContainer from 'features/displayManagement/components/SceneListContainer';
 import VideoListContainer from 'features/displayManagement/components/VideoListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
@@ -39,6 +40,7 @@ export default (
             <Route path=":idImage" component={ImageEditForm} />
           </Route>
           <Route path="video" component={VideoListContainer} />
+          <Route path="scene" component={SceneListContainer} />
         </Route>
         <Route path="display" component={DisplayListContainer} />
         <Route path="planning" component={PlanningList} />
