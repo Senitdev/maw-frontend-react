@@ -8,12 +8,12 @@ import ManagementLayout from 'features/core/components/ManagementLayout';
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
 import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
+import VideoListContainer from 'features/displayManagement/components/VideoListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
 import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
 
 // Temporaire
-const VideoList = () => <div>Video list</div>;
 const DisplayList = () => <div>Display list</div>;
 const PlanningList = () => <div>Planning list</div>;
 
@@ -38,7 +38,7 @@ export default (
             <IndexRoute component={ImageListContainer} />
             <Route path=":idImage" component={ImageEditForm} />
           </Route>
-          <Route path="video" component={VideoList} />
+          <Route path="video" component={VideoListContainer} />
         </Route>
         <Route path="display" component={DisplayList} />
         <Route path="planning" component={PlanningList} />
