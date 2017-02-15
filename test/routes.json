@@ -1,5 +1,7 @@
 {
   "/entities/:entId/modules/:modId/medias": "/medias",
   "/entities/:entId/modules/:modId/medias/:type": "/medias?type=:type",
-  "/entities/:entId/modules/:modId/medias/:id": "/medias/:id"
+  "/entities/:entId/modules/:modId/medias/:id": "/medias/:id",
+  "/entities/:entId/modules/:modId/screens": "/screens",
+  "/entities/:entId/modules/:modId/screens/:id": "/screens/:id"
 }

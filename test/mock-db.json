@@ -1,10 +1,86 @@
 {
   "medias": [
-    { "id": 1, "type": "video", "name": "Média 1", "createdAt": 1486652871928},
-    { "id": 2, "type": "image", "name": "Média 2", "createdAt": 1486652871828},
-    { "id": 3, "type": "image", "name": "Média 3", "createdAt": 1486652870928},
-    { "id": 4, "type": "video", "name": "Média 4", "createdAt": 1486652861928},
-    { "id": 5, "type": "image", "name": "Média 5", "createdAt": 1486652851938},
-    { "id": 6, "type": "image", "name": "Média 6", "createdAt": 1486652831958}
+    {
+      "id": 1,
+      "type": "video",
+      "name": "Média 1",
+      "createdAt": 1486652871928
+    },
+    {
+      "id": 2,
+      "type": "image",
+      "name": "Média 2",
+      "createdAt": 1486652871828
+    },
+    {
+      "id": 3,
+      "type": "image",
+      "name": "Média 3",
+      "createdAt": 1486652870928
+    },
+    {
+      "id": 4,
+      "type": "video",
+      "name": "Média 4",
+      "createdAt": 1486652861928
+    },
+    {
+      "id": 5,
+      "type": "image",
+      "name": "Média 5",
+      "createdAt": 1486652851938
+    },
+    {
+      "id": 6,
+      "type": "image",
+      "name": "Média 6",
+      "createdAt": 1486652831958
+    },
+    {
+      "id": 8,
+      "type": "scene",
+      "name": "Média 8",
+      "createdAt": 1486652831958
+    },
+    {
+      "id": 9,
+      "type": "scene",
+      "name": "Média 9",
+      "createdAt": 1486652831958
+    },
+    {
+      "id": 10,
+      "type": "scene",
+      "name": "Média 10",
+      "createdAt": 1486652831958
+    },
+    {
+      "id": 11,
+      "type": "display",
+      "distantVersion": "1",
+      "lastPull": 1486652831900,
+      "media": {}
+    },
+    {
+      "id": 12,
+      "type": "display",
+      "distantVersion": "1",
+      "lastPull": 1486652831901,
+      "media": {}
+    },
+    {
+      "id": 13,
+      "type": "display",
+      "distantVersion": "1",
+      "lastPull": 1486652831902,
+      "media": {}
+    },
+    {
+      "id": 13,
+      "type": "planning",
+      "distantVersion": "1",
+      "lastPull": 1486652831902,
+      "media": {}
+    }
   ]
 }
