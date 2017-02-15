@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, IndexRedirect, Redirect } from 'react-router';
+import { Route, IndexRedirect, Redirect, IndexRoute } from 'react-router';
 
 import App from './App';
 import NotFoundView from 'components/NotFound';
@@ -10,6 +10,7 @@ import MediaLibraryContainer from 'features/displayManagement/components/MediaLi
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
+import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
 
 // Temporaire
 const VideoList = () => <div>Video list</div>;
@@ -33,7 +34,10 @@ export default (
       <Route path="display-management" component={DisplayManagementContainer}>
         <IndexRedirect to="image" />
         <Route component={MediaLibraryContainer}>
-          <Route path="image" component={ImageListContainer} />
+          <Route path="image">
+            <IndexRoute component={ImageListContainer} />
+            <Route path=":idImage" component={ImageEditForm} />
+          </Route>
           <Route path="video" component={VideoList} />
         </Route>
         <Route path="display" component={DisplayList} />
