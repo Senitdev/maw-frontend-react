@@ -5,8 +5,6 @@ import { Icon, Input, Form, Button, Row, Col } from 'antd';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 
-import './ImageList.scss';
-
 class EditFormClass extends Component {
   static propTypes = {
     form: PropTypes.object.isRequired,
