@@ -72,20 +72,15 @@ export default class planningListContainer extends Component {
     };
 
     return (
-      <Layout>
-        <Layout.Header>Agendas</Layout.Header>
-        <Layout.Content>
-          <DataTable
-            title="Agendas"
-            loading={this.props.isFetching}
-            columns={columns}
-            dataSource={this.props.plannings}
-            rowSelection={rowSelection}
-            onRefresh={this.onRefresh}
-            onDelete={this.onDelete}
-            onDeleteSelection={this.onDeleteSelection}/>
-        </Layout.Content>
-      </Layout>
+      <DataTable
+        title="Agendas"
+        loading={this.props.isFetching}
+        columns={columns}
+        dataSource={this.props.plannings}
+        rowSelection={rowSelection}
+        onRefresh={this.onRefresh}
+        onDelete={this.onDelete}
+        onDeleteSelection={this.onDeleteSelection}/>
     );
   }
 }

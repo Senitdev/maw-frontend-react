@@ -6,7 +6,6 @@ import NotFoundView from 'components/NotFound';
 import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
-import MediaLibraryContainer from 'features/displayManagement/components/MediaLibraryContainer';
 import PlanningListContainer from 'features/displayManagement/components/PlanningListContainer';
 import DisplayListContainer from 'features/displayManagement/components/DisplayListContainer';
 import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
@@ -31,15 +30,13 @@ export default (
       <IndexRedirect to="display-management" />
 
       <Route path="display-management" component={DisplayManagementContainer}>
-        <IndexRedirect to="image" />
-        <Route component={MediaLibraryContainer}>
-          <Route path="image">
-            <IndexRoute component={ImageListContainer} />
-            <Route path=":idImage" component={ImageEditForm} />
-          </Route>
-          <Route path="video" component={VideoListContainer} />
-          <Route path="scene" component={SceneListContainer} />
+        <IndexRedirect to="planning" />
+        <Route path="image">
+          <IndexRoute component={ImageListContainer} />
+          <Route path=":idImage" component={ImageEditForm} />
         </Route>
+        <Route path="video" component={VideoListContainer} />
+        <Route path="scene" component={SceneListContainer} />
         <Route path="display" component={DisplayListContainer} />
         <Route path="planning" component={PlanningListContainer} />
       </Route>

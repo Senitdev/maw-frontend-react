@@ -84,20 +84,15 @@ export default class DisplayListContainer extends Component {
     };
 
     return (
-      <Layout>
-        <Layout.Header>Écrans</Layout.Header>
-        <Layout.Content>
-          <DataTable
-            title="Écrans"
-            loading={this.props.isFetching}
-            columns={columns}
-            dataSource={this.props.displays}
-            rowSelection={rowSelection}
-            onRefresh={this.onRefresh}
-            onDelete={this.onDelete}
-            onDeleteSelection={this.onDeleteSelection}/>
-        </Layout.Content>
-      </Layout>
+      <DataTable
+        title="Écrans"
+        loading={this.props.isFetching}
+        columns={columns}
+        dataSource={this.props.displays}
+        rowSelection={rowSelection}
+        onRefresh={this.onRefresh}
+        onDelete={this.onDelete}
+        onDeleteSelection={this.onDeleteSelection}/>
     );
   }
 }
