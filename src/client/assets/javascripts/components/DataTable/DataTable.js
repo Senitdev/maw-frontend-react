@@ -143,7 +143,6 @@ export default class DataTable extends Component {
               placeholder="Recherche"
               value={this.state.searchText}
               onChange={this.onInputChange}
-              onPressEnter={this.onSearch}
             />
           </Col>
           <Col offset={5} span={5}>
