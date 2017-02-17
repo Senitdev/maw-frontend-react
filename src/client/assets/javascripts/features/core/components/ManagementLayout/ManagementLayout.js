@@ -44,7 +44,7 @@ export default class ManagementLayout extends Component {
                         style={{zIndex: '2', bottom: '0'}}>
             <SideMenu collapsed={collapsedSideMenu} />
           </Layout.Sider>
-          <Layout.Content style={{zIndex: '1', overflowY: 'scroll'}}>
+          <Layout.Content style={{zIndex: '1'}}>
             {this.props.children}
           </Layout.Content>
         </Layout>

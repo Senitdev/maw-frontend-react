@@ -9,8 +9,9 @@ export default class PlanningEditorContainer extends Component {
     return (
       <Layout style={{ height: 'auto' }}>
         <Layout.Sider><MediaListContainer /></Layout.Sider>
-        <Layout.Content>
-          <Layout.Content><CalendarContainer /></Layout.Content>
+        <Layout.Content
+         style={{ padding: '5px', backgroundColor: '#f1f1f1' }}>
+          <CalendarContainer />
         </Layout.Content>
       </Layout>
     );

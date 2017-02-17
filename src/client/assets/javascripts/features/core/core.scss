@@ -2,10 +2,22 @@
   height: auto;
   min-height: 100%;
 }
-$primary-color: #eee;
+$primary-color: #f8f8f8;
 #coreLayout > .ant-layout-header {
   background-color: $primary-color !important;
+  z-index: 2;
+  box-shadow: 0px -3px 14px 0px rgba(184,184,184,0.55);
 }
 #coreLayout > div > .ant-layout-sider {
   background-color: $primary-color !important;
+  box-shadow: 3px 0px 10px 0px rgba(184,184,184,0.15);
+}
+
+.ant-menu {
+  background: none;
+}
+
+.ant-layout-sider-trigger {
+  background-color: #eee;
+  color: #000;
 }
