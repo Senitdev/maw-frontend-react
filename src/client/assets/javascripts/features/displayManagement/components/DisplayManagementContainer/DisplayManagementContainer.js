@@ -5,9 +5,9 @@ export default class DisplayManagementContainer extends Component {
 
   render() {
     return (
-      <Layout>
+      <Layout id={'displayManagementLayout'}>
         <Layout.Header>Titre TODO: le rendre dynamic</Layout.Header>
-        <Layout.Content style={{paddingTop: '8px'}}>
+        <Layout.Content>
           {this.props.children}
         </Layout.Content>
       </Layout>

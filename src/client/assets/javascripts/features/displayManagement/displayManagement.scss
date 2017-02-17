@@ -1,0 +1,10 @@
+#displayManagementLayout {
+
+}
+$primary-color: rgb(232, 232, 232);
+#displayManagementLayout > .ant-layout-header {
+  background-color: $primary-color !important;
+}
+#displayManagementLayout > div > div > .ant-layout-sider {
+  background-color: $primary-color !important;
+}

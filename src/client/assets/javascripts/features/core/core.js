@@ -4,6 +4,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { State } from 'models/core';
 
+import './core.scss';
 // Action Types
 
 const COLLAPSE_SIDE_MENU = 'maw/core/COLLAPSE_SIDE_MENU';

@@ -1,0 +1,11 @@
+#coreLayout {
+  height: auto;
+  min-height: 100%;
+}
+$primary-color: #eee;
+#coreLayout > .ant-layout-header {
+  background-color: $primary-color !important;
+}
+#coreLayout > div > .ant-layout-sider {
+  background-color: $primary-color !important;
+}

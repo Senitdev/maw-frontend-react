@@ -5,6 +5,8 @@ import fetch from 'isomorphic-fetch';
 
 import { State } from 'models/displayManagement';
 
+import './displayManagement.scss';
+
 export const NAME = 'displayManagement';
 
 // Action types

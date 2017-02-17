@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Layout } from 'antd';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 import DataTable from 'components/DataTable';
