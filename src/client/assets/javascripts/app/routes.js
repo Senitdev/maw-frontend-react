@@ -14,6 +14,7 @@ import VideoListContainer from 'features/displayManagement/components/VideoListC
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
 import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
+import PlanningEditorContainer from 'features/displayManagement/components/PlanningEditorContainer';
 
 export default (
   <Route component={App}>
@@ -38,7 +39,11 @@ export default (
         <Route path="video" component={VideoListContainer} />
         <Route path="scene" component={SceneListContainer} />
         <Route path="display" component={DisplayListContainer} />
-        <Route path="planning" component={PlanningListContainer} />
+        <Route path="planning">
+          <IndexRoute component={PlanningListContainer} />
+          <Route path=":idPlanning" component={PlanningEditorContainer} />
+        </Route>
+
       </Route>
 
     </Route>
