@@ -13,8 +13,14 @@
 .gutter-example .ant-row > div {
   background: transparent;
 }
-.gutter-box {
+.media-gutter-box {
   padding: 5px 0;
   border: 0px solid black;
   margin-top: 5px;
+  cursor: pointer;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
