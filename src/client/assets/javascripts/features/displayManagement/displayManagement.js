@@ -14,6 +14,9 @@ const RECEIVE_MEDIA = 'maw/displayManagement/RECEIVE_MEDIA';
 const INVALIDATE_MEDIA = 'maw/displayManagement/INVALIDATE_MEDIA';
 const DELETE_MEDIA_SUCESS = 'maw/displayManagement/DELETE_MEDIA_SUCESS';
 const DELETE_MEDIA_QUERY = 'maw/displayManagement/DELETE_MEDIA_QUERY';
+const ERROR_CONFIRMED = 'maw/displayManagement/ERROR_CONFIRMED';
+const ERROR_RAISED = 'maw/displayManagement/ERROR_RAISED';
+
 // Action creators
 
 function requestMedia(type) {
@@ -50,8 +53,13 @@ function fetchMedia(type) {
   return (dispatch) => {
     dispatch(requestMedia(type));
     return fetch('http://localhost:3001/' + 'entities/1/modules/1/medias/' + type)
-      .then((response) => response.json())
-      .then((mediaList) => dispatch(receiveMedia(type, mediaList)));
+      .then((response) => {
+        if (response.status >= 400)
+          errorHandler(response.status)(dispatch);
+        return response.json();
+      }).then((mediaList) => {
+        dispatch(receiveMedia(type, mediaList));
+      }).catch((error) => errorHandler(error)(dispatch));
   };
 }
 
@@ -77,11 +85,35 @@ function deleteMedia(type, id) {
     return fetch('http://localhost:3001/' + 'medias/' + id, {
       method: 'DELETE'
     }).then(() => dispatch(deleteMediaSucess(type, id)))
-      .catch((error) => console.log("ERROR: " + error));
+      .catch((error) => errorHandler(error)(dispatch));
+  };
+}
+
+function errorHandler(error) {
+  if(error >= 400) {
+    return (dispatch) => dispatch(errorRaised(error, "L'action n'a pas pu être exécuter par le serveur. Vous pouvez essayer de vider le cache de votre navigateur et le redémarrer si le problème persiste."));
+  } else {
+    return (dispatch) => dispatch(errorRaised(error, "Les serveurs sont inatteignables. Veuillez réessayer ultérieurement."));
+  }
+}
+
+function errorRaised(error, message) {
+  return {
+    type: ERROR_RAISED,
+    payload: { error, message }
+  };
+}
+
+function errorConfirmed(errorId) {
+  console.log(errorId);
+  return {
+    type: ERROR_CONFIRMED,
+    payload: { errorId }
   };
 }
 
 export const actionCreators = {
+  errorConfirmed,
   deleteMedia,
   invalidateMedia,
   fetchMedia
@@ -118,28 +150,44 @@ const initialState: State = {
       items: []
     },
   },
+  error: [],
 };
 
 // Reducer
 
 export default function reducer(state: State = initialState, action: any = {}): State {
-  /*function filterObj(obj, id) {
-    var newObj = {};
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if(obj[key].id !== id) {
-          newObj[key] = obj[id];
-        }
-      }
-    }
-    return newObj;
-  }*/
 
-  if (!action.payload || !state.mediaByType[action.payload.type]) {
+  if (!action.payload) {
     return state;
   }
 
   switch (action.type) {
+
+    case ERROR_RAISED:
+      return {
+        ...state,
+        error: [
+          ...state.error,
+          {
+            id: state.error.length,
+            error: action.payload.error,
+            message: action.payload.message,
+            time: Date.now(),
+            confirmed: false
+          }
+        ]
+      };
+
+    case ERROR_CONFIRMED:
+      return {
+        ...state,
+        error: state.error.map((error) => {
+                            if (error.id === action.payload.errorId)
+                              return { ...error, confirmed: true };
+                            else
+                              return {...error};
+                          })
+      };
 
     case REQUEST_MEDIA:
      return {

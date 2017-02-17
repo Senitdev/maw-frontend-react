@@ -1,12 +1,27 @@
 import React, { Component, PropTypes } from 'react';
-import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Alert, Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
 import { Link } from 'react-router';
 
+import { actionCreators as displayManagementActions, NAME as displayManagementName } from 'features/displayManagement';
+
+const mapStateToProps = (state) => {
+  const { error } = state[displayManagementName];
+
+  return { error };
+};
+
+@connect(mapStateToProps, (dispatch) => ({
+  actions: bindActionCreators(displayManagementActions, dispatch)
+}))
 export default class DataTable extends Component {
 
   static propTypes = {
+    actions: PropTypes.object.isRequired,
     columns: PropTypes.arrayOf(PropTypes.object),
     dataSource: PropTypes.arrayOf(PropTypes.object),
+    error: PropTypes.arrayOf(PropTypes.object),
     loading: PropTypes.bool,
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
@@ -54,7 +69,6 @@ export default class DataTable extends Component {
 
     const data = !this.state.searchText ? this.props.dataSource : this.search();
     const columns = [
-
       ...this.props.columns,
       {
         title: 'Actions',
@@ -93,9 +107,24 @@ export default class DataTable extends Component {
         </Menu.Item>
       </Menu>
     );
+    var errors = [];
+    for (let i=0; i<this.props.error.length; i++) {
+      if(!this.props.error[i].confirmed)
+        errors.push(<Alert message={"Une erreur est survenu: " + this.props.error[i].error}
+                           description={this.props.error[i].message}
+                           key={"errorId:"+i}
+                           type="error"
+                           closable
+                           onClose={() => this.props.actions.errorConfirmed(i)} />);
+    }
 
     return (
       <div>
+        <Row>
+          <Col offset={1} span={22}>
+            {errors}
+          </Col>
+        </Row>
         <Row>
           <Col offset={1} span={22}>
             <h1>{this.props.title}</h1>
