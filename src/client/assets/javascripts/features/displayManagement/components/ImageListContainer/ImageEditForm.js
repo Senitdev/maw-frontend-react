@@ -11,7 +11,7 @@ class EditFormClass extends Component {
     name: PropTypes.string.isRequired
   }
 
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
 
     this.props.form.validateFields((err, values) => {
