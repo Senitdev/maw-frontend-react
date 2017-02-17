@@ -32,9 +32,9 @@ export default (
 
       <Route path="display-management" component={DisplayManagementContainer}>
         <IndexRedirect to="planning" />
-        <Route path="image">
+        <Route path="image" name="Images">
           <IndexRoute component={ImageListContainer} />
-          <Route path=":idImage" component={ImageEditForm} />
+          <Route path=":idImage" component={ImageEditForm} name="Image édition" />
         </Route>
         <Route path="video" component={VideoListContainer} />
         <Route path="scene" component={SceneListContainer} />
