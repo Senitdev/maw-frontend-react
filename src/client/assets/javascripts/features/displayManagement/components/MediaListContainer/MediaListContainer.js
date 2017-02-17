@@ -15,23 +15,9 @@ import './MediaList.scss';
 @connect((state) => {
   const { mediaById, mediaByType } = state[displayManagementName];
 
-  const images = mediaByType['image'].items.map((id) =>
-    <Col key={id.toString()} className="gutter-row" span={8}>
-      <div className="media-gutter-box"><Icon type="video-camera" /><br />{mediaById[id].name}</div>
-    </Col>
-  );
-
-  const videos = mediaByType['video'].items.map((id) =>
-    <Col key={id.toString()} className="gutter-row" span={8}>
-      <div className="media-gutter-box"><Icon type="video-camera" /><br />{mediaById[id].name}</div>
-    </Col>
-  );
-
-
   return {
     mediaByType,
-    images,
-    videos
+    mediaById
   };
 
 }, (dispatch) => ({
@@ -41,17 +27,27 @@ export default class MediaListContainer extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    images: PropTypes.array.isRequired,
+    mediaById: PropTypes.object.isRequired,
     mediaByType: PropTypes.object.isRequired,
-    videos: PropTypes.array.isRequired,
   };
 
-  componentDidMount() {
-    if (this.props.images.length == 0)
-      this.props.actions.fetchMedia('image');
-    if (this.props.videos.length == 0)
-      this.props.actions.fetchMedia('video');
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchText: '',
+    };
+  }
 
+  componentDidMount() {
+    this.props.actions.fetchMedia('image');
+  if (this.props.mediaByType['image'].items.length == 0)
+      this.props.actions.fetchMedia('image');
+      if (this.props.mediaByType['video'].items.length == 0)
+      this.props.actions.fetchMedia('video');
+  }
+
+  onInputChange = (e) => {
+    this.setState({ searchText: e.target.value });
   }
 
   render() {
@@ -72,22 +68,46 @@ export default class MediaListContainer extends Component {
       });
     });
 
+    const reg = new RegExp(this.state.searchText, 'gi');
+
+    const images = this.props.mediaByType['image'].items.map((id) => {
+      if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
+        return (
+          <Col key={id.toString()} className="gutter-row" span={8}>
+            <div className="media-gutter-box"><Icon type="user" /><br />{this.props.mediaById[id].name}</div>
+          </Col>
+        );
+      else
+        return null;
+    });
+
+    const videos = this.props.mediaByType['video'].items.map((id) => {
+      if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
+        return (
+          <Col key={id.toString()} className="gutter-row" span={8}>
+            <div className="media-gutter-box"><Icon type="video-camera" /><br />{this.props.mediaById[id].name}</div>
+          </Col>
+        );
+      else
+        return null;
+    });
+
     return (
       <div id="media-list-container" className="media-list-container">
         <Row justify="center" align="top">
           <Col offset={1} span={6}><h2>Media</h2></Col>
           <Col span={16}><Input.Search
             placeholder="Recherche"
-            onSearch={(value) => console.log(value)}
+            onChange={this.onInputChange}
           /></Col>
         </Row>
         <Row className="group-media-list" gutter={16}>
           <Col offset={1} span={23}><h3>Vidéos</h3></Col>
-          {this.props.videos}
+          {videos}
         </Row>
         <Row className="group-media-list" gutter={16}>
           <Col offset={1} span={23}><h3>Images</h3></Col>
-          {this.props.images}
+          {images}
         </Row>
       </div>
     );
