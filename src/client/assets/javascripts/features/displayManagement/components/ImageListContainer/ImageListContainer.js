@@ -54,8 +54,6 @@ export default class ImageListContainer extends Component {
     this.props.actions.deleteMedia('image', id);
   }
 
-  onEdit = '/display-management/image/';
-
   onDeleteSelection = () => {
 
   }
@@ -94,7 +92,7 @@ export default class ImageListContainer extends Component {
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
-        onEdit={this.onEdit}
+        onEdit="/display-management/image/"
         onDeleteSelection={this.onDeleteSelection}/>
     );
   }

@@ -80,6 +80,7 @@ export default class planningListContainer extends Component {
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
+        onEdit="/display-management/planning/"
         onDeleteSelection={this.onDeleteSelection}/>
     );
   }
