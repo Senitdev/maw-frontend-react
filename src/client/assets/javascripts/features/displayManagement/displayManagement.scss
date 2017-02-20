@@ -4,6 +4,7 @@
 $primary-color: #f4f4f4;
 #displayManagementLayout > .ant-layout-header {
   background-color: $primary-color !important;
+  border-bottom: solid 1px #ddd;
 }
 #displayManagementLayout > div > div > .ant-layout-sider {
   background-color: $primary-color !important;
