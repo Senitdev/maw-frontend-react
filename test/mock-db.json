@@ -1,47 +1,78 @@
-{
+{ "files": [
+  {
+    "id": 1,
+    "type": "video",
+    "name": "Média 1",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 3,
+    "type": "image",
+    "name": "Média 3",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 4,
+    "type": "video",
+    "name": "Média 4",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 5,
+    "type": "image",
+    "name": "Média 5",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 6,
+    "type": "image",
+    "name": "Média 6",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 15,
+    "type": "image",
+    "name": "Média 15",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 16,
+    "type": "image",
+    "name": "Média 16",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  },
+  {
+    "id": 17,
+    "type": "image",
+    "name": "Média 17",
+    "width": "1920",
+    "height": "1080",
+    "weight": "200",
+    "createdAt": 1486652870928
+  }
+],
   "medias": [
-    {
-      "id": 1,
-      "type": "video",
-      "name": "Média 1",
-      "createdAt": 1486652871928
-    },
-    {
-      "id": 2,
-      "type": "image",
-      "name": "Média 2",
-      "createdAt": 1486652871828
-    },
-    {
-      "id": 3,
-      "type": "image",
-      "name": "Média 3",
-      "createdAt": 1486652870928
-    },
-    {
-      "id": 4,
-      "type": "video",
-      "name": "Média 4",
-      "createdAt": 1486652861928
-    },
-    {
-      "id": 5,
-      "type": "image",
-      "name": "Média 5",
-      "createdAt": 1486652851938
-    },
-    {
-      "id": 6,
-      "type": "image",
-      "name": "Média 6",
-      "createdAt": 1486652831958
-    },
-    {
-      "id": 9,
-      "type": "scene",
-      "name": "Média 9",
-      "createdAt": 1486652831958
-    },
     {
       "id": 10,
       "type": "scene",
@@ -75,24 +106,6 @@
       "distantVersion": "1",
       "lastPull": 1486652831902,
       "media": {}
-    },
-    {
-      "id": 15,
-      "type": "image",
-      "name": "Média 15",
-      "createdAt": 1486652871828
-    },
-    {
-      "id": 16,
-      "type": "image",
-      "name": "Média 16",
-      "createdAt": 1486652871828
-    },
-    {
-      "id": 17,
-      "type": "image",
-      "name": "Média 17",
-      "createdAt": 1486652871828
     }
   ]
 }

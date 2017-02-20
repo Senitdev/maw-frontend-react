@@ -72,6 +72,17 @@ export default class ImageListContainer extends Component {
         sorter: (a, b) => a.id - b.id
       },
       {
+        title: 'Résolution',
+        key: 'resolution',
+        render: (img) => <span>{img.width}x{img.height} (px)</span>,
+      },
+      {
+        title: 'Poid',
+        key: 'weight',
+        sorter: (a, b) => a.id - b.id,
+        render: (img) => <span>{img.weight} (Ko)</span>
+      },
+      {
         title: 'Date de création',
         dataIndex: 'createdAt',
         key: 'createdAt',

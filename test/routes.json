@@ -3,5 +3,8 @@
   "/entities/:entId/modules/:modId/medias/:type": "/medias?type=:type",
   "/entities/:entId/modules/:modId/medias/:id": "/medias/:id",
   "/entities/:entId/modules/:modId/screens": "/screens",
-  "/entities/:entId/modules/:modId/screens/:id": "/screens/:id"
+  "/entities/:entId/modules/:modId/screens/:id": "/screens/:id",
+  "/entities/:entId/modules/:modId/files": "/files",
+  "/entities/:entId/modules/:modId/files/:typeIn": "/files?type=:typeIn",
+  "/entities/:entId/modules/:modId/files/:id": "/files/:id"
 }

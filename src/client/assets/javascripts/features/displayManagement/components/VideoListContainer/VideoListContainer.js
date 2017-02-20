@@ -71,6 +71,17 @@ export default class VideoListContainer extends Component {
         sorter: (a, b) => a.id - b.id
       },
       {
+        title: 'Résolution',
+        key: 'resolution',
+        render: (video) => <span>{video.width}x{video.height} (px)</span>,
+      },
+      {
+        title: 'Poid',
+        key: 'weight',
+        sorter: (a, b) => a.id - b.id,
+        render: (video) => <span>{video.weight} (Ko)</span>
+      },
+      {
         title: 'Date de création',
         dataIndex: 'createdAt',
         key: 'createdAt',

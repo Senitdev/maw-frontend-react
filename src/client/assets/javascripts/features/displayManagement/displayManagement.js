@@ -2,6 +2,7 @@
 
 import { createStructuredSelector } from 'reselect';
 import fetch from 'isomorphic-fetch';
+import $ from 'jquery';
 
 import { State } from 'models/displayManagement';
 
@@ -52,9 +53,18 @@ function invalidateMedia(type) {
 }
 
 function fetchMedia(type) {
+  let url;
+  if (type == 'image' || type == 'video')
+    url = 'entities/1/modules/1/files/' + type + '?' + $.param({
+      'withExtendedMedia': true
+    });
+  else
+    url = 'entities/1/modules/1/medias/' + type + '?' + $.param({
+      'withExtendedMedia': true
+    });
   return (dispatch) => {
     dispatch(requestMedia(type));
-    return fetch('http://localhost:3001/' + 'entities/1/modules/1/medias/' + type)
+    return fetch('http://localhost:3001/' + url)
       .then((response) => {
         if (response.status >= 400)
           errorHandler(response.status)(dispatch);
