@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
 
@@ -30,7 +30,8 @@ export default class CalendarContainer extends Component {
           end: '20:00',
       },
       minTime: '07:00:00',
-      maxTime: '20:00:00'
+      maxTime: '20:00:00',
+      eventOverlap: false
     });
 
     // Suppression des numéros des jours (affichage seulement de lun., etc)
