@@ -1,0 +1,19 @@
+#calendar-container {
+  overflow: hidden;
+}
+
+.calendar-details {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.calendar-details > div {
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+.calendar-details-affix {
+  text-align: right;
+  font-style: italic;
+}
