@@ -13,3 +13,12 @@ $primary-color: #f4f4f4;
 #displayManagementLayout > .ant-layout-content {
   background-color: #f1f1f1;
 }
+
+#displayManagementLayout .display-management-content-layout {
+  height: auto;
+}
+
+#displayManagementLayout .ant-layout-content {
+  padding: 5px;
+  background-color: #f1f1f1;
+}

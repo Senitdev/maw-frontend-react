@@ -12,6 +12,8 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import './MediaList.scss';
 
+import { MediaTypes } from 'models/displayManagement';
+
 @connect((state) => {
   const { mediaById, mediaByType } = state[displayManagementName];
 
@@ -39,11 +41,10 @@ export default class MediaListContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.fetchMedia('image');
-  if (this.props.mediaByType['image'].items.length == 0)
-      this.props.actions.fetchMedia('image');
-      if (this.props.mediaByType['video'].items.length == 0)
-      this.props.actions.fetchMedia('video');
+    for (let key of Object.keys(MediaTypes)) {
+      if (this.props.mediaByType[MediaTypes[key].key].items.length == 0)
+        this.props.actions.fetchMedia(MediaTypes[key].key);
+    }
   }
 
   onInputChange = (e) => {
@@ -70,27 +71,35 @@ export default class MediaListContainer extends Component {
 
     const reg = new RegExp(this.state.searchText, 'gi');
 
-    const images = this.props.mediaByType['image'].items.map((id) => {
-      if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
-        return (
-          <Col key={id.toString()} className="gutter-row" span={8}>
-            <div className="media-gutter-box"><Icon type="user" /><br />{this.props.mediaById[id].name}</div>
-          </Col>
-        );
-      else
-        return null;
-    });
+    const medias = [];
+    const groupsMedia = [];
 
-    const videos = this.props.mediaByType['video'].items.map((id) => {
-      if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
-        return (
-          <Col key={id.toString()} className="gutter-row" span={8}>
-            <div className="media-gutter-box"><Icon type="video-camera" /><br />{this.props.mediaById[id].name}</div>
-          </Col>
-        );
-      else
-        return null;
-    });
+    for (let key of Object.keys(MediaTypes)) {
+      medias[MediaTypes[key].key] = this.props.mediaByType[MediaTypes[key].key].items.map((id) => {
+        if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
+          return (
+            <Col key={id.toString()} className="gutter-row" span={8}>
+              <div
+                className="media-gutter-box"
+                id={this.props.mediaById[id].id}
+                >
+                <Icon type="user" />
+                <br />
+                {this.props.mediaById[id].name}
+              </div>
+            </Col>
+          );
+        else
+          return null;
+      });
+
+      groupsMedia.push(
+        <Row className="group-media-list" gutter={16} key={MediaTypes[key].key}>
+          <Col offset={1} span={23}><h3>{MediaTypes[key].name}</h3></Col>
+          {medias[MediaTypes[key].key]}
+        </Row>
+      );
+    }
 
     return (
       <div id="media-list-container" className="media-list-container">
@@ -101,14 +110,7 @@ export default class MediaListContainer extends Component {
             onChange={this.onInputChange}
           /></Col>
         </Row>
-        <Row className="group-media-list" gutter={16}>
-          <Col offset={1} span={23}><h3>Vidéos</h3></Col>
-          {videos}
-        </Row>
-        <Row className="group-media-list" gutter={16}>
-          <Col offset={1} span={23}><h3>Images</h3></Col>
-          {images}
-        </Row>
+        {groupsMedia}
       </div>
     );
   }

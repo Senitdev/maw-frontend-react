@@ -15,6 +15,7 @@ import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
 import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
 import PlanningEditorContainer from 'features/displayManagement/components/PlanningEditorContainer';
+import SceneEditorContainer from 'features/displayManagement/components/SceneEditorContainer';
 
 export default (
   <Route component={App}>
@@ -37,7 +38,10 @@ export default (
           <Route path=":idImage" component={ImageEditForm} name="Image édition" />
         </Route>
         <Route path="video" component={VideoListContainer} />
-        <Route path="scene" component={SceneListContainer} />
+        <Route path="scene">
+          <IndexRoute component={SceneListContainer} />
+          <Route path=":idScene" component={SceneEditorContainer} />
+        </Route>
         <Route path="display" component={DisplayListContainer} />
         <Route path="planning">
           <IndexRoute component={PlanningListContainer} />

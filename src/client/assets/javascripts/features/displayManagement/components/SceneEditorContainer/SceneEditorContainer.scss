@@ -1,0 +1,19 @@
+#scene-list-container .ant-layout-sider{
+  background: none;
+}
+
+#scene-list-container > div {
+  height: 100%;
+}
+
+#scene-editor-list li {
+  padding: 5px;
+}
+
+#scene-editor-list li.selected {
+  background-color: #ddd;
+}
+
+#scene-editor-list button {
+  float: right;
+}

@@ -28,7 +28,11 @@ export default class DisplayManagementContainer extends Component {
       if (paths[i] !== 'display-management' && paths[i] !== '')
         pathsView.push(
           <Breadcrumb.Item key={paths[i]}>
-            <Link to={'/display-management/' + paths[i]}> {this.pathConnection(paths[i])} </Link>
+            { (i < 3) ?
+              <Link to={'/display-management/' + paths[i]}> {this.pathConnection(paths[i])} </Link>
+              :
+              <span> {this.pathConnection(paths[i])} </span>
+            }
           </Breadcrumb.Item>
         );
     }

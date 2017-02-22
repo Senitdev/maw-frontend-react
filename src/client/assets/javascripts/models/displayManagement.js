@@ -13,6 +13,21 @@ interface Image extends Media {
 
 }
 
+export const MediaTypes = {
+  IMAGE: {
+    key: 'image',
+    name: 'Images',
+  },
+  VIDEO: {
+    key: 'video',
+    name: 'Vidéos',
+  },
+  PLANNING: {
+    key: 'planning',
+    name: 'Plannings',
+  },
+};
+
 export type State = {
   mediaById: Array<Media>,
   mediaByType: {[key: string]: {
