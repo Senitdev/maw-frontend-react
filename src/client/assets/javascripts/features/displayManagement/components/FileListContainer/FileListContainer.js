@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable, { EditableCell } from 'components/DataTable';
+import DataTable, { EditableCell } from 'features/displayManagement/components/DataTable';
 
 const mapStateToProps = (state) => {
   const { mediaById, file } = state[displayManagementName];

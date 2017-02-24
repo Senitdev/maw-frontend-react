@@ -1,18 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
 import { Link } from 'react-router';
 
-import { actionCreators as displayManagementActions } from 'features/displayManagement';
+import { ModalFileViewer } from '../MediaViewers';
 
-@connect(undefined, (dispatch) => ({
-  actions: bindActionCreators(displayManagementActions, dispatch)
-}))
 export default class DataTable extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
     columns: PropTypes.arrayOf(PropTypes.object),
     dataSource: PropTypes.arrayOf(PropTypes.object),
     error: PropTypes.arrayOf(PropTypes.object),
@@ -71,9 +65,7 @@ export default class DataTable extends Component {
         width: 110,
         render: (undefined, record) => (
           <span>
-            <Tooltip placement="left" title="Prévisualiser le média">
-              <Button icon="eye" />
-            </Tooltip>
+            <ModalFileViewer file={record} />
             { this.props.onEdit &&
             <Tooltip placement="bottom" title="Modifier le média">
               { typeof this.props.onEdit == 'string' ?
@@ -93,7 +85,9 @@ export default class DataTable extends Component {
       <Menu>
         { this.props.onDeleteSelection &&
         <Menu.Item key="deleteSelected">
-          <Tooltip placement="left" title="Supprime tout les éléments sélectionnés dans la liste"><Icon type="delete" /> Supprimer la sélection</Tooltip>
+          <Tooltip placement="left" title="Supprime tout les éléments sélectionnés dans la liste">
+            <Button onClick={this.props.onDeleteSelection}><Icon type="delete" />Supprimer la sélection</Button>
+          </Tooltip>
         </Menu.Item> }
       </Menu>
     );
