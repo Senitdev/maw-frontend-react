@@ -71,6 +71,7 @@ export default class FileListContainer extends Component {
       {
         title: 'Nom',
         key: 'name',
+        width: 350,
         sorter: (a, b) => a.id - b.id,
         render: (file) => <EditableCell file={file} field={'name'} onEdit={this.onEdit} />
       },
@@ -84,6 +85,12 @@ export default class FileListContainer extends Component {
         key: 'weight',
         sorter: (a, b) => a.id - b.id,
         render: (file) => <span>{file.weight} (Ko)</span>
+      },
+      {
+        title: 'mimetype',
+        dataIndex: 'mimetype',
+        key: 'mimetype',
+        sorter: (a, b) => a.id - b.id,
       },
       {
         title: 'Date de création',
