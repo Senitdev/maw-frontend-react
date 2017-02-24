@@ -15,7 +15,9 @@ import './MediaList.scss';
 import { MediaTypes } from 'models/displayManagement';
 
 @connect((state) => {
-  const { mediaById, mediaByType } = state[displayManagementName];
+  const { mediaById, file, scene, agenda } = state[displayManagementName];
+
+  const mediaByType = { file, scene, agenda };
 
   return {
     mediaByType,
@@ -41,10 +43,9 @@ export default class MediaListContainer extends Component {
   }
 
   componentDidMount() {
-    for (let key of Object.keys(MediaTypes)) {
-      if (this.props.mediaByType[MediaTypes[key].key].items.length == 0)
-        this.props.actions.fetchMedia(MediaTypes[key].key);
-    }
+    this.props.actions.fetchMediaList('file');
+    this.props.actions.fetchMediaList('scene');
+    this.props.actions.fetchMediaList('agenda');
   }
 
   onInputChange = (e) => {

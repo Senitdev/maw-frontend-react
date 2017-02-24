@@ -6,15 +6,13 @@ import NotFoundView from 'components/NotFound';
 import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
-import PlanningListContainer from 'features/displayManagement/components/PlanningListContainer';
-import DisplayListContainer from 'features/displayManagement/components/DisplayListContainer';
-import ImageListContainer from 'features/displayManagement/components/ImageListContainer';
+import AgendaListContainer from 'features/displayManagement/components/AgendaListContainer';
+import ScreenListContainer from 'features/displayManagement/components/ScreenListContainer';
 import SceneListContainer from 'features/displayManagement/components/SceneListContainer';
-import VideoListContainer from 'features/displayManagement/components/VideoListContainer';
+import FileListContainer from 'features/displayManagement/components/FileListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
-import { ImageEditForm } from 'features/displayManagement/components/ImageListContainer';
-import PlanningEditorContainer from 'features/displayManagement/components/PlanningEditorContainer';
+import AgendaEditorContainer from 'features/displayManagement/components/AgendaEditorContainer';
 import SceneEditorContainer from 'features/displayManagement/components/SceneEditorContainer';
 
 export default (
@@ -32,20 +30,16 @@ export default (
       <IndexRedirect to="display-management" />
 
       <Route path="display-management" component={DisplayManagementContainer}>
-        <IndexRedirect to="planning" />
-        <Route path="image" name="Images">
-          <IndexRoute component={ImageListContainer} />
-          <Route path=":idImage" component={ImageEditForm} name="Image édition" />
-        </Route>
-        <Route path="video" component={VideoListContainer} />
+        <IndexRedirect to="agenda" />
+        <Route path="file" component={FileListContainer} />
         <Route path="scene">
           <IndexRoute component={SceneListContainer} />
           <Route path=":idScene" component={SceneEditorContainer} />
         </Route>
-        <Route path="display" component={DisplayListContainer} />
-        <Route path="planning">
-          <IndexRoute component={PlanningListContainer} />
-          <Route path=":idPlanning" component={PlanningEditorContainer} />
+        <Route path="screen" component={ScreenListContainer} />
+        <Route path="agenda">
+          <IndexRoute component={AgendaListContainer} />
+          <Route path=":idAgenda" component={AgendaEditorContainer} />
         </Route>
 
       </Route>

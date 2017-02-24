@@ -6,15 +6,13 @@ export default class DisplayManagementContainer extends Component {
 
   pathConnection(path) {
     switch (path) {
-      case 'image':
-        return 'Images';
-      case 'video':
-        return 'Vidéos';
+      case 'file':
+        return 'Fichiers';
       case 'scene':
         return 'Scènes';
-      case 'display':
+      case 'screen':
         return 'Écrans';
-      case 'planning':
+      case 'agenda':
         return 'Agendas';
       default:
         return path;

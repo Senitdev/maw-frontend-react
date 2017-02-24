@@ -16,19 +16,16 @@ export default class SideMenu extends Component {
     var defaultSelectedKeys=[];
     if (this.context.router.isActive('display-management')) {
       defaultOpenKeys.push("display-management");
-      if (this.context.router.isActive('display-management/image')) {
+      if (this.context.router.isActive('display-management/file')) {
         defaultOpenKeys.push("display-management-media-library");
-        defaultSelectedKeys.push("display-management/image");
-      } else if (this.context.router.isActive('display-management/video')) {
-        defaultOpenKeys.push("display-management-media-library");
-        defaultSelectedKeys.push("display-management/video");
+        defaultSelectedKeys.push("display-management/file");
       } else if (this.context.router.isActive('display-management/scene')) {
         defaultOpenKeys.push("display-management-media-library");
         defaultSelectedKeys.push("display-management/scene");
-      } else if (this.context.router.isActive('display-management/display')) {
+      } else if (this.context.router.isActive('display-management/screen')) {
         defaultSelectedKeys.push("display-management/display");
-      } else if (this.context.router.isActive('display-management/planning')) {
-        defaultSelectedKeys.push("display-management/planning");
+      } else if (this.context.router.isActive('display-management/agenda')) {
+        defaultSelectedKeys.push("display-management/agenda");
       }
     }
 
@@ -43,12 +40,8 @@ export default class SideMenu extends Component {
         <SubMenu key="display-management" title={<span><Icon type="video-camera" /><span className="item-text">Afficheurs</span></span>}>
           <SubMenu key="display-management-media-library" title={<span><Icon type='file' />Médiathèque</span>}>
 
-            <Menu.Item key="display-management/image">
-              <Link to="/display-management/image"><Icon type="picture" />Images</Link>
-            </Menu.Item>
-
-            <Menu.Item key="display-management/video">
-              <Link to="/display-management/video"><Icon type="video-camera" />Vidéos</Link>
+            <Menu.Item key="display-management/file">
+              <Link to="/display-management/file"><Icon type="picture" />Fichiers</Link>
             </Menu.Item>
 
             <Menu.Item key="display-management/scene">
@@ -57,12 +50,12 @@ export default class SideMenu extends Component {
 
           </SubMenu>
 
-          <Menu.Item key="display-management/display">
-            <Link to="/display-management/display"><Icon type="desktop" />Écrans</Link>
+          <Menu.Item key="display-management/screen">
+            <Link to="/display-management/screen"><Icon type="desktop" />Écrans</Link>
           </Menu.Item>
 
-          <Menu.Item key="display-management/planning">
-            <Link to="/display-management/planning"><Icon type="calendar" />Plannings</Link>
+          <Menu.Item key="display-management/agenda">
+            <Link to="/display-management/agenda"><Icon type="calendar" />Agendas</Link>
           </Menu.Item>
 
         </SubMenu>

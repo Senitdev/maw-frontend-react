@@ -6,27 +6,27 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import DataTable from 'components/DataTable';
 
 const mapStateToProps = (state) => {
-  const { mediaById, mediaByType } = state[displayManagementName];
-  const { isFetching, items } = mediaByType['image'];
+  const { mediaById, screen } = state[displayManagementName];
+  const { isFetching, items } = screen;
 
-  const images = items.map(function(id) {
+  const screens = items.map(function(id) {
     return mediaById[id];
   });
   return {
     isFetching,
-    images
+    screens
   };
 };
 
 @connect(mapStateToProps, (dispatch) => ({
   actions: bindActionCreators(displayManagementActions, dispatch)
 }))
-export default class ImageListContainer extends Component {
+export default class ScreenListContainer extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    images: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    screens: PropTypes.array.isRequired,
   };
 
   constructor(props) {
@@ -38,8 +38,7 @@ export default class ImageListContainer extends Component {
   }
 
   componentDidMount() {
-    if (this.props.images.length == 0)
-      this.props.actions.fetchMedia('image');
+    this.props.actions.fetchMediaList('screen');
   }
 
   onSelectionChange = (selectedRowKeys) => {
@@ -47,15 +46,17 @@ export default class ImageListContainer extends Component {
   }
 
   onRefresh = () => {
-    this.props.actions.fetchMedia('image');
+    this.props.actions.fetchMediaList('screen');
   }
 
   onDelete = (id) => {
-    this.props.actions.deleteMedia('image', id);
+    this.props.actions.deleteMedia(id);
   }
 
   onDeleteSelection = () => {
-
+    for (let i=0; i<this.state.selectedRows.length; i++) {
+      this.props.actions.deleteMedia(this.state.selectedRows[i]);
+    }
   }
 
   render() {
@@ -66,26 +67,15 @@ export default class ImageListContainer extends Component {
         sorter: (a, b) => a.id - b.id
       },
       {
-        title: 'Nom',
-        dataIndex: 'name',
-        key: 'name',
+        title: 'Version',
+        dataIndex: 'distantVersion',
+        key: 'distantVersion',
         sorter: (a, b) => a.id - b.id
       },
       {
-        title: 'Résolution',
-        key: 'resolution',
-        render: (img) => <span>{img.width}x{img.height} (px)</span>,
-      },
-      {
-        title: 'Poid',
-        key: 'weight',
-        sorter: (a, b) => a.id - b.id,
-        render: (img) => <span>{img.weight} (Ko)</span>
-      },
-      {
-        title: 'Date de création',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
+        title: 'Dernier contact',
+        dataIndex: 'lastPull',
+        key: 'lastPull',
         sorter: (a, b) => a.id - b.id
       },
     ];
@@ -96,14 +86,13 @@ export default class ImageListContainer extends Component {
 
     return (
       <DataTable
-        title="Images"
+        title="Écrans"
         loading={this.props.isFetching}
         columns={columns}
-        dataSource={this.props.images}
+        dataSource={this.props.screens}
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
-        onEdit="/display-management/image/"
         onDeleteSelection={this.onDeleteSelection}/>
     );
   }

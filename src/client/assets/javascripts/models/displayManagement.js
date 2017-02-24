@@ -45,39 +45,35 @@ interface Screen extends Media {
 }
 
 export const MediaTypes = {
-  IMAGE: {
-    key: 'image',
-    name: 'Images',
+  FILE: {
+    key: 'file',
+    name: 'Fichiers',
   },
-  VIDEO: {
-    key: 'video',
-    name: 'Vidéos',
-  },
-  PLANNING: {
-    key: 'planning',
-    name: 'Plannings',
+  AGENDA: {
+    key: 'agenda',
+    name: 'Agendas',
   },
 };
 
 export type State = {
   mediaById: Array<Media>,
   relationsById: Array<Relation>,
-  agendas: {
+  agenda: {
     isFetching: boolean,
     fetchError: Object,
     items: number[]
   },
-  scenes: {
+  scene: {
     isFetching: boolean,
     fetchError: Object,
     items: number[]
   },
-  screens: {
+  screen: {
     isFetching: boolean,
     fetchError: Object,
     items: number[]
   },
-  files: {
+  file: {
     isFetching: boolean,
     fetchError: Object,
     items: number[]

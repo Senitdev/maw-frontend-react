@@ -1,18 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Alert, Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
+import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
 import { Link } from 'react-router';
 
-import { actionCreators as displayManagementActions, NAME as displayManagementName } from 'features/displayManagement';
+import { actionCreators as displayManagementActions } from 'features/displayManagement';
 
-const mapStateToProps = (state) => {
-  const { error } = state[displayManagementName];
-
-  return { error };
-};
-
-@connect(mapStateToProps, (dispatch) => ({
+@connect(undefined, (dispatch) => ({
   actions: bindActionCreators(displayManagementActions, dispatch)
 }))
 export default class DataTable extends Component {
@@ -72,11 +66,10 @@ export default class DataTable extends Component {
       ...this.props.columns,
       {
         title: 'Actions',
-        dataIndex: 'actions',
         key: 'actions',
         fixed: 'right',
         width: 110,
-        render: (text, record) => (
+        render: (undefined, record) => (
           <span>
             <Tooltip placement="left" title="Prévisualiser le média">
               <Button icon="eye" />
@@ -102,29 +95,11 @@ export default class DataTable extends Component {
         <Menu.Item key="deleteSelected">
           <Tooltip placement="left" title="Supprime tout les éléments sélectionnés dans la liste"><Icon type="delete" /> Supprimer la sélection</Tooltip>
         </Menu.Item> }
-        <Menu.Item key="editSelected">
-          <Tooltip placement="left" title="Vers l'édition multiple"><Icon type="edit" /> Editer la sélection</Tooltip>
-        </Menu.Item>
       </Menu>
     );
-    var errors = [];
-    for (let i=0; i<this.props.error.length; i++) {
-      if(!this.props.error[i].confirmed)
-        errors.push(<Alert message={"Une erreur est survenu: " + this.props.error[i].error}
-                           description={this.props.error[i].message}
-                           key={"errorId:"+i}
-                           type="error"
-                           closable
-                           onClose={() => this.props.actions.errorConfirmed(i)} />);
-    }
 
     return (
       <div>
-        <Row>
-          <Col offset={1} span={22}>
-            {errors}
-          </Col>
-        </Row>
         <Row>
           <Col offset={1} span={22}>
             <h1>{this.props.title}</h1>

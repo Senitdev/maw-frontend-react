@@ -8,7 +8,7 @@ import { State } from 'models/displayManagement';
 import './displayManagement.scss';
 
 export const NAME = 'displayManagement';
-
+const API = 'http://192.168.201.68/backend-global/';
 // Action types
 
 const MEDIA_LIST_REQUEST = 'maw/displayManagement/MEDIA_LIST_REQUEST';
@@ -43,10 +43,8 @@ const normalize = {
     ratioDenominator: media.ratio_denominator,
     type: media.type,
     version: media.version,
-    createdAt: new Date(media.created_at),
-    updatedAt: new Date(media.updated_at),
-    relationsWithHosts: media.host_medias.map((host) => host.id),
-    relationsWithGuests: media.guest_medias_with_all_pivot.map((guest) => guest.id),
+    createdAt: media.created_at,
+    updatedAt: media.updated_at,
     duration: media.duration
   }),
   file: (file) => ({
@@ -61,12 +59,12 @@ const normalize = {
   }),
 };
 
-function mediaListSuccess(type, mediaList) {
+function mediaListSuccess(type, mediaById) {
   return {
     type: MEDIA_LIST_SUCCESS,
     payload: {
       type,
-      mediaList
+      mediaById
     }
   };
 }
@@ -82,9 +80,13 @@ function mediaListFailure(type, error) {
 }
 
 function fetchMediaList(type) {
-  let url = 'http://localhost:3001/entities/1/modules/3/';
+  const url = API + 'entities/1/modules/3/';
 
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    if (getState()[NAME][type].isFetching) {
+      return;
+    }
+
     dispatch(mediaListRequest(type));
     let promiseArray = [];
 
@@ -102,7 +104,7 @@ function fetchMediaList(type) {
 
     if (type == 'screen' || type == 'file') {
       promiseArray.push(
-        fetch(url + type)
+        fetch(url + type + 's')
           .then((response) => {
             if (response.status < 200 || response.status >= 300) {
               let error = new Error('mediaList fetch fail');
@@ -122,7 +124,7 @@ function fetchMediaList(type) {
         let mediaById = mediaList.reduce((mediaById, media) => {
           mediaById[media.id] = normalize.media(media);
           return mediaById;
-        });
+        }, {});
 
         if (dataList) {
           for (let i = 0; i < dataList.length; i++) {
@@ -159,9 +161,11 @@ function deleteMediaFailure(error) {
 }
 
 function deleteMedia(id) {
+  let url = API + 'entities/1/modules/3/';
+
   return (dispatch) => {
     dispatch(deleteMediaRequest(id));
-    return fetch('http://localhost:3001/' + 'medias/' + id, {
+    return fetch(url + 'medias/' + id, {
       method: 'DELETE'
     })
     .then((response) => {
@@ -186,22 +190,22 @@ export const actionCreators = {
 const initialState: State = {
   mediaById: {},
   relationsById: {},
-  agendas: {
+  agenda: {
     isFetching: false,
     fetchError: null,
     items: []
   },
-  scenes: {
+  scene: {
     isFetching: false,
     fetchError: null,
     items: []
   },
-  screens: {
+  screen: {
     isFetching: false,
     fetchError: null,
     items: []
   },
-  files: {
+  file: {
     isFetching: false,
     fetchError: null,
     items: []
@@ -234,7 +238,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
         [action.payload.type]: {
           ...state[action.payload.type],
           isFetching: false,
-          items: Object.keys(action.payload.mediaById)
+          items: Object.keys(action.payload.mediaById).map((id) => Number(id))
         }
       };
 
@@ -243,6 +247,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
         ...state,
         [action.payload.type]: {
           ...state[action.payload.type],
+          isFetching: false,
           fetchError: action.payload.error
         }
       };

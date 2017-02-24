@@ -3,7 +3,7 @@ import { Layout } from 'antd';
 import MediaListContainer from '../MediaListContainer';
 import CalendarContainer from '../CalendarContainer';
 
-export default class PlanningEditorContainer extends Component {
+export default class AgendaEditorContainer extends Component {
 
   render() {
     return (

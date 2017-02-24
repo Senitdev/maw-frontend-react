@@ -1,21 +1,20 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Layout } from 'antd';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable from 'components/DataTable';
+import DataTable, { EditableCell } from 'components/DataTable';
 
 const mapStateToProps = (state) => {
-  const { mediaById, mediaByType } = state[displayManagementName];
-  const { isFetching, items } = mediaByType['planning'];
+  const { mediaById, agenda } = state[displayManagementName];
+  const { isFetching, items } = agenda;
 
-  const plannings = items.map(function(id) {
+  const agendas = items.map(function(id) {
     return mediaById[id];
   });
   return {
     isFetching,
-    plannings
+    agendas
   };
 };
 
@@ -26,8 +25,8 @@ export default class planningListContainer extends Component {
 
   static propTypes = {
     actions: PropTypes.object.isRequired,
+    agendas: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
-    plannings: PropTypes.array.isRequired,
   };
 
   constructor(props) {
@@ -39,7 +38,7 @@ export default class planningListContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.fetchMedia('planning');
+    this.props.actions.fetchMediaList('agenda');
   }
 
   onSelectionChange = (selectedRowKeys) => {
@@ -47,24 +46,34 @@ export default class planningListContainer extends Component {
   }
 
   onRefresh = () => {
-    this.props.actions.fetchMedia('planning');
+    this.props.actions.fetchMedia('agenda');
   }
 
   onDelete = (id) => {
-    this.props.actions.deleteMedia('planning', id);
+    this.props.actions.deleteMedia(id);
   }
 
   onDeleteSelection = () => {
-
+    for (let i=0; i<this.state.selectedRows.length; i++) {
+      this.props.actions.deleteMedia(this.state.selectedRows[i]);
+    }
   }
-
+  onEdit(editedFile) {
+    console.log(editedFile);
+  }
   render() {
     const columns = [{
         title: 'ID',
         dataIndex: 'id',
         key: 'id',
         sorter: (a, b) => a.id - b.id
-      }
+      },
+      {
+        title: 'Nom',
+        key: 'name',
+        sorter: (a, b) => a.id - b.id,
+        render: (file) => <EditableCell file={file} field={'name'} onEdit={this.onEdit} />
+      },
     ];
 
     const rowSelection = {
@@ -76,11 +85,11 @@ export default class planningListContainer extends Component {
         title="Agendas"
         loading={this.props.isFetching}
         columns={columns}
-        dataSource={this.props.plannings}
+        dataSource={this.props.agendas}
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
-        onEdit="/display-management/planning/"
+        onEdit="/display-management/agenda/"
         onDeleteSelection={this.onDeleteSelection}/>
     );
   }
