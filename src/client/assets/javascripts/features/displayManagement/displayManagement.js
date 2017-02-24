@@ -2,7 +2,6 @@
 
 import { createStructuredSelector } from 'reselect';
 import fetch from 'isomorphic-fetch';
-import $ from 'jquery';
 
 import { State } from 'models/displayManagement';
 
@@ -12,277 +11,277 @@ export const NAME = 'displayManagement';
 
 // Action types
 
-const REQUEST_MEDIA = 'maw/displayManagement/REQUEST_MEDIA';
-const RECEIVE_MEDIA = 'maw/displayManagement/RECEIVE_MEDIA';
-const INVALIDATE_MEDIA = 'maw/displayManagement/INVALIDATE_MEDIA';
+const MEDIA_LIST_REQUEST = 'maw/displayManagement/MEDIA_LIST_REQUEST';
+const MEDIA_LIST_SUCCESS = 'maw/displayManagement/MEDIA_LIST_SUCCESS';
+const MEDIA_LIST_FAILURE = 'maw/displayManagement/MEDIA_LIST_FAILURE';
+
+const MEDIA_DETAILS_REQUEST = 'maw/displayManagement/MEDIA_DETAILS_REQUEST';
+const MEDIA_DETAILS_SUCCESS = 'maw/displayManagement/MEDIA_DETAILS_SUCCESS';
+const MEDIA_DETAILS_FAILURE = 'maw/displayManagement/MEDIA_DETAILS_FAILURE';
+
+const DELETE_MEDIA_REQUEST = 'maw/displayManagement/DELETE_MEDIA_REQUEST';
 const DELETE_MEDIA_SUCESS = 'maw/displayManagement/DELETE_MEDIA_SUCESS';
-const DELETE_MEDIA_QUERY = 'maw/displayManagement/DELETE_MEDIA_QUERY';
-const ERROR_CONFIRMED = 'maw/displayManagement/ERROR_CONFIRMED';
-const ERROR_RAISED = 'maw/displayManagement/ERROR_RAISED';
+const DELETE_MEDIA_FAILURE = 'maw/displayManagement/DELETE_MEDIA_FAILURE';
 
 // Action creators
 
-function requestMedia(type) {
+function mediaListRequest(type) {
   return {
-    type: REQUEST_MEDIA,
+    type: MEDIA_LIST_REQUEST,
     payload: { type }
   };
 }
 
-function receiveMedia(type, media) {
-  // Transforme le tableau de media réceptionné en objet indexé par id
-  const mediaById = media.reduce((mediaById, media) => {
-    mediaById[media.id] = media;
-    return mediaById;
-  }, {});
+/**
+ * Transforme un objet provenant du serveur en objet stoquer dans l'état redux.
+ **/
+const normalize = {
+  media: (media) => ({
+    id: media.id,
+    name: media.name,
+    ratioNumerator: media.ratio_numerator,
+    ratioDenominator: media.ratio_denominator,
+    type: media.type,
+    version: media.version,
+    createdAt: new Date(media.created_at),
+    updatedAt: new Date(media.updated_at),
+    relationsWithHosts: media.host_medias.map((host) => host.id),
+    relationsWithGuests: media.guest_medias_with_all_pivot.map((guest) => guest.id),
+    duration: media.duration
+  }),
+  file: (file) => ({
+    width: file.width,
+    height: file.height,
+    weight: file.weight,
+    mimetype: file.mimetype
+  }),
+  screen: (screen) => ({
+    distantVersion: screen.distant_version,
+    lastPull: screen.last_pull
+  }),
+};
 
+function mediaListSuccess(type, mediaList) {
   return {
-    type: RECEIVE_MEDIA,
+    type: MEDIA_LIST_SUCCESS,
     payload: {
       type,
-      mediaById
+      mediaList
+    }
+  };
+}
+function mediaListFailure(type, error) {
+  return {
+    type: MEDIA_LIST_FAILURE,
+    error: true,
+    payload: {
+      type,
+      error
     }
   };
 }
 
-function invalidateMedia(type) {
+function fetchMediaList(type) {
+  let url = 'http://localhost:3001/entities/1/modules/3/';
+
+  return (dispatch) => {
+    dispatch(mediaListRequest(type));
+    let promiseArray = [];
+
+    promiseArray.push(
+      fetch(url + 'medias?typeIn[]=' + type)
+        .then((response) => {
+          if (response.status < 200 || response.status >= 300) {
+            let error = new Error('mediaList fetch fail');
+            error.response = response;
+            throw error;
+          }
+          return response.json().then((json) => json.data);
+        })
+    );
+
+    if (type == 'screen' || type == 'file') {
+      promiseArray.push(
+        fetch(url + type)
+          .then((response) => {
+            if (response.status < 200 || response.status >= 300) {
+              let error = new Error('mediaList fetch fail');
+              error.response = response;
+              throw error;
+            }
+            return response.json().then((json) => json.data);
+          })
+      );
+    }
+
+    return Promise.all(promiseArray)
+      .then((data) => {
+        const [mediaList, dataList] = data;
+
+        // Transforme le tableau de media réceptionné en objet indexé par id
+        let mediaById = mediaList.reduce((mediaById, media) => {
+          mediaById[media.id] = normalize.media(media);
+          return mediaById;
+        });
+
+        if (dataList) {
+          for (let i = 0; i < dataList.length; i++) {
+            Object.assign(mediaById[dataList[i].media_id], normalize[type](dataList[i]));
+          }
+        }
+
+        dispatch(mediaListSuccess(type, mediaById));
+      })
+      .catch((error) => dispatch(mediaListFailure(type, error)));
+  };
+}
+
+function deleteMediaSucess(id) {
   return {
-    type: INVALIDATE_MEDIA,
-    payload: { type }
+    type: DELETE_MEDIA_SUCESS,
+    payload: { id }
   };
 }
 
-function fetchMedia(type) {
-  let url;
-  if (type == 'image' || type == 'video')
-    url = 'entities/1/modules/1/files/' + type + '?' + $.param({
-      'withExtendedMedia': true
-    });
-  else
-    url = 'entities/1/modules/1/medias/' + type + '?' + $.param({
-      'withExtendedMedia': true
-    });
-  return (dispatch) => {
-    dispatch(requestMedia(type));
-    return fetch('http://localhost:3001/' + url)
-      .then((response) => {
-        if (response.status >= 400)
-          errorHandler(response.status)(dispatch);
-        return response.json();
-      }).then((mediaList) => {
-        dispatch(receiveMedia(type, mediaList));
-      }).catch((error) => errorHandler(error)(dispatch));
-  };
-}
-
-/* TODO Actuellement, on rappele fetchMedia après un delete, on devrait simplement
-   supprimer le media supprimé de la liste des médias. Mais j'ai pas réussi a flitrer correctement
-   la liste dans le reducer de l'action DELETE_MEDIA_SUCESS*/
-function deleteMediaSucess(type, id) {
-  return (dispatch) => {
-    dispatch(fetchMedia(type));
-  };
-}
-
-function deleteMediaQuery(type) {
+function deleteMediaRequest(id) {
   return {
-    type: DELETE_MEDIA_QUERY,
-    payload: { type }
+    type: DELETE_MEDIA_REQUEST,
+    payload: { id }
   };
 }
 
-function deleteMedia(type, id) {
+function deleteMediaFailure(error) {
+  return {
+    type: DELETE_MEDIA_FAILURE,
+    error: true,
+    payload: error
+  };
+}
+
+function deleteMedia(id) {
   return (dispatch) => {
-    dispatch(deleteMediaQuery(type));
+    dispatch(deleteMediaRequest(id));
     return fetch('http://localhost:3001/' + 'medias/' + id, {
       method: 'DELETE'
-    }).then(() => dispatch(deleteMediaSucess(type, id)))
-      .catch((error) => errorHandler(error)(dispatch));
-  };
-}
-
-function errorHandler(error) {
-  if(error >= 400) {
-    return (dispatch) => dispatch(errorRaised(error, "L'action n'a pas pu être exécuter par le serveur. Vous pouvez essayer de vider le cache de votre navigateur et le redémarrer si le problème persiste."));
-  } else {
-    return (dispatch) => dispatch(errorRaised(error, "Les serveurs sont inatteignables. Veuillez réessayer ultérieurement."));
-  }
-}
-
-function errorRaised(error, message) {
-  return {
-    type: ERROR_RAISED,
-    payload: { error, message }
-  };
-}
-
-function errorConfirmed(errorId) {
-  console.log(errorId);
-  return {
-    type: ERROR_CONFIRMED,
-    payload: { errorId }
+    })
+    .then((response) => {
+      if (response.status < 200 || response.status >= 300) {
+        let error = new Error('delete fail');
+        error.response = response;
+        throw error;
+      }
+      dispatch(deleteMediaSucess(id));
+    })
+    .catch(deleteMediaFailure);
   };
 }
 
 export const actionCreators = {
-  errorConfirmed,
   deleteMedia,
-  invalidateMedia,
-  fetchMedia
+  fetchMediaList,
 };
 
 // State initial
 
 const initialState: State = {
   mediaById: {},
-  mediaByType: {
-    image: {
-      isFetching: false,
-      didInvalidate: true,
-      items: []
-    },
-    video: {
-      isFetching: false,
-      didInvalidate: true,
-      items: []
-    },
-    scene: {
-      isFetching: false,
-      didInvalidate: true,
-      items: []
-    },
-    display: {
-      isFetching: false,
-      didInvalidate: true,
-      items: []
-    },
-    planning: {
-      isFetching: false,
-      didInvalidate: true,
-      items: []
-    },
+  relationsById: {},
+  agendas: {
+    isFetching: false,
+    fetchError: null,
+    items: []
   },
-  error: [],
+  scenes: {
+    isFetching: false,
+    fetchError: null,
+    items: []
+  },
+  screens: {
+    isFetching: false,
+    fetchError: null,
+    items: []
+  },
+  files: {
+    isFetching: false,
+    fetchError: null,
+    items: []
+  },
+  deleteError: null
 };
 
 // Reducer
 
 export default function reducer(state: State = initialState, action: any = {}): State {
 
-  if (!action.payload) {
-    return state;
-  }
-
   switch (action.type) {
 
-    case ERROR_RAISED:
+    case MEDIA_LIST_REQUEST:
       return {
         ...state,
-        error: [
-          ...state.error,
-          {
-            id: state.error.length,
-            error: action.payload.error,
-            message: action.payload.message,
-            time: Date.now(),
-            confirmed: false
-          }
-        ]
-      };
-
-    case ERROR_CONFIRMED:
-      return {
-        ...state,
-        error: state.error.map((error) => {
-                            if (error.id === action.payload.errorId)
-                              return { ...error, confirmed: true };
-                            else
-                              return {...error};
-                          })
-      };
-
-    case REQUEST_MEDIA:
-     return {
-       ...state,
-       mediaByType: {
-         ...state.mediaByType,
-         [action.payload.type]: {
-           ...state.mediaByType[action.payload.type],
-           isFetching: true,
-           didInvalidate: false
-         }
-       }
-     };
-
-    case INVALIDATE_MEDIA:
-      return {
-        ...state,
-        mediaByType: {
-          ...state.mediaByType,
-          [action.payload.type]: {
-            ...state.mediaByType[action.payload.type],
-            didInvalidate: true
-          }
+        [action.payload.type]: {
+          ...state[action.payload.type],
+          isFetching: true
         }
       };
 
-    case RECEIVE_MEDIA:
+    case MEDIA_LIST_SUCCESS:
       return {
         ...state,
         mediaById: {
           ...state.mediaById,
           ...action.payload.mediaById
         },
-        mediaByType: {
-          ...state.mediaByType,
-          [action.payload.type]: {
-            ...state.mediaByType[action.payload.type],
-            isFetching: false,
-            didInvalidate: false,
-            items: Object.keys(action.payload.mediaById)
-          }
+        [action.payload.type]: {
+          ...state[action.payload.type],
+          isFetching: false,
+          items: Object.keys(action.payload.mediaById)
         }
       };
 
-    case DELETE_MEDIA_QUERY:
+    case MEDIA_LIST_FAILURE:
       return {
         ...state,
-        mediaByType: {
-          ...state.mediaByType,
-          [action.payload.type]: {
-            ...state.mediaByType[action.payload.type],
-            isFetching: true,
-            didInvalidate: false
-          }
+        [action.payload.type]: {
+          ...state[action.payload.type],
+          fetchError: action.payload.error
         }
       };
 
-    /* TODO À corriger. Voirs l'action DELETE_MEDIA_SUCESS pour plus d'info */
-    case DELETE_MEDIA_SUCESS:
+    case DELETE_MEDIA_REQUEST: {
+      const { type } = state.mediaById[action.payload.id];
       return {
         ...state,
-        mediaById: {
-          ...state.mediaById
+        [type]: {
+          ...state[type],
+          isFetching: true,
         },
-        mediaByType: {
-          ...state.mediaByType,
-          [action.payload.type]: {
-            ...state.mediaByType[action.payload.type],
-            isFetching: false,
-            didInvalidate: false,
-            items: [
-              ...state.mediaByType[action.payload.type].items.filter((id) => id !== action.payload.id)
-            ]
-          }
+        deleteError: null
+      };
+    }
+
+    case DELETE_MEDIA_SUCESS: {
+      const { type } = state.mediaById[action.payload.id];
+      return {
+        ...state,
+        [type]: {
+          ...state[type],
+          items: state[type].items.filter((id) => id != action.payload.id)
         }
+      };
+    }
+
+    case DELETE_MEDIA_FAILURE:
+      return {
+        ...state,
+        deleteError: action.payload
       };
 
     default:
       return state;
   }
 }
-// Selectors
 
+// Selector
 const displayManagement = (state) => state[NAME];
 
 export const selector = createStructuredSelector({
