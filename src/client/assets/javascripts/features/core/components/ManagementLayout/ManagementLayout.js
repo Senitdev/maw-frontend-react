@@ -2,28 +2,30 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Layout, Menu, Icon, Col, Dropdown, Button } from 'antd';
-import { Link } from 'react-router';
 
 import { actionCreators as coreActions, selector } from '../../';
+import { actionCreators as authActions } from 'features/auth';
 import SideMenu from '../SideMenu';
 
 @connect(selector, (dispatch) => ({
-  actions: bindActionCreators(coreActions, dispatch)
+  coreActions: bindActionCreators(coreActions, dispatch),
+  authActions: bindActionCreators(authActions, dispatch),
 }))
 export default class ManagementLayout extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
+    authActions: PropTypes.object.isRequired,
     children: PropTypes.element.isRequired,
     core: PropTypes.object.isRequired,
+    coreActions: PropTypes.object.isRequired,
   };
 
   render() {
-    const { 'core': { collapsedSideMenu }, 'actions': { collapseSideMenu }} = this.props;
+    const { 'core': { collapsedSideMenu }, 'coreActions': { collapseSideMenu }, 'authActions': { logout } } = this.props;
     const menu = (
       <Menu>
         <Menu.Item>
-          <Link to="/login">Logout <Icon type="logout" /></Link>
+          <a onClick={logout}>Déconnexion <Icon type="logout" /></a>
         </Menu.Item>
       </Menu>
     );
