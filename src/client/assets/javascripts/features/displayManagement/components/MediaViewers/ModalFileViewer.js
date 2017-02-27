@@ -34,6 +34,8 @@ export class ModalFileViewer extends Component {
     if(mimetype) {
       if (mimetype.search('image') === 0) {
         viewer = <img width='380px' src={fileUrl} />;
+      } else if (mimetype.search('video') === 0) {
+        viewer = <video width='380px' controls src='https://www.w3schools.com/html/mov_bbb.mp4' />;
       }
     }
 

@@ -19,6 +19,9 @@
   border: 0px solid black;
   margin-top: 5px;
   cursor: pointer;
+  word-wrap: break-word;
+  overflow: hidden;
+  height: 60px;
 
   -webkit-user-select: none;
   -moz-user-select: none;

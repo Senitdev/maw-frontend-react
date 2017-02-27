@@ -123,7 +123,12 @@ export default class SceneEditorContainer extends Component {
       var className = idTemp == this.state.mediaSelected ? 'selected' : '';
       mediaListLi.push(
         <li key={idTemp} className={className}>
-          <a onClick={() => this.selecteMediaInScene(idTemp)}>{this.props.mediaById[this.state.mediaInScene[idTemp].id].name}</a>
+          <a
+            onClick={() => this.selecteMediaInScene(idTemp)}
+            title={this.props.mediaById[this.state.mediaInScene[idTemp].id].name}
+            >
+              {this.props.mediaById[this.state.mediaInScene[idTemp].id].name}
+            </a>
           <Button type="danger" icon="delete" size="small" onClick={() => this.removeMediaInScene(idTemp)} />
         </li>
       );

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 
-import { Input, Row, Col, Icon } from 'antd';
+import { Input, Row, Col, Icon, Tooltip } from 'antd';
 
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
@@ -74,20 +74,27 @@ export default class MediaListContainer extends Component {
 
     const medias = [];
     const groupsMedia = [];
+    var count = 0;
 
     for (let key of Object.keys(MediaTypes)) {
       medias[MediaTypes[key].key] = this.props.mediaByType[MediaTypes[key].key].items.map((id) => {
+
+        const tooltipPlacement = count % 3 == 0 ? 'left' : (count % 3 == 2 ? 'right' : 'top');
+        count++;
+
         if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
           return (
             <Col key={id.toString()} className="gutter-row" span={8}>
-              <div
-                className="media-gutter-box"
-                id={this.props.mediaById[id].id}
-                >
-                <Icon type="user" />
-                <br />
-                {this.props.mediaById[id].name}
-              </div>
+              <Tooltip placement={tooltipPlacement} title={this.props.mediaById[id].name}>
+                <div
+                  className="media-gutter-box"
+                  id={this.props.mediaById[id].id}
+                  >
+                  <Icon type="user" />
+                  <br />
+                  {this.props.mediaById[id].name}
+                </div>
+              </Tooltip>
             </Col>
           );
         else
