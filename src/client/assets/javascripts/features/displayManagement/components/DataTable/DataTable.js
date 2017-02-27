@@ -98,7 +98,7 @@ export default class DataTable extends Component {
             </Tooltip> }
             { this.props.onDelete &&
             <Tooltip placement="bottom" title="Supprimer le média">
-              <Button icon="delete" onClick={() => {this.props.onDelete(record.id);}} />
+              <Button icon="delete" loading={record.isDeleting} onClick={() => this.props.onDelete(record.id)} />
             </Tooltip> }
           </span>
         )

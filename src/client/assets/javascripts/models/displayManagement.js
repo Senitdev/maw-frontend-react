@@ -78,6 +78,6 @@ export type State = {
     fetchError: Object,
     items: number[]
   },
-  deleteError: Object,
+  isDeleting: Array<boolean>,
   isPatching: Array<boolean>,
 };

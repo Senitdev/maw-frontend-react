@@ -218,11 +218,21 @@ function deleteMediaRequest(id) {
   };
 }
 
-function deleteMediaFailure(error) {
-  return {
-    type: DELETE_MEDIA_FAILURE,
-    error: true,
-    payload: error
+function deleteMediaFailure(id/*, error*/) {
+  return (dispatch) => {
+    dispatch({
+      type: DELETE_MEDIA_FAILURE,
+      error: true,
+      payload: { id }
+    });
+    /* TODO: afficher une notification
+    if (error instanceof Response) {
+
+    }
+    else {
+
+    }
+    */
   };
 }
 
@@ -231,18 +241,20 @@ function deleteMedia(id) {
 
   return (dispatch) => {
     dispatch(deleteMediaRequest(id));
+
     return fetch(url + 'medias/' + id, {
       method: 'DELETE'
     })
     .then((response) => {
-      if (response.status < 200 || response.status >= 300) {
-        let error = new Error('delete fail');
-        error.response = response;
-        throw error;
+      if (!response.ok) {
+        throw response;
       }
       dispatch(deleteMediaSuccess(id));
     })
-    .catch(deleteMediaFailure);
+    .catch((error) => {
+      console.log(error);
+      dispatch(deleteMediaFailure(id, error));
+    });
   };
 }
 
@@ -277,6 +289,7 @@ const initialState: State = {
     fetchError: null,
     items: []
   },
+  isDeleting: {},
   deleteError: null,
   isPatching: {},
 };
@@ -355,14 +368,12 @@ export default function reducer(state: State = initialState, action: any = {}): 
       };
 
     case DELETE_MEDIA_REQUEST: {
-      const { type } = state.mediaById[action.payload.id];
       return {
         ...state,
-        [type]: {
-          ...state[type],
-          isFetching: true,
-        },
-        deleteError: null
+        isDeleting: {
+          ...state.isDeleting,
+          [action.payload.id]: true
+        }
       };
     }
 
@@ -373,6 +384,10 @@ export default function reducer(state: State = initialState, action: any = {}): 
         [type]: {
           ...state[type],
           items: state[type].items.filter((id) => id != action.payload.id)
+        },
+        isDeleting: {
+          ...state.isDeleting,
+          [action.payload.id]: false
         }
       };
     }
@@ -380,7 +395,10 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case DELETE_MEDIA_FAILURE:
       return {
         ...state,
-        deleteError: action.payload
+        isDeleting: {
+          ...state.isDeleting,
+          [action.payload.id]: false
+        }
       };
 
     default:

@@ -6,11 +6,14 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import DataTable from 'features/displayManagement/components/DataTable';
 
 const mapStateToProps = (state) => {
-  const { mediaById, file } = state[displayManagementName];
+  const { mediaById, file, isDeleting } = state[displayManagementName];
   const { isFetching, items } = file;
 
   const files = items.map(function(id) {
-    return mediaById[id];
+    return {
+      ...mediaById[id],
+      isDeleting: isDeleting[id]
+    };
   });
   return {
     isFetching,
