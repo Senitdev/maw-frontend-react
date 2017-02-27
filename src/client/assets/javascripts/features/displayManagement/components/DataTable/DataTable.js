@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'antd';
+import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon, Popconfirm } from 'antd';
 import { Link } from 'react-router';
 
 import { ModalFileViewer } from '../MediaViewers';
@@ -98,7 +98,9 @@ export default class DataTable extends Component {
             </Tooltip> }
             { this.props.onDelete &&
             <Tooltip placement="bottom" title="Supprimer le média">
-              <Button icon="delete" loading={record.isDeleting} onClick={() => this.props.onDelete(record.id)} />
+              <Popconfirm title="Êtes-vous sûr ?" onConfirm={() => this.props.onDelete(record.id)} okText="Oui" cancelText="Non">
+                <Button icon="delete" loading={record.isDeleting} />
+              </Popconfirm>
             </Tooltip> }
           </span>
         )
