@@ -4,38 +4,48 @@ import { Input, Icon } from 'antd';
 export class EditableCell extends Component {
 
   static propTypes = {
-    field: PropTypes.string,
-    file: PropTypes.object,
-    onEdit: PropTypes.func,
+    actions: PropTypes.object.isRequired,
+    editMedia: PropTypes.func.isRequired,
+    field: PropTypes.string.isRequired,
+    media: PropTypes.object.isRequired,
   }
+
   state = {
-    value: this.props.file[this.props.field],
-    editable: false,
+    isEditing: false,
+    editedValue: ''
   }
+
   handleChange = (e) => {
-    this.setState({ value: e.target.value });
+    this.setState({ editedValue: e.target.value });
   }
+
   edit = () => {
-    this.setState({ editable: true });
+    this.setState({
+      isEditing: true,
+      editedValue: this.props.media[this.props.field]
+    });
   }
+
   onEdit = () => {
-    const editedFile = {
-      ...this.props.file,
-      [this.props.field]: this.state.value
+    const editedMedia = {
+      ...this.props.media,
+      [this.props.field]: this.state.editedValue
     };
-    this.props.onEdit(editedFile);
-    this.setState({ editable: false });
+    this.props.editMedia(editedMedia);
+    this.setState({ isEditing: false });
   }
+
   render() {
-    const { editable, value } = this.state;
+
+    const { isEditing } = this.state;
 
     return (
       <div className="editable-cell">
         {
-          editable ?
+          isEditing ?
           <div className="editable-cell-input-wrapper">
             <Input
-              value={value}
+              value={this.state.editedValue}
               onChange={this.handleChange}
               onPressEnter={this.onEdit}
             />
@@ -47,7 +57,7 @@ export class EditableCell extends Component {
           </div>
           :
           <div className="editable-cell-text-wrapper">
-            {value || ' '}
+            {this.props.media[this.props.field]}
             <Icon
               type="edit"
               className="editable-cell-icon"

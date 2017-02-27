@@ -58,8 +58,8 @@ export default class planningListContainer extends Component {
       this.props.actions.deleteMedia(this.state.selectedRows[i]);
     }
   }
-  onEdit(editedFile) {
-    console.log(editedFile);
+  onEdit = (editedFile) => {
+    this.props.actions.patchMedia(editedFile);
   }
   render() {
     const columns = [
@@ -79,7 +79,8 @@ export default class planningListContainer extends Component {
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
         onEdit="/display-management/agenda/"
-        onDeleteSelection={this.onDeleteSelection}/>
+        onDeleteSelection={this.onDeleteSelection}
+        editMedia={this.onEdit} />
     );
   }
 }

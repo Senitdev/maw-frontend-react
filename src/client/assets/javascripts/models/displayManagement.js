@@ -79,4 +79,5 @@ export type State = {
     items: number[]
   },
   deleteError: Object,
+  isPatching: Array<boolean>,
 };

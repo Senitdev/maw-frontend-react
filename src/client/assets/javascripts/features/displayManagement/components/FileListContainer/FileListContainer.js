@@ -58,9 +58,10 @@ export default class FileListContainer extends Component {
       this.props.actions.deleteMedia(this.state.selectedRows[i]);
     }
   }
-  onEdit(editedFile) {
-    console.log(editedFile);
+  onEdit = (editedFile) => {
+    this.props.actions.patchMedia(editedFile);
   }
+
   render() {
     const columns = [
       {
@@ -95,7 +96,8 @@ export default class FileListContainer extends Component {
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
-        onDeleteSelection={this.onDeleteSelection}/>
+        onDeleteSelection={this.onDeleteSelection}
+        editMedia={this.onEdit} />
     );
   }
 }

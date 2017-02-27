@@ -58,6 +58,9 @@ export default class ScreenListContainer extends Component {
       this.props.actions.deleteMedia(this.state.selectedRows[i]);
     }
   }
+  onEdit = (editedFile) => {
+    this.props.actions.patchMedia(editedFile);
+  }
 
   render() {
     const columns = [
@@ -82,7 +85,8 @@ export default class ScreenListContainer extends Component {
         rowSelection={rowSelection}
         onRefresh={this.onRefresh}
         onDelete={this.onDelete}
-        onDeleteSelection={this.onDeleteSelection}/>
+        onDeleteSelection={this.onDeleteSelection}
+        editMedia={this.onEdit} />
     );
   }
 }

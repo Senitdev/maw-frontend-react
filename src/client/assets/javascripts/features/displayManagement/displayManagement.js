@@ -19,11 +19,77 @@ const MEDIA_DETAILS_REQUEST = 'maw/displayManagement/MEDIA_DETAILS_REQUEST';
 const MEDIA_DETAILS_SUCCESS = 'maw/displayManagement/MEDIA_DETAILS_SUCCESS';
 const MEDIA_DETAILS_FAILURE = 'maw/displayManagement/MEDIA_DETAILS_FAILURE';
 
+const PATCH_MEDIA_REQUEST = 'maw/displayManagement/PATCH_MEDIA_REQUEST';
+const PATCH_MEDIA_SUCCESS = 'maw/displayManagement/PATCH_MEDIA_SUCCESS';
+const PATCH_MEDIA_FAILURE = 'maw/displayManagement/PATCH_MEDIA_FAILURE';
+
 const DELETE_MEDIA_REQUEST = 'maw/displayManagement/DELETE_MEDIA_REQUEST';
 const DELETE_MEDIA_SUCESS = 'maw/displayManagement/DELETE_MEDIA_SUCESS';
 const DELETE_MEDIA_FAILURE = 'maw/displayManagement/DELETE_MEDIA_FAILURE';
 
 // Action creators
+
+/* TODO
+function mediaDetailsRequest(type) {
+  return {
+    type: MEDIA_DETAILS_REQUEST,
+    payload: { }
+  };
+}
+function mediaDetailsSuccess(type, id) {
+  return {
+    type: MEDIA_DETAILS_SUCCESS,
+    payload: { }
+  };
+}
+function mediaDetailsFailure(error) {
+  return {
+    type: MEDIA_DETAILS_FAILURE,
+    payload: { }
+  };
+}
+*/
+
+function patchMediaRequest(id) {
+  return {
+    type: PATCH_MEDIA_REQUEST,
+    payload: { id }
+  };
+}
+function patchMediaSuccess(media) {
+  return {
+    type: PATCH_MEDIA_SUCCESS,
+    payload: { media }
+  };
+}
+function patchMediaFailure(id) {
+  return {
+    type: PATCH_MEDIA_FAILURE,
+    payload: { id }
+  };
+}
+function patchMedia(media) {
+  let url = API + 'entities/1/modules/3/';
+
+  return (dispatch) => {
+    dispatch(patchMediaRequest(media.id));
+    return fetch(url + 'medias/' + media.id + '?return=1&Media=' + JSON.stringify({Media: media}) + '&name=' + media.name, {
+      method: 'PATCH',
+      header: {'content-type': 'application/json'}
+    })
+    .then((response) => {
+      if (!response.ok) {
+        let error = new Error('patch fail');
+        error.response = response;
+        throw error;
+      }
+      response.json().then(
+        (response) => dispatch(patchMediaSuccess(response.data))
+      );
+    })
+    .catch((media) => patchMediaFailure(media.id));
+  };
+}
 
 function mediaListRequest(type) {
   return {
@@ -183,6 +249,7 @@ function deleteMedia(id) {
 export const actionCreators = {
   deleteMedia,
   fetchMediaList,
+  patchMedia,
 };
 
 // State initial
@@ -210,7 +277,8 @@ const initialState: State = {
     fetchError: null,
     items: []
   },
-  deleteError: null
+  deleteError: null,
+  isPatching: {},
 };
 
 // Reducer
@@ -218,6 +286,40 @@ const initialState: State = {
 export default function reducer(state: State = initialState, action: any = {}): State {
 
   switch (action.type) {
+
+    case PATCH_MEDIA_REQUEST:
+      return {
+        ...state,
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.id]: true,
+        },
+      };
+
+    case PATCH_MEDIA_SUCCESS:
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById,
+          [action.payload.media.id]: {
+            ...state.mediaById[action.payload.media.id],
+            ...action.payload.media
+          }
+        },
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.media.id]: false,
+        },
+      };
+
+    case PATCH_MEDIA_FAILURE:
+      return {
+        ...state,
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.id]: false,
+        },
+      };
 
     case MEDIA_LIST_REQUEST:
       return {

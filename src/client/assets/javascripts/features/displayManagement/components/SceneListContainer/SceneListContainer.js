@@ -58,8 +58,8 @@ export default class SceneListContainer extends Component {
       this.props.actions.deleteMedia(this.state.selectedRows[i]);
     }
   }
-  onEdit(editedFile) {
-    console.log(editedFile);
+  onEdit = (editedFile) => {
+    this.props.actions.patchMedia(editedFile);
   }
 
   render() {
@@ -81,7 +81,8 @@ export default class SceneListContainer extends Component {
         onRefresh={this.onRefresh}
         onEdit="/display-management/scene/"
         onDelete={this.onDelete}
-        onDeleteSelection={this.onDeleteSelection}/>
+        onDeleteSelection={this.onDeleteSelection}
+        editMedia={this.onEdit} />
     );
   }
 }

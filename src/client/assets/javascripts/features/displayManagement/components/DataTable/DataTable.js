@@ -9,6 +9,7 @@ export default class DataTable extends Component {
   static propTypes = {
     columns: PropTypes.arrayOf(PropTypes.object),
     dataSource: PropTypes.arrayOf(PropTypes.object),
+    editMedia: PropTypes.func,
     error: PropTypes.arrayOf(PropTypes.object),
     loading: PropTypes.bool,
     onDelete: PropTypes.func,
@@ -69,7 +70,9 @@ export default class DataTable extends Component {
         key: 'name',
         width: 350,
         sorter: (a, b) => a.id - b.id,
-        render: (file) => <EditableCell file={file} field={'name'} onEdit={this.onEdit} />
+        render: (media) => <EditableCell media={media}
+                                         field={'name'}
+                                         editMedia={this.props.editMedia} />
       },
       ...this.props.columns,
       {
