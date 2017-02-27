@@ -4,7 +4,6 @@ import { Input, Icon } from 'antd';
 export class EditableCell extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
     editMedia: PropTypes.func.isRequired,
     field: PropTypes.string.isRequired,
     media: PropTypes.object.isRequired,
