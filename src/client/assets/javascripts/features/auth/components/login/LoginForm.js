@@ -61,6 +61,7 @@ class LoginForm extends Component {
     return (
       <Form onSubmit={this.onSubmit} className="login-form">
         <h1>Connexion</h1>
+        <hr style={{marginBottom: '10px'}} />
         {errorMessages && (
           <Alert type="error" message="Echec de la connexion" description={errorMessages} closable />
         )}

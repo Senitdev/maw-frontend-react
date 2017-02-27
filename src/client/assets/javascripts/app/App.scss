@@ -1,0 +1,7 @@
+@import '../features/core/components/AppHeader/AppHeaderVariables';
+
+#App {
+  padding-top: $AppHeaderHeight;
+  height: 100%;
+  background-color: #f4f4f4;
+}

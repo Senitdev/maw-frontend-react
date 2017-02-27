@@ -1,0 +1,14 @@
+@import '../../CoreVariables';
+@import 'AppHeaderVariables';
+
+#AppHeader {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: $AppHeaderHeight;
+  line-height: $AppHeaderHeight;
+  z-index: 3;
+  background-color: $primary-color !important;
+  box-shadow: 0px -3px 14px 0px rgba(184,184,184,0.55);
+}

@@ -1,0 +1,32 @@
+@import '../../CoreVariables';
+
+#ManagementLayout {
+  height: 100%;
+  overflow: hidden;
+}
+#ManagementLayout {
+  .ant-layout-sider {
+    z-index: 2;
+    background-color: $primary-color !important;
+    box-shadow: 3px 0px 10px 0px rgba(184,184,184,0.15);
+  }
+  .siderContent {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 48px;
+    overflow-y: auto;
+  }
+  .ant-layout-sider.ant-layout-sider-collapsed .siderContent {
+    overflow: visible;
+  }
+  .ant-layout-sider-trigger {
+    background-color: #eee;
+    color: #000;
+  }
+  .ant-layout-content {
+    z-index: 1;
+    overflow: auto;
+  }
+}

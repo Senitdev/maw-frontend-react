@@ -30,7 +30,11 @@ export default class SideMenu extends Component {
     }
 
     return (
-      <Menu defaultOpenKeys={defaultOpenKeys} defaultSelectedKeys={defaultSelectedKeys} className={'SideMenu' + (this.props.collapsed ? ' collapsed' : '')} mode={this.props.collapsed ? 'vertical' : 'inline'}>
+      <Menu id="SideMenu"
+        defaultOpenKeys={defaultOpenKeys}
+        defaultSelectedKeys={defaultSelectedKeys}
+        className={this.props.collapsed ? 'collapsed' : ''}
+        mode={this.props.collapsed ? 'vertical' : 'inline'}>
 
         <Menu.Item key="dashboard">
           <Icon type="windows" />
