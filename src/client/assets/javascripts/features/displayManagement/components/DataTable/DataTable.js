@@ -3,7 +3,7 @@ import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon } from 'a
 import { Link } from 'react-router';
 
 import { ModalFileViewer } from '../MediaViewers';
-
+import { EditableCell } from './';
 export default class DataTable extends Component {
 
   static propTypes = {
@@ -57,7 +57,27 @@ export default class DataTable extends Component {
 
     const data = !this.state.searchText ? this.props.dataSource : this.search();
     const columns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+        width: 44,
+        sorter: (a, b) => a.id - b.id
+      },
+      {
+        title: 'Nom',
+        key: 'name',
+        width: 350,
+        sorter: (a, b) => a.id - b.id,
+        render: (file) => <EditableCell file={file} field={'name'} onEdit={this.onEdit} />
+      },
       ...this.props.columns,
+      {
+        title: 'Date de création',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        sorter: (a, b) => a.id - b.id,
+      },
       {
         title: 'Actions',
         key: 'actions',

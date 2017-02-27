@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable, { EditableCell } from 'features/displayManagement/components/DataTable';
+import DataTable from 'features/displayManagement/components/DataTable';
 
 const mapStateToProps = (state) => {
   const { mediaById, screen } = state[displayManagementName];
@@ -60,18 +60,7 @@ export default class ScreenListContainer extends Component {
   }
 
   render() {
-    const columns = [{
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        sorter: (a, b) => a.id - b.id
-      },
-      {
-        title: 'Version',
-        dataIndex: 'distantVersion',
-        key: 'distantVersion',
-        sorter: (a, b) => a.id - b.id
-      },
+    const columns = [
       {
         title: 'Dernier contact',
         dataIndex: 'lastPull',

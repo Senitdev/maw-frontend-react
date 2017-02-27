@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable, { EditableCell } from 'features/displayManagement/components/DataTable';
+import DataTable from 'features/displayManagement/components/DataTable';
 
 const mapStateToProps = (state) => {
   const { mediaById, file } = state[displayManagementName];
@@ -62,19 +62,7 @@ export default class FileListContainer extends Component {
     console.log(editedFile);
   }
   render() {
-    const columns = [{
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        sorter: (a, b) => a.id - b.id
-      },
-      {
-        title: 'Nom',
-        key: 'name',
-        width: 350,
-        sorter: (a, b) => a.id - b.id,
-        render: (file) => <EditableCell file={file} field={'name'} onEdit={this.onEdit} />
-      },
+    const columns = [
       {
         title: 'Résolution',
         key: 'resolution',
@@ -90,12 +78,6 @@ export default class FileListContainer extends Component {
         title: 'mimetype',
         dataIndex: 'mimetype',
         key: 'mimetype',
-        sorter: (a, b) => a.id - b.id,
-      },
-      {
-        title: 'Date de création',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
         sorter: (a, b) => a.id - b.id,
       }
     ];
