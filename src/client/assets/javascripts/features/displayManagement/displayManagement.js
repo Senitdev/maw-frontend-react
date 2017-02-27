@@ -8,7 +8,7 @@ import { State } from 'models/displayManagement';
 import './displayManagement.scss';
 
 export const NAME = 'displayManagement';
-const API = 'http://192.168.201.68/backend-global/';
+const API = 'http://auth.maw.com/backend-global/';
 // Action types
 
 const MEDIA_LIST_REQUEST = 'maw/displayManagement/MEDIA_LIST_REQUEST';
