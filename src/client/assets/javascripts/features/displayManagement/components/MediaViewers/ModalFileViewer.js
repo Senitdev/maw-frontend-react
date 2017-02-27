@@ -39,7 +39,7 @@ export class ModalFileViewer extends Component {
 
     return (
       <span>
-        <Tooltip title="Prévisualiser" placement="bottom" mouseEnterDelay="0.6">
+        <Tooltip title="Prévisualiser" placement="bottom" mouseEnterDelay={0.6}>
           <Button icon='eye' onClick={this.showModal} />
         </Tooltip>
         <Modal title={name}

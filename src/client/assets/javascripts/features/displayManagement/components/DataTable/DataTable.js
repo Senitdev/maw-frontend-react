@@ -90,14 +90,14 @@ export default class DataTable extends Component {
           <span>
             <ModalFileViewer file={record} />
             { this.props.onEdit &&
-            <Tooltip title="Modifier" placement="bottom" mouseEnterDelay="0.6">
+            <Tooltip title="Modifier" placement="bottom" mouseEnterDelay={0.6}>
               { typeof this.props.onEdit == 'string' ?
                 <Link to={this.props.onEdit + record.id}><Button icon="edit" /></Link> :
                 <Button icon="edit" onClick={() => {this.props.onEdit(record.id);}} />
               }
             </Tooltip> }
             { this.props.onDelete &&
-            <Tooltip title="Supprimer" placement="bottom" mouseEnterDelay="0.6">
+            <Tooltip title="Supprimer" placement="bottom" mouseEnterDelay={0.6}>
               <Popconfirm title="Êtes-vous sûr ?" onConfirm={() => this.props.onDelete(record.id)} okText="Oui" cancelText="Non">
                 <Button icon="delete" loading={record.isDeleting} />
               </Popconfirm>
@@ -126,7 +126,7 @@ export default class DataTable extends Component {
         <Row style={{marginTop: '6px'}}>
           { this.props.onRefresh &&
           <Col offset={1} span={1}>
-            <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay="0.6">
+            <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay={0.6}>
               <Button loading={this.props.loading} icon="reload" onClick={this.props.onRefresh} />
             </Tooltip>
           </Col> }
