@@ -47,8 +47,7 @@ export class ModalFileViewer extends Component {
                onOk={this.handleOk}
                onCancel={this.handleCancel}
                width='400px'
-               okText='fermer'
-               cancelText='_'>
+               footer={null} >
           {viewer}
         </Modal>
       </span>
