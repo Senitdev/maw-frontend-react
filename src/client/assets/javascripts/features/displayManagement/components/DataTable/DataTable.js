@@ -111,7 +111,7 @@ export default class DataTable extends Component {
         { this.props.onDeleteSelection &&
         <Menu.Item key="deleteSelected">
           <Tooltip placement="left" title="Supprime tout les éléments sélectionnés dans la liste">
-            <Button onClick={this.props.onDeleteSelection}><Icon type="delete" />Supprimer la sélection</Button>
+            <a onClick={this.props.onDeleteSelection}><Icon type="delete" /> Supprimer la sélection</a>
           </Tooltip>
         </Menu.Item> }
       </Menu>
@@ -142,7 +142,7 @@ export default class DataTable extends Component {
           <Col offset={5} span={5}>
             <Dropdown overlay={actionOnSelectedMenu}>
               <Button>
-                <Icon type="down" /> Actions sur la sélection
+                <Icon type="down" /> Actions
               </Button>
             </Dropdown>
           </Col>
