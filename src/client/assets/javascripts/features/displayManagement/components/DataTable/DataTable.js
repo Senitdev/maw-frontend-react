@@ -90,14 +90,14 @@ export default class DataTable extends Component {
           <span>
             <ModalFileViewer file={record} />
             { this.props.onEdit &&
-            <Tooltip placement="bottom" title="Modifier le média">
+            <Tooltip title="Modifier" placement="bottom" mouseEnterDelay="0.6">
               { typeof this.props.onEdit == 'string' ?
                 <Link to={this.props.onEdit + record.id}><Button icon="edit" /></Link> :
                 <Button icon="edit" onClick={() => {this.props.onEdit(record.id);}} />
               }
             </Tooltip> }
             { this.props.onDelete &&
-            <Tooltip placement="bottom" title="Supprimer le média">
+            <Tooltip title="Supprimer" placement="bottom" mouseEnterDelay="0.6">
               <Popconfirm title="Êtes-vous sûr ?" onConfirm={() => this.props.onDelete(record.id)} okText="Oui" cancelText="Non">
                 <Button icon="delete" loading={record.isDeleting} />
               </Popconfirm>
@@ -110,9 +110,7 @@ export default class DataTable extends Component {
       <Menu>
         { this.props.onDeleteSelection &&
         <Menu.Item key="deleteSelected">
-          <Tooltip placement="left" title="Supprime tout les éléments sélectionnés dans la liste">
-            <a onClick={this.props.onDeleteSelection}><Icon type="delete" /> Supprimer la sélection</a>
-          </Tooltip>
+          <a onClick={this.props.onDeleteSelection}><Icon type="delete" /> Supprimer la sélection</a>
         </Menu.Item> }
       </Menu>
     );
@@ -128,7 +126,7 @@ export default class DataTable extends Component {
         <Row style={{marginTop: '6px'}}>
           { this.props.onRefresh &&
           <Col offset={1} span={1}>
-            <Tooltip placement="right" title="Rafraichir les données">
+            <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay="0.6">
               <Button loading={this.props.loading} icon="reload" onClick={this.props.onRefresh} />
             </Tooltip>
           </Col> }
