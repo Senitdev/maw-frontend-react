@@ -24,7 +24,7 @@ const PATCH_MEDIA_SUCCESS = 'maw/displayManagement/PATCH_MEDIA_SUCCESS';
 const PATCH_MEDIA_FAILURE = 'maw/displayManagement/PATCH_MEDIA_FAILURE';
 
 const DELETE_MEDIA_REQUEST = 'maw/displayManagement/DELETE_MEDIA_REQUEST';
-const DELETE_MEDIA_SUCESS = 'maw/displayManagement/DELETE_MEDIA_SUCESS';
+const DELETE_MEDIA_SUCCESS = 'maw/displayManagement/DELETE_MEDIA_SUCCESS';
 const DELETE_MEDIA_FAILURE = 'maw/displayManagement/DELETE_MEDIA_FAILURE';
 
 // Action creators
@@ -204,9 +204,9 @@ function fetchMediaList(type) {
   };
 }
 
-function deleteMediaSucess(id) {
+function deleteMediaSuccess(id) {
   return {
-    type: DELETE_MEDIA_SUCESS,
+    type: DELETE_MEDIA_SUCCESS,
     payload: { id }
   };
 }
@@ -240,7 +240,7 @@ function deleteMedia(id) {
         error.response = response;
         throw error;
       }
-      dispatch(deleteMediaSucess(id));
+      dispatch(deleteMediaSuccess(id));
     })
     .catch(deleteMediaFailure);
   };
@@ -366,7 +366,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
       };
     }
 
-    case DELETE_MEDIA_SUCESS: {
+    case DELETE_MEDIA_SUCCESS: {
       const { type } = state.mediaById[action.payload.id];
       return {
         ...state,
