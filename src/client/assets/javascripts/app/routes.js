@@ -15,38 +15,54 @@ import RegisterContainer from 'features/auth/components/register/RegisterContain
 import AgendaEditorContainer from 'features/displayManagement/components/AgendaEditorContainer';
 import SceneEditorContainer from 'features/displayManagement/components/SceneEditorContainer';
 
-export default (
-  <Route component={App}>
+export default function getRoutes(store) {
 
-    {/* Routes accessible lorsque l'utilisateur n'est PAS authentifié */}
-    <Route onEnter={() => {/* redirectToDashboard if auth */}}>
-      <Route path="/login" component={LoginContainer} />
-      <Route path="/register" component={RegisterContainer} />
-    </Route>
+  function redirectIfAlreadyLoggedIn(nextState, replace) {
+    if (store.getState().auth.loggedIn) {
+      replace('/');
+    }
+  }
 
-    {/* Routes accessible lorsque l'utilisateur EST authentifié */}
-    <Route path="/" component={ManagementLayout} onEnter={() => {/* redirectToLogin if not auth */}}>
+  function redirectIfNotLoggedIn(nextState, replace) {
+    if (! store.getState().auth.loggedIn) {
+      replace({
+        pathname: '/login',
+        state: { nextPathname: nextState.location.pathname }
+      });
+    }
+  }
 
-      <IndexRedirect to="display-management" />
+  return (
+    <Route component={App}>
 
-      <Route path="display-management" component={DisplayManagementContainer}>
-        <IndexRedirect to="agenda" />
-        <Route path="file" component={FileListContainer} />
-        <Route path="scene">
-          <IndexRoute component={SceneListContainer} />
-          <Route path=":idScene" component={SceneEditorContainer} />
-        </Route>
-        <Route path="screen" component={ScreenListContainer} />
-        <Route path="agenda">
-          <IndexRoute component={AgendaListContainer} />
-          <Route path=":idAgenda" component={AgendaEditorContainer} />
-        </Route>
-
+      {/* Routes accessible lorsque l'utilisateur n'est PAS authentifié */}
+      <Route onEnter={redirectIfAlreadyLoggedIn}>
+        <Route path="/login" component={LoginContainer} />
+        <Route path="/register" component={RegisterContainer} />
       </Route>
 
-    </Route>
+      {/* Routes accessible lorsque l'utilisateur EST authentifié */}
+      <Route path="/" component={ManagementLayout} onEnter={redirectIfNotLoggedIn}>
+        <IndexRedirect to="display-management" />
 
-    <Route path="/404" component={NotFoundView} />
-    <Redirect from="*" to="/404" />
-  </Route>
-);
+        <Route path="display-management" component={DisplayManagementContainer}>
+          <IndexRedirect to="agenda" />
+
+          <Route path="file" component={FileListContainer} />
+          <Route path="scene">
+            <IndexRoute component={SceneListContainer} />
+            <Route path=":idScene" component={SceneEditorContainer} />
+          </Route>
+          <Route path="screen" component={ScreenListContainer} />
+          <Route path="agenda">
+            <IndexRoute component={AgendaListContainer} />
+            <Route path=":idAgenda" component={AgendaEditorContainer} />
+          </Route>
+        </Route>
+      </Route>
+
+      <Route path="/404" component={NotFoundView} />
+      <Redirect from="*" to="/404" />
+    </Route>
+  );
+}
