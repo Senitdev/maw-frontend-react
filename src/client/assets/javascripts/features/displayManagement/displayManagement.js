@@ -28,8 +28,11 @@ const DELETE_MEDIA_REQUEST = 'maw/displayManagement/DELETE_MEDIA_REQUEST';
 const DELETE_MEDIA_SUCCESS = 'maw/displayManagement/DELETE_MEDIA_SUCCESS';
 const DELETE_MEDIA_FAILURE = 'maw/displayManagement/DELETE_MEDIA_FAILURE';
 
-// Action creators
+const MEDIA_RELATION_REQUEST = 'maw/displayManagement/MEDIA_RELATION_REQUEST';
+const MEDIA_RELATION_SUCCESS = 'maw/displayManagement/MEDIA_RELATION_SUCCESS';
+const MEDIA_RELATION_FAILURE = 'maw/displayManagement/MEDIA_RELATION_FAILURE';
 
+// Action creators
 
 function patchMediaRequest(id) {
   return {
@@ -78,6 +81,13 @@ function mediaListRequest(type) {
   return {
     type: MEDIA_LIST_REQUEST,
     payload: { type }
+  };
+}
+
+function mediaRelationRequest(idMedia) {
+  return {
+    type: MEDIA_RELATION_REQUEST,
+    payload: { idMedia }
   };
 }
 
@@ -237,6 +247,25 @@ function fetchMediaDetails(id, type) {
   };
 }
 
+function mediaRelationSuccess(mediaRelation) {
+  return {
+    type: MEDIA_RELATION_SUCCESS,
+    payload: {
+      mediaRelation
+    }
+  };
+}
+
+function mediaRelationFailure(error) {
+  return {
+    type: MEDIA_RELATION_FAILURE,
+    error: true,
+    payload: {
+      error
+    }
+  };
+}
+
 function fetchMediaList(type) {
   const url = API + 'entities/1/modules/3/';
 
@@ -346,9 +375,32 @@ function deleteMedia(id) {
       dispatch(deleteMediaSuccess(id));
     })
     .catch((error) => {
-      console.log(error);
       dispatch(deleteMediaFailure(id, error));
     });
+  };
+}
+
+function fetchMediaRelation(idMedia) {
+  const url = API + 'entities/1/modules/3/media-media/' + idMedia;
+
+  return (dispatch) => {
+
+    dispatch(mediaRelationRequest(idMedia));
+    return fetch(url)
+      .then((response) => {
+        if (response.status < 200 || response.status >= 300) {
+          let error = new Error('mediaList fetch fail');
+          error.response = response;
+          throw error;
+        }
+        return response.json().then((json) => json.data);
+      })
+      .then((data) => {
+        //console.log(data);
+
+        dispatch(mediaRelationSuccess(data));
+      })
+      .catch((error) => dispatch(mediaRelationFailure(error)));
   };
 }
 
@@ -357,6 +409,7 @@ export const actionCreators = {
   fetchMediaList,
   fetchMediaDetails,
   patchMedia,
+  fetchMediaRelation,
 };
 
 // State initial
@@ -533,6 +586,26 @@ export default function reducer(state: State = initialState, action: any = {}): 
           ...state.isDeleting,
           [action.payload.id]: false
         }
+      };
+
+    case MEDIA_RELATION_REQUEST:
+      return {
+        ...state
+      };
+
+    case MEDIA_RELATION_SUCCESS:
+      return {
+        ...state,
+        mediaById: {
+          ...state.relationsById,
+          ...action.payload.mediaRelation
+        },
+      };
+
+    case MEDIA_RELATION_FAILURE:
+      return {
+        ...state,
+        fetchError: action.payload.error
       };
 
     default:
