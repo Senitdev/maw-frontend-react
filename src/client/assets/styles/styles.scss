@@ -2,7 +2,7 @@ body {
 
 }
 
-#app, div [data-reactroot] {
+#app, #app > [data-reactroot] {
   min-width: 1245px;
   height: 100%;
 }

@@ -4,6 +4,7 @@ import { createStructuredSelector } from 'reselect';
 import fetch from 'isomorphic-fetch';
 
 import { State } from 'models/displayManagement';
+import { NotificationGenerator } from 'features/core/components/NotificationGenerator';
 
 import './displayManagement.scss';
 
@@ -57,12 +58,14 @@ function patchMediaRequest(id) {
   };
 }
 function patchMediaSuccess(media) {
+  NotificationGenerator.raise('média mis à jour', 'Le média \"' + media.name + '\" à été édité.', 'success');
   return {
     type: PATCH_MEDIA_SUCCESS,
     payload: { media }
   };
 }
 function patchMediaFailure(id) {
+  NotificationGenerator.raise('Une erreur s\'est produit lors de la mise à jour du média.', 'Veuillez vérifier votre connection internet, recharger la page et réessayer', 'error');
   return {
     type: PATCH_MEDIA_FAILURE,
     payload: { id }
@@ -135,6 +138,7 @@ function mediaListSuccess(type, mediaById) {
   };
 }
 function mediaListFailure(type, error) {
+  NotificationGenerator.raise('Une erreur s\'est produit lors de la récupération des données', 'Veuillez vérifier votre connection internet, recharger la page et réessayer', 'error');
   return {
     type: MEDIA_LIST_FAILURE,
     error: true,
@@ -205,6 +209,7 @@ function fetchMediaList(type) {
 }
 
 function deleteMediaSuccess(id) {
+  NotificationGenerator.raise('Le média à été correctement supprimé.', '', 'success');
   return {
     type: DELETE_MEDIA_SUCCESS,
     payload: { id }
@@ -219,6 +224,7 @@ function deleteMediaRequest(id) {
 }
 
 function deleteMediaFailure(id/*, error*/) {
+  NotificationGenerator.raise('Une erreur s\'est produit lors de la suppression.', 'Veuillez vérifier votre connection internet, recharger la page et réessayer', 'error');
   return (dispatch) => {
     dispatch({
       type: DELETE_MEDIA_FAILURE,
@@ -290,7 +296,6 @@ const initialState: State = {
     items: []
   },
   isDeleting: {},
-  deleteError: null,
   isPatching: {},
 };
 
