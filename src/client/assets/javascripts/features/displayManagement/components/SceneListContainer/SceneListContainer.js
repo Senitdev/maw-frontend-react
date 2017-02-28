@@ -81,6 +81,7 @@ export default class SceneListContainer extends Component {
         columns={columns}
         dataSource={this.props.scenes}
         rowSelection={rowSelection}
+        onAdd="/display-management/scene/new"
         onRefresh={this.onRefresh}
         onEdit="/display-management/scene/"
         onDelete={this.onDelete}

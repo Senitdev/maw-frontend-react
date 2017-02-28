@@ -7,13 +7,11 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
 
-import { Form, Layout, Button } from 'antd';
+import { Layout, Button } from 'antd';
 
-import { SceneEditorForm } from './SceneEditorForm';
+import SceneEditorForm from './SceneEditorForm';
 
 import './SceneEditorContainer.scss';
-
-import { MediaTypes } from 'models/displayManagement';
 
 @connect((state) => {
   const { mediaById, file, scene, agenda } = state[displayManagementName];
@@ -59,16 +57,16 @@ export default class SceneEditorContainer extends Component {
         this.setState({
           mediaInScene: this.state.mediaInScene.concat([{
             id: ui.draggable.attr("id"),
-            boxLeft: 0,
-            boxTop: 0,
-            boxWidth: 0,
-            boxHeight: 0,
-            guestLeft: 0,
-            guestTop: 0,
-            guestWidth: 0,
-            guestHeight: 0,
-            startTimeOffset: 0,
-            duration: -1,
+            boxLeft: {value: 0},
+            boxTop: {value: 0},
+            boxWidth: {value: 0},
+            boxHeight: {value: 0},
+            guestLeft: {value: 0},
+            guestTop: {value: 0},
+            guestWidth: {value: 0},
+            guestHeight: {value: 0},
+            startTimeOffset: {value: 0},
+            duration: {value: -1},
           }])
         });
       }
@@ -100,23 +98,20 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
-  submitMediaData = (err, values) => {
-    if (!err) {
-      var newMedias = this.state.mediaInScene;
-      newMedias[this.state.mediaSelected].boxHeight = values.box_height;
-      newMedias[this.state.mediaSelected].boxLeft = values.box_left;
-      newMedias[this.state.mediaSelected].boxTop = values.box_top;
-      newMedias[this.state.mediaSelected].boxWidth = values.box_width;
-      newMedias[this.state.mediaSelected].duration = values.duration;
-      newMedias[this.state.mediaSelected].guestHeight = values.guest_height;
-      newMedias[this.state.mediaSelected].guestLeft = values.guest_left;
-      newMedias[this.state.mediaSelected].guestTop = values.guest_top;
-      newMedias[this.state.mediaSelected].guestWidth = values.guest_width;
-      newMedias[this.state.mediaSelected].startTimeOffset = values.start_time_offset;
-      this.setState({
-        mediaInScene: newMedias,
-      });
-    }
+  handleFormChange = (changedFields) => {
+    var newMedias = this.state.mediaInScene;
+    newMedias[this.state.mediaSelected] = {...this.state.mediaInScene[this.state.mediaSelected], ...changedFields};
+    this.setState({
+      mediaInScene: newMedias,
+    });
+  }
+
+  changeDuration = (e) => {
+    var newMedias = this.state.mediaInScene;
+    newMedias[this.state.mediaSelected].duration.value = e.target.checked ? 0 : -1;
+    this.setState({
+      mediaInScene: newMedias,
+    });
   }
 
   render() {
@@ -137,14 +132,14 @@ export default class SceneEditorContainer extends Component {
       );
     }
 
-    const EditorForm = Form.create()(SceneEditorForm);
-
     return (
       <Layout className="display-management-content-layout">
         <Layout.Sider><MediaListContainer /></Layout.Sider>
         <Layout.Content id="scene-list-container">
           <Layout>
             <Layout.Sider id="scene-editor-list">
+              <Button type="primary" size="large">Sauvegarder</Button>
+              <br />
               <h3>Médias dans la scène</h3>
               <ul>
                 {mediaListLi}
@@ -152,9 +147,10 @@ export default class SceneEditorContainer extends Component {
             </Layout.Sider>
             <Layout.Content>
               { this.state.mediaSelected >= 0 &&
-                <EditorForm
-                  validateFields={this.submitMediaData}
+                <SceneEditorForm
+                  onChange={this.handleFormChange}
                   mediaData={this.state.mediaInScene[this.state.mediaSelected]}
+                  changeDuration={this.changeDuration}
                 />
               }
             </Layout.Content>

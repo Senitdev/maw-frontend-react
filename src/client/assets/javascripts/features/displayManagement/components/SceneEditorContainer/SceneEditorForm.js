@@ -1,38 +1,53 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Checkbox, Button, InputNumber, Row, Col } from 'antd';
+import { Form, Checkbox, InputNumber, Row, Col } from 'antd';
 
-export class SceneEditorForm extends Component {
+const SceneEditorForm = Form.create({
+
+  onFieldsChange(props, changedFields) {
+    props.onChange(changedFields);
+  },
+
+  mapPropsToFields(props) {
+    return {
+      boxHeight: {
+        ...props.mediaData.boxHeight
+      },
+      boxLeft: {
+        ...props.mediaData.boxLeft
+      },
+      boxTop: {
+        ...props.mediaData.boxTop
+      },
+      boxWidth: {
+        ...props.mediaData.boxWidth
+      },
+      duration: {
+        ...props.mediaData.duration
+      },
+      guestHeight: {
+        ...props.mediaData.guestHeight
+      },
+      guestLeft: {
+        ...props.mediaData.guestLeft
+      },
+      guestTop: {
+        ...props.mediaData.guestTop
+      },
+      guestWidth: {
+        ...props.mediaData.guestWidth
+      },
+      startTimeOffset: {
+        ...props.mediaData.startTimeOffset
+      },
+    };
+  },
+})(
+class SceneEditorForm extends Component {
 
   static propTypes = {
+    changeDuration: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
     mediaData: PropTypes.object.isRequired,
-    validateFields: PropTypes.func.isRequired,
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isDuration: this.props.mediaData.duration >= 0,
-    };
-  }
-
-  changeDuration = (e) => {
-    if (e.target.checked) {
-      this.props.mediaData.duration = 0;
-      this.setState({
-        isDuration: true,
-      });
-    } else {
-      this.props.mediaData.duration = -1;
-      this.setState({
-        isDuration: false,
-      });
-    }
-  }
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFieldsAndScroll(this.props.validateFields);
   }
 
   render() {
@@ -47,16 +62,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="box_left"
+              label="boxLeft"
               hasFeedback
             >
-              {getFieldDecorator('box_left', {
+              {getFieldDecorator('boxLeft', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.boxLeft,
+                }]
               })(
                 <InputNumber />
               )}
@@ -65,16 +79,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="box_top"
+              label="boxTop"
               hasFeedback
             >
-              {getFieldDecorator('box_top', {
+              {getFieldDecorator('boxTop', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.boxTop,
+                }]
               })(
                 <InputNumber />
               )}
@@ -83,16 +96,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="box_width"
+              label="boxWidth"
               hasFeedback
             >
-              {getFieldDecorator('box_width', {
+              {getFieldDecorator('boxWidth', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.boxWidth,
+                }]
               })(
                 <InputNumber />
               )}
@@ -101,16 +113,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="box_height"
+              label="boxHeight"
               hasFeedback
             >
-              {getFieldDecorator('box_height', {
+              {getFieldDecorator('boxHeight', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.boxHeight,
+                }]
               })(
                 <InputNumber />
               )}
@@ -121,16 +132,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="guest_left"
+              label="guestLeft"
               hasFeedback
             >
-              {getFieldDecorator('guest_left', {
+              {getFieldDecorator('guestLeft', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.guestLeft,
+                }]
               })(
                 <InputNumber />
               )}
@@ -139,16 +149,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="guest_top"
+              label="guestTop"
               hasFeedback
             >
-              {getFieldDecorator('guest_top', {
+              {getFieldDecorator('guestTop', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.guestTop,
+                }]
               })(
                 <InputNumber />
               )}
@@ -157,16 +166,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="guest_width"
+              label="guestWidth"
               hasFeedback
             >
-              {getFieldDecorator('guest_width', {
+              {getFieldDecorator('guestWidth', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.guestWidth,
+                }]
               })(
                 <InputNumber />
               )}
@@ -175,16 +183,15 @@ export class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="guest_height"
+              label="guestHeight"
               hasFeedback
             >
-              {getFieldDecorator('guest_height', {
+              {getFieldDecorator('guestHeight', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.guestHeight,
+                }]
               })(
                 <InputNumber />
               )}
@@ -195,16 +202,15 @@ export class SceneEditorForm extends Component {
           <Col span="12">
             <Form.Item
               {...formItemLayout}
-              label="start_time_offset"
+              label="startTimeOffset"
               hasFeedback
             >
-              {getFieldDecorator('start_time_offset', {
+              {getFieldDecorator('startTimeOffset', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                }],
-                initialValue: this.props.mediaData.startTimeOffset,
+                }]
               })(
                 <InputNumber />
               )}
@@ -216,24 +222,22 @@ export class SceneEditorForm extends Component {
               label="duration"
               hasFeedback
             >
-              <Checkbox defaultChecked={this.state.isDuration} onChange={this.changeDuration} />
+              <Checkbox checked={this.props.mediaData.duration.value >= 0} onChange={this.props.changeDuration} />
               {getFieldDecorator('duration', {
                 rules: [{
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                   }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
-                  }],
-                initialValue: this.state.isDuration ? this.props.mediaData.duration : -1,
+                  }]
               })(
-                <InputNumber disabled={!this.state.isDuration} />
+                <InputNumber disabled={this.props.mediaData.duration.value < 0} />
               )}
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item style={{float: 'right'}}>
-          <Button type="primary" htmlType="submit" size="large">Sauvegarder</Button>
-        </Form.Item>
       </Form>
     );
   }
-}
+});
+
+export default SceneEditorForm;
