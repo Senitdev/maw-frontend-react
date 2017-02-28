@@ -34,6 +34,7 @@ export default class SceneEditorContainer extends Component {
     actions: PropTypes.object.isRequired,
     mediaById: PropTypes.object.isRequired,
     mediaByType: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -49,6 +50,7 @@ export default class SceneEditorContainer extends Component {
     this.props.actions.fetchMediaList('file');
     this.props.actions.fetchMediaList('scene');
     this.props.actions.fetchMediaList('agenda');
+    this.props.actions.fetchMediaDetails(Number(this.props.params.idScene));
   }
 
   componentDidMount() {
@@ -74,10 +76,11 @@ export default class SceneEditorContainer extends Component {
   }
 
   selecteMediaInScene = (id) => {
-    if (id != this.state.selecteMedia)
+    if (id != this.state.selecteMedia) {
       this.setState({
         mediaSelected: id
       });
+    }
   }
 
   removeMediaInScene = (id) => {

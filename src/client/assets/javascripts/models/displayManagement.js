@@ -8,7 +8,7 @@ interface Relation {
   boxHeight: number;
   guestLeft: number;
   guestTop: number;
-  guestwidth: number;
+  guestWidth: number;
   guestHeight: number;
   startTimeOffset: number;
   duration: number;
@@ -78,6 +78,8 @@ export type State = {
     fetchError: Object,
     items: number[]
   },
+  isFetchingDetails: boolean,
+  detailsFetchError: Object,
   isDeleting: Array<boolean>,
   isPatching: Array<boolean>,
 };

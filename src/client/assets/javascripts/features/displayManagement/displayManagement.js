@@ -30,26 +30,6 @@ const DELETE_MEDIA_FAILURE = 'maw/displayManagement/DELETE_MEDIA_FAILURE';
 
 // Action creators
 
-/* TODO
-function mediaDetailsRequest(type) {
-  return {
-    type: MEDIA_DETAILS_REQUEST,
-    payload: { }
-  };
-}
-function mediaDetailsSuccess(type, id) {
-  return {
-    type: MEDIA_DETAILS_SUCCESS,
-    payload: { }
-  };
-}
-function mediaDetailsFailure(error) {
-  return {
-    type: MEDIA_DETAILS_FAILURE,
-    payload: { }
-  };
-}
-*/
 
 function patchMediaRequest(id) {
   return {
@@ -114,6 +94,8 @@ const normalize = {
     version: media.version,
     createdAt: media.created_at,
     updatedAt: media.updated_at,
+    relationsWithHosts: [],
+    relationsWithGuests: [],
     duration: media.duration
   }),
   file: (file) => ({
@@ -126,6 +108,21 @@ const normalize = {
     distantVersion: screen.distant_version,
     lastPull: screen.last_pull
   }),
+  relation: (relation) => ({
+    id: relation.id,
+    hostMediaId: relation.host_media_id,
+    guestMediaId: relation.guest_media_id,
+    boxLeft: relation.box_left,
+    boxTop: relation.box_top,
+    boxwidth: relation.box_width,
+    boxHeight: relation.box_height,
+    guestLeft: relation.guest_left,
+    guestTop: relation.guest_top,
+    guestWidth: relation.guest_width,
+    guestHeight: relation.guest_height,
+    startTimeOffset: relation.start_time_offset,
+    duration: relation.duration
+  })
 };
 
 function mediaListSuccess(type, mediaById) {
@@ -146,6 +143,97 @@ function mediaListFailure(type, error) {
       type,
       error
     }
+  };
+}
+
+function mediaDetailsRequest(id, type) {
+  return {
+    type: MEDIA_DETAILS_REQUEST,
+    payload: {
+      id,
+      type
+    }
+  };
+}
+
+function mediaDetailsSuccess(mediaById, relationsById) {
+  return {
+    type: MEDIA_DETAILS_SUCCESS,
+    payload: {
+      mediaById,
+      relationsById
+    }
+  };
+}
+
+function mediaDetailsFailure(error) {
+  return {
+    type: MEDIA_DETAILS_FAILURE,
+    payload: {
+      error
+    }
+  };
+}
+
+function fetchMediaDetails(id, type) {
+  const url = API + 'entities/1/modules/3/';
+
+  return (dispatch) => {
+    dispatch(mediaDetailsRequest(id, type));
+    let promiseArray = [];
+
+    promiseArray.push(
+      fetch(url + 'feats/media-inclusion-tree?id=' + id)
+        .then((response) => {
+          if (!response.ok) {
+            let error = new Error('mediaDetails fetch fail');
+            error.response = response;
+            throw error;
+          }
+          return response.json().then((json) => json.data);
+        })
+    );
+
+    if (type == 'screen' || type == 'file') {
+      promiseArray.push(
+        fetch(url + type + 's/' + id)
+          .then((response) => {
+            if (!response.ok) {
+              let error = new Error('mediaDetails fetch fail');
+              error.response = response;
+              throw error;
+            }
+            return response.json().then((json) => json.data);
+          })
+      );
+    }
+
+    return Promise.all(promiseArray)
+      .then((data) => {
+        const [inclusionTree, typeDetails] = data;
+
+        // Tableau de media provenant de l'arbre en objet indexé par id
+        let mediaById = {};
+        for (let id in inclusionTree.medias) {
+          mediaById[Number(id)] = normalize.media(inclusionTree.medias[id]);
+        }
+
+        if (typeDetails) {
+          Object.assign(mediaById[typeDetails.media_id], normalize[type](typeDetails));
+        }
+
+        // Relations
+        let relationsById = {};
+        for (let id in inclusionTree.relations) {
+          const relation = normalize.relation(inclusionTree.relations[id]);
+          relationsById[relation.id] = relation;
+          mediaById[relation.hostMediaId].relationsWithGuests.push(relation.id);
+          mediaById[relation.guestMediaId].relationsWithHosts.push(relation.id);
+        }
+
+        dispatch(mediaDetailsSuccess(mediaById, relationsById));
+      })
+      .catch((error) => dispatch(mediaDetailsFailure(type, error)));
   };
 }
 
@@ -186,7 +274,7 @@ function fetchMediaList(type) {
       );
     }
 
-    return Promise.all(promiseArray)
+    Promise.all(promiseArray)
       .then((data) => {
         const [mediaList, dataList] = data;
 
@@ -267,6 +355,7 @@ function deleteMedia(id) {
 export const actionCreators = {
   deleteMedia,
   fetchMediaList,
+  fetchMediaDetails,
   patchMedia,
 };
 
@@ -370,6 +459,46 @@ export default function reducer(state: State = initialState, action: any = {}): 
           isFetching: false,
           fetchError: action.payload.error
         }
+      };
+
+    case MEDIA_DETAILS_REQUEST:
+      return {
+        ...state,
+        isFetchingDetails: true,
+        detailsFetchError: {}
+      };
+
+    case MEDIA_DETAILS_SUCCESS: {
+      let mediaById = { ...state.mediaById };
+      for (let id in action.payload.mediaById) {
+        if (mediaById[id]) {
+          Object.assign(mediaById, {
+            [id]: {
+              ...state.mediaById[id],
+              ...action.payload.mediaById[id]
+            }
+          });
+        } else {
+          mediaById[id] = { ...action.payload.mediaById[id] };
+        }
+      }
+
+      return {
+        ...state,
+        mediaById,
+        relationsById: {
+          ...state.relationsById,
+          ...action.payload.relationsById,
+        },
+        isFetchingDetails: false,
+      };
+    }
+
+    case MEDIA_DETAILS_FAILURE:
+      return {
+        ...state,
+        isFetchingDetails: false,
+        detailsFetchError: action.payload.error
       };
 
     case DELETE_MEDIA_REQUEST: {
