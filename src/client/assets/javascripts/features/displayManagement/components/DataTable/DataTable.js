@@ -12,6 +12,7 @@ export default class DataTable extends Component {
     editMedia: PropTypes.func,
     error: PropTypes.arrayOf(PropTypes.object),
     loading: PropTypes.bool,
+    onAdd: PropTypes.string,
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
     onEdit: PropTypes.oneOfType([
@@ -130,7 +131,7 @@ export default class DataTable extends Component {
               <Button loading={this.props.loading} icon="reload" onClick={this.props.onRefresh} />
             </Tooltip>
           </Col> }
-          <Col offset={5} span={6}>
+          <Col offset={3} span={6}>
             <Input
               placeholder="Recherche"
               value={this.state.searchText}
@@ -144,6 +145,15 @@ export default class DataTable extends Component {
               </Button>
             </Dropdown>
           </Col>
+          { this.props.onAdd &&
+            <Col offset={0} span={3}>
+              <Link to={this.props.onAdd}>
+                <Button type="primary">
+                  <Icon type="plus" /> Ajouter
+                </Button>
+              </Link>
+            </Col>
+          }
         </Row>
         <Row style={{paddingTop: '4px'}}>
           <Col offset={1} span={22}>
