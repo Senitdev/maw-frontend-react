@@ -1,92 +1,39 @@
 import React, { Component, PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
+import { Col, Row } from 'antd';
 
-import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable from 'features/displayManagement/components/DataTable';
+import MediaTableContainer from '../MediaTableContainer';
 
-const mapStateToProps = (state) => {
-  const { mediaById, scene, isDeleting } = state[displayManagementName];
-  const { isFetching, items } = scene;
-
-  const scenes = items.map(function(id) {
-    return {
-      ...mediaById[id],
-      isDeleting: isDeleting[id]
-    };
-  });
-  return {
-    isFetching,
-    scenes
-  };
-};
-
-@connect(mapStateToProps, (dispatch) => ({
-  actions: bindActionCreators(displayManagementActions, dispatch)
-}))
+@withRouter
 export default class SceneListContainer extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
-    isFetching: PropTypes.bool.isRequired,
-    scenes: PropTypes.array.isRequired,
+    router: PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      selectedRows: []
-    };
+  onAdd = () => {
+    this.props.router.push('/display-management/scene/new');
   }
 
-  componentDidMount() {
-    this.props.actions.fetchMediaList('scene');
-  }
-
-  onSelectionChange = (selectedRowKeys) => {
-    this.setState({ selectedRows: selectedRowKeys });
-  }
-
-  onRefresh = () => {
-    this.props.actions.fetchMediaList('scene');
-  }
-
-  onDelete = (id) => {
-    this.props.actions.deleteMedia(id);
-  }
-
-  onDeleteSelection = () => {
-    for (let i=0; i<this.state.selectedRows.length; i++) {
-      this.props.actions.deleteMedia(this.state.selectedRows[i]);
-    }
-  }
-  onEdit = (editedFile) => {
-    this.props.actions.patchMedia(editedFile);
+  onEdit = (id) => {
+    this.props.router.push('display-management/scene/' + id);
   }
 
   render() {
-    const columns = [
-
-    ];
-
-    const rowSelection = {
-      onChange: this.onSelectionChange
-    };
 
     return (
-      <DataTable
-        title="Scènes"
-        loading={this.props.isFetching}
-        columns={columns}
-        dataSource={this.props.scenes}
-        rowSelection={rowSelection}
-        onAdd="/display-management/scene/new"
-        onRefresh={this.onRefresh}
-        onEdit="/display-management/scene/"
-        onDelete={this.onDelete}
-        onDeleteSelection={this.onDeleteSelection}
-        editMedia={this.onEdit} />
+      <div>
+        <Row>
+          <Col offset={1} span={22}>
+            <h1>Scènes</h1>
+            <hr style={{marginBottom: '4px'}} />
+            <MediaTableContainer
+              mediaType="scene"
+              onAdd={this.onAdd}
+              onEdit={this.onEdit} />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

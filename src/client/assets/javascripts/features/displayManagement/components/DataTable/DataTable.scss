@@ -1,0 +1,16 @@
+div.maw-data-table {
+
+}
+
+div.maw-data-table {
+  .maw-data-table-tool-bar {
+    button {
+      margin-right: 4px;
+    }
+  }
+  .maw-data-table-actions-column > div {
+    display: flex;
+  	justify-content: space-between;
+  	align-items: center;
+  }
+}

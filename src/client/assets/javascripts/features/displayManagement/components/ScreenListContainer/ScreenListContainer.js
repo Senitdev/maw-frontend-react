@@ -1,95 +1,64 @@
-import React, { Component, PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import React, { Component } from 'react';
+import { Icon, Col, Row, Tooltip } from 'antd';
 
-import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable from 'features/displayManagement/components/DataTable';
+import MediaTableContainer from '../MediaTableContainer';
 
-const mapStateToProps = (state) => {
-  const { mediaById, screen, isDeleting } = state[displayManagementName];
-  const { isFetching, items } = screen;
+import './ScreenListContainer.scss';
 
-  const screens = items.map(function(id) {
-    return {
-      ...mediaById[id],
-      isDeleting: isDeleting[id]
-    };
-  });
-  return {
-    isFetching,
-    screens
-  };
-};
-
-@connect(mapStateToProps, (dispatch) => ({
-  actions: bindActionCreators(displayManagementActions, dispatch)
-}))
 export default class ScreenListContainer extends Component {
 
-  static propTypes = {
-    actions: PropTypes.object.isRequired,
-    isFetching: PropTypes.bool.isRequired,
-    screens: PropTypes.array.isRequired,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      selectedRows: []
-    };
+  onAdd = () => {
+    // TODO: Callback bouton "Nouvel écran"
+    console.log('Nouvel écran cliqué');
   }
 
-  componentDidMount() {
-    this.props.actions.fetchMediaList('screen');
-  }
-
-  onSelectionChange = (selectedRowKeys) => {
-    this.setState({ selectedRows: selectedRowKeys });
-  }
-
-  onRefresh = () => {
-    this.props.actions.fetchMediaList('screen');
-  }
-
-  onDelete = (id) => {
-    this.props.actions.deleteMedia(id);
-  }
-
-  onDeleteSelection = () => {
-    for (let i=0; i<this.state.selectedRows.length; i++) {
-      this.props.actions.deleteMedia(this.state.selectedRows[i]);
-    }
-  }
-  onEdit = (editedFile) => {
-    this.props.actions.patchMedia(editedFile);
+  onEdit = (id) => {
+    // TODO: Callback bouton "Modifier écran"
+    console.log(`Modifier écran ${id} cliqué`);
   }
 
   render() {
+
+    const maxTimeWithoutPull = 1000 * 60 * 5;
+
+    function statusColumnRender(screen) {
+      if (Date.now() - screen.lastPull.getTime() > maxTimeWithoutPull) {
+        return (
+          <Tooltip title="Écran déconnecté" mouseEnterDelay={0.5}>
+            <div className="ant-alert-error"><Icon type="laptop" /></div>
+          </Tooltip>
+        );
+      }
+      return (
+        <Tooltip title="Écran connecté" mouseEnterDelay={0.5}>
+          <div className="ant-alert-success"><Icon type="laptop" /></div>
+        </Tooltip>
+      );
+    }
+
     const columns = [
       {
-        title: 'Dernier contact',
-        dataIndex: 'lastPull',
-        key: 'lastPull',
-        sorter: (a, b) => a.id - b.id
-      },
+        title: 'Status',
+        key: 'status',
+        className: 'screen-status',
+        render: statusColumnRender
+      }
     ];
 
-    const rowSelection = {
-      onChange: this.onSelectionChange
-    };
-
     return (
-      <DataTable
-        title="Écrans"
-        loading={this.props.isFetching}
-        columns={columns}
-        dataSource={this.props.screens}
-        rowSelection={rowSelection}
-        onRefresh={this.onRefresh}
-        onDelete={this.onDelete}
-        onDeleteSelection={this.onDeleteSelection}
-        editMedia={this.onEdit} />
+      <div>
+        <Row>
+          <Col offset={1} span={22}>
+            <h1>Écrans</h1>
+            <hr style={{marginBottom: '4px'}} />
+            <MediaTableContainer
+              mediaType="screen"
+              columns={columns}
+              onAdd={this.onAdd}
+              onEdit={this.onEdit} />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

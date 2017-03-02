@@ -116,7 +116,7 @@ const normalize = {
   }),
   screen: (screen) => ({
     distantVersion: screen.distant_version,
-    lastPull: screen.last_pull
+    lastPull: new Date(screen.last_pull)
   }),
   relation: (relation) => ({
     id: relation.id,

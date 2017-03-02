@@ -1,167 +1,106 @@
 import React, { Component, PropTypes } from 'react';
-import { Table, Input, Button, Row, Col, Tooltip, Dropdown, Menu, Icon, Popconfirm } from 'antd';
+import { Table, Input, Button, Row, Col, Tooltip, Popconfirm } from 'antd';
 import { Link } from 'react-router';
 
 import { ModalFileViewer } from '../MediaViewers';
-import { EditableCell } from './';
+
+import './DataTable.scss';
+
 export default class DataTable extends Component {
 
   static propTypes = {
     columns: PropTypes.arrayOf(PropTypes.object),
     dataSource: PropTypes.arrayOf(PropTypes.object),
-    editMedia: PropTypes.func,
-    error: PropTypes.arrayOf(PropTypes.object),
     loading: PropTypes.bool,
-    onAdd: PropTypes.string,
+    onAdd: PropTypes.func,
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
-    onEdit: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.string,
-    ]),
+    onEdit: PropTypes.func,
     onRefresh: PropTypes.func,
+    onSearch: PropTypes.func,
     rowSelection: PropTypes.object,
     title: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      searchText: '',
-      data: this.props.dataSource
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.dataSource) {
-      this.setState({ data: nextProps.dataSource });
-    }
-  }
-
-  onInputChange = (e) => {
-    this.setState({ searchText: e.target.value });
-  }
-
-  search() {
-    const { searchText } = this.state;
-    const reg = new RegExp(searchText, 'gi');
-
-    return this.props.dataSource.map((record) => {
-      const match = record.name.match(reg);
-      if (!match) {
-        return null;
-      }
-      return record;
-    }).filter((record) => !!record);
-  }
-
   render() {
 
-    const data = !this.state.searchText ? this.props.dataSource : this.search();
     const columns = [
-      {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        width: 44,
-        sorter: (a, b) => a.id - b.id
-      },
-      {
-        title: 'Nom',
-        key: 'name',
-        width: 350,
-        sorter: (a, b) => a.id - b.id,
-        render: (media) => <EditableCell media={media}
-                                         field={'name'}
-                                         editMedia={this.props.editMedia} />
-      },
       ...this.props.columns,
-      {
-        title: 'Date de création',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        sorter: (a, b) => a.id - b.id,
-      },
       {
         title: 'Actions',
         key: 'actions',
-        fixed: 'right',
-        width: 110,
-        render: (undefined, record) => (
-          <span>
+        width: 115,
+        className: 'maw-data-table-actions-column',
+        render: (text, record) => (
+          <div>
             <ModalFileViewer file={record} />
             { this.props.onEdit &&
             <Tooltip title="Modifier" placement="bottom" mouseEnterDelay={0.6}>
-              { typeof this.props.onEdit == 'string' ?
-                <Link to={this.props.onEdit + record.id}><Button icon="edit" /></Link> :
-                <Button icon="edit" onClick={() => {this.props.onEdit(record.id);}} />
-              }
+              <Button icon="edit" onClick={() => this.props.onEdit(record.id)} />
             </Tooltip> }
             { this.props.onDelete &&
             <Tooltip title="Supprimer" placement="bottom" mouseEnterDelay={0.6}>
-              <Popconfirm title="Êtes-vous sûr ?" onConfirm={() => this.props.onDelete(record.id)} okText="Oui" cancelText="Non">
+              <Popconfirm title="Supprimer ?" onConfirm={() => this.props.onDelete(record.id)} okText="Oui" cancelText="Non">
                 <Button icon="delete" loading={record.isDeleting} />
               </Popconfirm>
             </Tooltip> }
-          </span>
+          </div>
         )
       }
     ];
-    const actionOnSelectedMenu = (
-      <Menu>
-        { this.props.onDeleteSelection &&
-        <Menu.Item key="deleteSelected">
-          <a onClick={this.props.onDeleteSelection}><Icon type="delete" /> Supprimer la sélection</a>
-        </Menu.Item> }
-      </Menu>
-    );
+
+    const { title, onRefresh, onDeleteSelection, onAdd, onSearch } = this.props;
 
     return (
-      <div>
-        <Row>
-          <Col offset={1} span={22}>
-            <h1>{this.props.title}</h1>
+      <div className="maw-data-table">
+
+        { /* Ligne du titre si nécessaire */ title &&
+        <Row style={{marginBottom: '6px'}}>
+            <h1>{title}</h1>
             <hr />
-          </Col>
         </Row>
-        <Row style={{marginTop: '6px'}}>
-          { this.props.onRefresh &&
-          <Col offset={1} span={1}>
+        }
+
+        { /* Ligne avec les boutons d'action */
+        (onRefresh || onDeleteSelection || onAdd) && (
+        <Row style={{marginBottom: '4px'}}>
+
+          <Col span={2} className="maw-data-table-tool-bar">
+            { /* Bouton de refresh si nécessaire */ onRefresh &&
             <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay={0.6}>
-              <Button loading={this.props.loading} icon="reload" onClick={this.props.onRefresh} />
+              <Button loading={this.props.loading} icon="reload" onClick={onRefresh} />
             </Tooltip>
-          </Col> }
-          <Col offset={3} span={6}>
-            <Input
-              placeholder="Recherche"
-              value={this.state.searchText}
-              onChange={this.onInputChange}
-            />
+            }
+            { /* Bouton de suppression de la sélection si nécessaire */ onDeleteSelection &&
+            <Tooltip title="Supprimer la sélection" placement="bottom" mouseEnterDelay={0.6}>
+              <Popconfirm title="Supprimer la sélection ?" onConfirm={this.props.onDeleteSelection} okText="Oui" cancelText="Non">
+                <Button icon="delete" />
+              </Popconfirm>
+            </Tooltip>
+            }
+            { /* Bouton d'ajout si nécessaire */ onAdd &&
+            <Tooltip title="Ajouter" placement="bottom" mouseEnterDelay={0.6}>
+              <Button type="primary" icon="plus" onClick={onAdd} />
+            </Tooltip>
+            }
           </Col>
-          <Col offset={5} span={5}>
-            <Dropdown overlay={actionOnSelectedMenu}>
-              <Button>
-                <Icon type="down" /> Actions
-              </Button>
-            </Dropdown>
+
+          <Col span={4}>
+            { /* Champ de recherche si nécessaire */ onSearch &&
+            <Input.Search placeholder="Rechercher" onSearch={onSearch} />
+            }
           </Col>
-          { this.props.onAdd &&
-            <Col offset={0} span={3}>
-              <Link to={this.props.onAdd}>
-                <Button type="primary">
-                  <Icon type="plus" /> Ajouter
-                </Button>
-              </Link>
-            </Col>
-          }
         </Row>
-        <Row style={{paddingTop: '4px'}}>
-          <Col offset={1} span={22}>
+        )}
+
+        { /* Ligne avec la table */ }
+        <Row>
+          <Col>
             <Table
               loading={this.props.loading}
               columns={columns}
-              dataSource={data}
-              rowKey={(data) => data.id}
+              dataSource={this.props.dataSource}
+              rowKey={(record) => record.id}
               rowSelection={this.props.rowSelection} />
           </Col>
         </Row>

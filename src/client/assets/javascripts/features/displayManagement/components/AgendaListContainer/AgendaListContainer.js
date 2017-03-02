@@ -1,89 +1,39 @@
 import React, { Component, PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
+import { Col, Row } from 'antd';
 
-import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
-import DataTable from 'features/displayManagement/components/DataTable';
+import MediaTableContainer from '../MediaTableContainer';
 
-const mapStateToProps = (state) => {
-  const { mediaById, agenda, isDeleting } = state[displayManagementName];
-  const { isFetching, items } = agenda;
-
-  const agendas = items.map(function(id) {
-    return {
-      ...mediaById[id],
-      isDeleting: isDeleting[id]
-    };
-  });
-  return {
-    isFetching,
-    agendas
-  };
-};
-
-@connect(mapStateToProps, (dispatch) => ({
-  actions: bindActionCreators(displayManagementActions, dispatch)
-}))
-export default class planningListContainer extends Component {
+@withRouter
+export default class AgendaListContainer extends Component {
 
   static propTypes = {
-    actions: PropTypes.object.isRequired,
-    agendas: PropTypes.array.isRequired,
-    isFetching: PropTypes.bool.isRequired,
+    router: PropTypes.object.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      selectedRows: []
-    };
+  onAdd = () => {
+    this.props.router.push('/display-management/agenda/new');
   }
 
-  componentDidMount() {
-    this.props.actions.fetchMediaList('agenda');
+  onEdit = (id) => {
+    this.props.router.push('/display-management/agenda/' + id);
   }
 
-  onSelectionChange = (selectedRowKeys) => {
-    this.setState({ selectedRows: selectedRowKeys });
-  }
-
-  onRefresh = () => {
-    this.props.actions.fetchMedia('agenda');
-  }
-
-  onDelete = (id) => {
-    this.props.actions.deleteMedia(id);
-  }
-
-  onDeleteSelection = () => {
-    for (let i=0; i<this.state.selectedRows.length; i++) {
-      this.props.actions.deleteMedia(this.state.selectedRows[i]);
-    }
-  }
-  onEdit = (editedFile) => {
-    this.props.actions.patchMedia(editedFile);
-  }
   render() {
-    const columns = [
-    ];
-
-    const rowSelection = {
-      onChange: this.onSelectionChange
-    };
 
     return (
-      <DataTable
-        title="Agendas"
-        loading={this.props.isFetching}
-        columns={columns}
-        dataSource={this.props.agendas}
-        rowSelection={rowSelection}
-        onRefresh={this.onRefresh}
-        onDelete={this.onDelete}
-        onEdit="/display-management/agenda/"
-        onDeleteSelection={this.onDeleteSelection}
-        editMedia={this.onEdit} />
+      <div>
+        <Row>
+          <Col offset={1} span={22}>
+            <h1>Agendas</h1>
+            <hr style={{marginBottom: '4px'}} />
+            <MediaTableContainer
+              mediaType="scene"
+              onAdd={this.onAdd}
+              onEdit={this.onEdit} />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
