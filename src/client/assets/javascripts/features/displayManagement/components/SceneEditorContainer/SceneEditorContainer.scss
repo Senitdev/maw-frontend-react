@@ -6,6 +6,11 @@
   height: 100%;
 }
 
+#scene-editor-list {
+  display: flex;
+  flex-direction: column;
+}
+
 #scene-editor-list li {
   padding: 5px;
   word-break: break-word;
@@ -17,4 +22,12 @@
 
 #scene-editor-list > ul > li button {
   float: right;
+}
+
+#drop-empty-container {
+  margin: 5px;
+  padding-top: 20px;
+  height: 100%;
+  border: 1px dashed black;
+  text-align: center;
 }

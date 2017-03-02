@@ -7,7 +7,7 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
 
-import { Layout, Button, Input } from 'antd';
+import { Layout, Button, Input, Icon, Spin } from 'antd';
 
 import SceneEditorForm from './SceneEditorForm';
 
@@ -45,7 +45,8 @@ export default class SceneEditorContainer extends Component {
       mediaEdit: {
         id: -1,
         name: ''
-      }
+      },
+      isFetching: true,
     };
   }
 
@@ -63,6 +64,10 @@ export default class SceneEditorContainer extends Component {
     this.props.actions.fetchMediaList('agenda');
     if (idScene >= 0)
       this.props.actions.fetchMediaDetails(idScene);
+    else
+      this.setState({
+        isFetching: false
+      });
   }
 
   componentDidMount() {
@@ -81,6 +86,7 @@ export default class SceneEditorContainer extends Component {
             guestHeight: {value: 0},
             startTimeOffset: {value: 0},
             duration: {value: -1},
+            idRelation: -1, // Id le relation déjà existante (-1 si aucune)
           }])
         });
       }
@@ -114,13 +120,17 @@ export default class SceneEditorContainer extends Component {
           guestHeight: {value: relation.guestHeight},
           startTimeOffset: {value: relation.startTimeOffset},
           duration: {value: relation.duration},
+          idRelation: relation.id, // Id le relation déjà existante
         });
       }
       this.setState({
-        mediaInScene: mediaInScene
+        mediaInScene: mediaInScene,
+        isFetching: false
       });
     }
   }
+
+  mediaDeleted = [];
 
   selecteMediaInScene = (id) => {
     if (id != this.state.selecteMedia) {
@@ -131,6 +141,10 @@ export default class SceneEditorContainer extends Component {
   }
 
   removeMediaInScene = (id) => {
+    // Liste des relations supprimées
+    if (this.state.mediaInScene[id].idRelation >= 0)
+      this.mediaDeleted.push(this.state.mediaInScene[id].idRelation);
+
     var newMedias = this.state.mediaInScene;
     newMedias.splice(id, 1);
 
@@ -173,6 +187,14 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
+  submitChange = () => {
+    // this.mediaDeleted : contient les id des relations à supprimer
+    // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
+    // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
+    // send(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
+    console.log(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
+  }
+
   render() {
     var mediaListLi = [];
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
@@ -202,13 +224,26 @@ export default class SceneEditorContainer extends Component {
                   value={this.state.mediaEdit.name}
                   onChange={this.changeName}
                   placeholder="Nom de la scène" />
-                <Button style={{display: 'block', margin: '5px auto'}} type="primary" size="large">Sauvegarder</Button>
+                <Button onClick={this.submitChange} style={{display: 'block', margin: '5px auto'}} type="primary" size="large">Sauvegarder</Button>
               </div>
               <br />
-              <h3>Médias dans la scène</h3>
-              <ul>
-                {mediaListLi}
-              </ul>
+              <h3>Médias dans la scène <Spin spinning={this.state.isFetching} /></h3>
+              {
+                this.state.mediaInScene.length == 0 ?
+                  <div id="drop-empty-container">
+                    <span>
+                      <Icon type="arrow-down" />
+                    </span>
+                    <br />
+                    <span>
+                      Déplacez des médias ici !
+                    </span>
+                  </div>
+                :
+                  <ul>
+                    {mediaListLi}
+                  </ul>
+              }
             </Layout.Sider>
             <Layout.Content>
               { this.state.mediaSelected >= 0 &&
