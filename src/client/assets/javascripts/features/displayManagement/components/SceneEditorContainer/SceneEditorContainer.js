@@ -7,20 +7,21 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
 
-import { Layout, Button } from 'antd';
+import { Layout, Button, Input } from 'antd';
 
 import SceneEditorForm from './SceneEditorForm';
 
 import './SceneEditorContainer.scss';
 
 @connect((state) => {
-  const { mediaById, file, scene, agenda } = state[displayManagementName];
+  const { mediaById, file, scene, agenda, relationsById } = state[displayManagementName];
 
   const mediaByType = { file, scene, agenda };
 
   return {
     mediaByType,
-    mediaById
+    mediaById,
+    relationsById
   };
 
 }, (dispatch) => ({
@@ -41,14 +42,27 @@ export default class SceneEditorContainer extends Component {
     this.state = {
       mediaInScene: [],
       mediaSelected: -1,
+      mediaEdit: {
+        id: -1,
+        name: ''
+      }
     };
   }
 
   componentWillMount() {
+    const idScene = Number(this.props.params.idScene);
+    this.setState({
+      mediaEdit: {
+        ...this.state.mediaEdit,
+        id: !isNaN(idScene) ? idScene : -1
+      }
+    });
+
     this.props.actions.fetchMediaList('file');
     this.props.actions.fetchMediaList('scene');
     this.props.actions.fetchMediaList('agenda');
-    this.props.actions.fetchMediaDetails(Number(this.props.params.idScene));
+    if (idScene >= 0)
+      this.props.actions.fetchMediaDetails(idScene);
   }
 
   componentDidMount() {
@@ -71,6 +85,41 @@ export default class SceneEditorContainer extends Component {
         });
       }
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.mediaById) {
+      if (nextProps.mediaById[this.state.mediaEdit.id]) {
+        this.setState({
+          mediaEdit: {
+            ...this.state.mediaEdit,
+            name: nextProps.mediaById[this.state.mediaEdit.id].name
+          }
+        });
+      }
+    }
+    if (nextProps.relationsById) {
+      var mediaInScene = [];
+      for (var index in nextProps.relationsById) {
+        const relation = nextProps.relationsById[index];
+        mediaInScene.push({
+          id: relation.guestMediaId,
+          boxLeft: {value: relation.boxLeft},
+          boxTop: {value: relation.boxTop},
+          boxWidth: {value: relation.boxWidth},
+          boxHeight: {value: relation.boxHeight},
+          guestLeft: {value: relation.guestLeft},
+          guestTop: {value: relation.guestTop},
+          guestWidth: {value: relation.guestWidth},
+          guestHeight: {value: relation.guestHeight},
+          startTimeOffset: {value: relation.startTimeOffset},
+          duration: {value: relation.duration},
+        });
+      }
+      this.setState({
+        mediaInScene: mediaInScene
+      });
+    }
   }
 
   selecteMediaInScene = (id) => {
@@ -114,6 +163,16 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
+  changeName = (e) => {
+    const { value } = e.target;
+    this.setState({
+      mediaEdit: {
+        ...this.state.mediaEdit,
+        name: value
+      }
+    });
+  }
+
   render() {
     var mediaListLi = [];
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
@@ -138,7 +197,13 @@ export default class SceneEditorContainer extends Component {
         <Layout.Content id="scene-list-container">
           <Layout>
             <Layout.Sider id="scene-editor-list">
-              <Button type="primary" size="large">Sauvegarder</Button>
+              <div style={{padding: '5px 5px 0px 5px'}}>
+                <Input
+                  value={this.state.mediaEdit.name}
+                  onChange={this.changeName}
+                  placeholder="Nom de la scène" />
+                <Button style={{display: 'block', margin: '5px auto'}} type="primary" size="large">Sauvegarder</Button>
+              </div>
               <br />
               <h3>Médias dans la scène</h3>
               <ul>
