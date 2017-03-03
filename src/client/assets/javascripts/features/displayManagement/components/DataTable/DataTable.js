@@ -65,7 +65,7 @@ export default class DataTable extends Component {
         (onRefresh || onDeleteSelection || onAdd) && (
         <Row style={{marginBottom: '4px'}}>
 
-          <Col span={2} className="maw-data-table-tool-bar">
+          <Col span={3} className="maw-data-table-tool-bar">
             { /* Bouton de refresh si nécessaire */ onRefresh &&
             <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay={0.6}>
               <Button loading={this.props.loading} icon="reload" onClick={onRefresh} />

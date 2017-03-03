@@ -16,7 +16,7 @@ export default class SceneListContainer extends Component {
   }
 
   onEdit = (id) => {
-    this.props.router.push('display-management/scene/' + id);
+    this.props.router.push('/display-management/scene/' + id);
   }
 
   render() {
