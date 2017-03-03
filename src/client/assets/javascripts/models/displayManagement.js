@@ -4,7 +4,7 @@ interface Relation {
   guestMediaId: number;
   boxLeft: number;
   boxTop: number;
-  boxwidth: number;
+  boxWidth: number;
   boxHeight: number;
   guestLeft: number;
   guestTop: number;

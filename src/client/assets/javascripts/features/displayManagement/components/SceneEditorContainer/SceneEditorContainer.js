@@ -209,7 +209,7 @@ export default class SceneEditorContainer extends Component {
     // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
     // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
     // send(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
-    console.log(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
+    this.props.actions.patchScene(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
   }
 
   moveMediaInScene = (id, deplacement) => {

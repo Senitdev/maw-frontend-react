@@ -2,8 +2,9 @@
 
 import { createStructuredSelector } from 'reselect';
 import fetch from 'isomorphic-fetch';
-
+import omit from 'lodash/omit';
 import { State } from 'models/displayManagement';
+
 import { NotificationGenerator } from 'features/core/components/NotificationGenerator';
 
 import './displayManagement.scss';
@@ -32,7 +33,211 @@ const MEDIA_RELATION_REQUEST = 'maw/displayManagement/MEDIA_RELATION_REQUEST';
 const MEDIA_RELATION_SUCCESS = 'maw/displayManagement/MEDIA_RELATION_SUCCESS';
 const MEDIA_RELATION_FAILURE = 'maw/displayManagement/MEDIA_RELATION_FAILURE';
 
+const CREATE_RELATION_REQUEST = 'maw/displayManagement/CREATE_RELATION_REQUEST';
+const CREATE_RELATION_SUCCESS = 'maw/displayManagement/CREATE_RELATION_SUCCESS';
+const CREATE_RELATION_FAILURE = 'maw/displayManagement/CREATE_RELATION_FAILURE';
+
+const PATCH_RELATION_REQUEST = 'maw/displayManagement/PATCH_RELATION_REQUEST';
+const PATCH_RELATION_SUCCESS = 'maw/displayManagement/PATCH_RELATION_SUCCESS';
+const PATCH_RELATION_FAILURE = 'maw/displayManagement/PATCH_RELATION_FAILURE';
+
+const DELETE_RELATION_REQUEST = 'maw/displayManagement/DELETE_RELATION_REQUEST';
+const DELETE_RELATION_SUCCESS = 'maw/displayManagement/DELETE_RELATION_SUCCESS';
+const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
+
 // Action creators
+
+function deleteRelationRequest(id) {
+  return {
+    type: DELETE_RELATION_REQUEST,
+    payload: { id }
+  };
+}
+function deleteRelationSuccess(id) {
+  return {
+    type: DELETE_RELATION_SUCCESS,
+    payload: { id }
+  };
+}
+function deleteRelationFailure(id, error) {
+  return {
+    type: DELETE_RELATION_FAILURE,
+    payload: { id, error }
+  };
+}
+
+function deleteRelation(id) {
+  const url = API + 'entities/1/modules/3/media-media/';
+
+  return (dispatch) => {
+    dispatch(deleteRelationRequest(id));
+
+    return fetch(url + id, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'}
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw response;
+      }
+      dispatch(deleteRelationSuccess(id));
+    })
+    .catch((error) => {
+      dispatch(deleteRelationFailure(id, error));
+    });
+  };
+}
+
+function camelToSnake(s) {
+  return s.replace(/([A-Z])/g, function($1){return "_"+$1.toLowerCase();});
+}
+function snakeToCamel(s) {
+  return s.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('_','');});
+}
+function normalizeRelationForServer(relation) {
+  var relationForServer = {};
+  for (let key in relation)
+    relationForServer[camelToSnake(key)] = relation[key];
+  return relationForServer;
+}
+function normalizeRelation(relationFromServer) {
+  var relation = {};
+  for (let key in relationFromServer)
+    relation[snakeToCamel(key)] = relationFromServer[key];
+  return relation;
+}
+function createRelationRequest() {
+  return {
+    type: CREATE_RELATION_REQUEST,
+    payload: { }
+  };
+}
+function createRelationSuccess(relation) {
+  return {
+    type: CREATE_RELATION_SUCCESS,
+    payload: { relation }
+  };
+}
+function createRelationFailure() {
+  return {
+    type: CREATE_RELATION_FAILURE,
+    payload: { }
+  };
+}
+
+function createRelation(relation) {
+
+  const relationForServer = normalizeRelationForServer(relation);
+  let url = API + 'entities/1/modules/3/media-media';
+
+  return (dispatch) => {
+    dispatch(createRelationRequest());
+
+    return fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({...relationForServer, return: 1})
+    })
+    .then((response) => {
+      if (!response.ok) {
+        let error = new Error('create fail');
+        error.response = response;
+        throw error;
+      }
+      response.json()
+      .then((response) => {
+        relation.id = response.data.id;
+        dispatch(createRelationSuccess(normalizeRelation(relation)));
+      });
+    })
+    .catch((error) => dispatch(createRelationFailure(relation.id, error)));
+  };
+}
+
+function patchRelationRequest() {
+  return {
+    type: PATCH_RELATION_REQUEST,
+    payload: { }
+  };
+}
+function patchRelationSuccess(relation) {
+  return {
+    type: PATCH_RELATION_SUCCESS,
+    payload: { relation }
+  };
+}
+function patchRelationFailure(id, error) {
+  return {
+    type: PATCH_RELATION_FAILURE,
+    payload: { id, error }
+  };
+}
+
+function patchRelation(relation) {
+
+  const relationForServer = normalizeRelationForServer(relation);
+  let url = API + 'entities/1/modules/3/media-media/' + relation.id;
+
+  return (dispatch) => {
+    dispatch(patchRelationRequest());
+    return fetch(url, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({...relationForServer, return: 1})
+    })
+    .then((response) => {
+      if (!response.ok) {
+        let error = new Error('patch fail');
+        error.response = response;
+        throw error;
+      }
+      dispatch(patchRelationSuccess(normalizeRelation(relation)));
+    })
+    .catch((error) => dispatch(patchRelationFailure(relation.id, error)));
+  };
+}
+
+//Prend des relations provenant d'un formulaire pour le mettre en forme, prêt à être transmit au action.
+function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene) {
+  var normalizedRelations = {};
+
+  for (let key in patchedOrCreatedRelations) { //Pour chaque relation à MàJ ou crée...
+    normalizedRelations[key] = {};
+
+    if (patchedOrCreatedRelations.hasOwnProperty(key)) {
+      let relation = patchedOrCreatedRelations[key]; //Etrait la relation
+      normalizedRelations[key]['id'] = relation['idRelation'];
+      if (normalizedRelations[key]['id'] < 0) { //Si on a affaire à une création, on doit renseigner hostMedia et guestMedia
+        normalizedRelations[key]['hostMediaId'] = scene['id'];
+        normalizedRelations[key]['guestMediaId'] = parseInt(relation['id']);
+      }
+      for (let subKey in relation) {
+        if (subKey in relation)
+          if (relation[subKey].value != null)
+            if (relation[subKey].value > -1)
+              normalizedRelations[key][subKey] = relation[subKey].value;
+      }
+    }
+  }
+  return normalizedRelations;
+}
+function patchScene(deletedRelations, patchedOrCreatedRelations, scene) {
+
+  const normalizedRelationsFromSceneEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene);
+
+  return (dispatch) => {
+    deletedRelations.forEach((deletedRelation) => {
+      dispatch(deleteRelation(deletedRelation));
+    });
+    for (let key in normalizedRelationsFromSceneEditor) {
+      if (normalizedRelationsFromSceneEditor[key].id > -1) {
+        dispatch(patchRelation(normalizedRelationsFromSceneEditor[key]));
+      } else {
+        dispatch(createRelation(normalizedRelationsFromSceneEditor[key]));
+      }
+    }
+  };
+}
 
 function patchMediaRequest(id) {
   return {
@@ -124,7 +329,7 @@ const normalize = {
     guestMediaId: relation.guest_media_id,
     boxLeft: relation.box_left,
     boxTop: relation.box_top,
-    boxwidth: relation.box_width,
+    boxWidth: relation.box_width,
     boxHeight: relation.box_height,
     guestLeft: relation.guest_left,
     guestTop: relation.guest_top,
@@ -410,6 +615,7 @@ export const actionCreators = {
   fetchMediaDetails,
   patchMedia,
   fetchMediaRelation,
+  patchScene,
 };
 
 // State initial
@@ -446,6 +652,73 @@ const initialState: State = {
 export default function reducer(state: State = initialState, action: any = {}): State {
 
   switch (action.type) {
+
+    //TODO case DELETE_RELATION_REQUEST
+    //TODO case DELETE_RELATION_FAILURE
+    //TODO case PATCH_RELATION_REQUEST
+    //TODO case PATCH_RELATION_FAILURE
+    //TODO case CREATE_RELATION_REQUEST
+    //TODO case CREATE_RELATION_FAILURE
+
+    case CREATE_RELATION_SUCCESS: {
+      var newRelationsWithGuests = (state.mediaById[action.payload.relation.hostMediaId].relationsWithGuests).slice();
+      newRelationsWithGuests.push(action.payload.relation.id);
+      var newRelationsWithHosts = (state.mediaById[action.payload.relation.guestMediaId].relationsWithHosts).slice();
+      newRelationsWithHosts.push(action.payload.relation.id);
+      return {
+        ...state,
+        relationsById: {
+          ...state.relationsById,
+          [action.payload.relation.id]: action.payload.relation,
+        },
+        mediaById: {
+          ...state.mediaById,
+          [action.payload.relation.hostMediaId]: {
+            ...state.mediaById[action.payload.relation.hostMediaId],
+            relationsWithGuests: newRelationsWithGuests
+          },
+          [action.payload.relation.guestMediaId]: {
+            ...state.mediaById[action.payload.relation.guestMediaId],
+            relationsWithHosts: newRelationsWithHosts
+          }
+        }
+      };
+    }
+
+    case PATCH_RELATION_SUCCESS: {
+      return {
+        ...state,
+        relationsById: {
+          ...state.relationsById,
+          [action.payload.relation.id]: {
+            ...state.relationsById[action.payload.relation.id],
+            ...action.payload.relation,
+          }
+        }
+      };
+    }
+
+    case DELETE_RELATION_SUCCESS: {
+      let { id } = action.payload;
+      let hostId = state.mediaById[state.relationsById[id].hostMediaId].id;
+      let guestId = state.mediaById[state.relationsById[id].guestMediaId].id;
+
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById,
+          [hostId]: {
+            ...state.mediaById[hostId],
+            relationsWithGuests: state.mediaById[hostId].relationsWithGuests.filter((relationId) => id != relationId)
+          },
+          [guestId]: {
+            ...state.mediaById[guestId],
+            relationsWithHosts: state.mediaById[guestId].relationsWithHosts.filter((relationId) => id != relationId)
+          }
+        },
+        relationsById: omit(state.relationsById, id)
+      };
+    }
 
     case PATCH_MEDIA_REQUEST:
       return {
@@ -536,12 +809,22 @@ export default function reducer(state: State = initialState, action: any = {}): 
         }
       }
 
+      // TODO Ceci pour contourner un bug qui fait que le serveur nouos retourne Null parfoit pour des valeurs à zero.
+      // Il faudra supprimer ça et dévercer action.payload.relationsById directement dans state.relationsById
+      var relationsNormalized = {
+        ...action.payload.relationsById
+      };
+      for (let key in action.payload.relationsById)
+        for (let subKey in action.payload.relationsById[key])
+          if (action.payload.relationsById[key][subKey] == null)
+            relationsNormalized[key][subKey] = 0;
+
       return {
         ...state,
         mediaById,
         relationsById: {
           ...state.relationsById,
-          ...action.payload.relationsById,
+          ...relationsNormalized,
         },
         isFetchingDetails: false,
       };
