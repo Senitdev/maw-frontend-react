@@ -28,7 +28,7 @@ export default class AgendaListContainer extends Component {
             <h1>Agendas</h1>
             <hr style={{marginBottom: '4px'}} />
             <MediaTableContainer
-              mediaType="scene"
+              mediaType="agenda"
               onAdd={this.onAdd}
               onEdit={this.onEdit} />
           </Col>
