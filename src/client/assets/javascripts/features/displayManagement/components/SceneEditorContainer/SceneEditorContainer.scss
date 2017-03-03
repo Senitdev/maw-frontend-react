@@ -1,9 +1,7 @@
+$randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
+
 #scene-list-container .ant-layout-sider{
   background: none;
-}
-
-#scene-list-container > div {
-  height: 100%;
 }
 
 #scene-editor-list {
@@ -30,4 +28,60 @@
   height: 100%;
   border: 1px dashed black;
   text-align: center;
+}
+
+#editor-positions {
+  border: 1px solid black;
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  user-select: none;
+}
+
+#editor-positions > div{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.editor-position {
+  border: 1px solid #989898;
+  color: white;
+}
+
+#editor-duration-menu {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.editor-duration > div {
+  height: 44px;
+}
+
+.editor-duration {
+  border: 1px solid black;
+  padding: 3px;
+  margin-bottom: 1px;
+}
+
+.editor-duration button {
+  vertical-align: middle;
+  display: block;
+}
+
+.editor-duration .editor-duration-buttons {
+  border-right: 1px solid black;
+}
+
+.editor-separation-element {
+  width: 100px;
+  height: 100%;
+  background-color: rgb(random(256)-1,random(256)-1,random(256)-1);
+  color: white;
+}
+
+#scene-list-container .ant-tabs-content {
+  height: 100%;
 }

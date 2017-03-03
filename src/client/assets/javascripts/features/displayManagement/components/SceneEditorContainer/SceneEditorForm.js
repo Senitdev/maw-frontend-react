@@ -62,7 +62,7 @@ class SceneEditorForm extends Component {
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="boxLeft"
+              label="x %"
               hasFeedback
             >
               {getFieldDecorator('boxLeft', {
@@ -72,14 +72,14 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber />
+                <InputNumber min={0} max={100} />
               )}
             </Form.Item>
           </Col>
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="boxTop"
+              label="y %"
               hasFeedback
             >
               {getFieldDecorator('boxTop', {
@@ -89,14 +89,14 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber />
+                <InputNumber min={0} max={100} />
               )}
             </Form.Item>
           </Col>
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="boxWidth"
+              label="largeur %"
               hasFeedback
             >
               {getFieldDecorator('boxWidth', {
@@ -106,14 +106,14 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber />
+                <InputNumber min={0} max={100} />
               )}
             </Form.Item>
           </Col>
           <Col span="6">
             <Form.Item
               {...formItemLayout}
-              label="boxHeight"
+              label="hauteur %"
               hasFeedback
             >
               {getFieldDecorator('boxHeight', {
@@ -123,7 +123,7 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber />
+                <InputNumber min={0} max={100} />
               )}
             </Form.Item>
           </Col>

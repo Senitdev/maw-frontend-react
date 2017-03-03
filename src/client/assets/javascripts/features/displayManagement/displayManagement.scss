@@ -1,5 +1,5 @@
 #displayManagementLayout {
-
+  height: 100%;
 }
 $primary-color: #f4f4f4;
 #displayManagementLayout > .ant-layout-header {
@@ -15,10 +15,11 @@ $primary-color: #f4f4f4;
 }
 
 #displayManagementLayout .display-management-content-layout {
-  height: auto;
+  height: 100%;
 }
 
 #displayManagementLayout .ant-layout-content {
   padding: 5px;
   background-color: #f1f1f1;
+  display: block;
 }
