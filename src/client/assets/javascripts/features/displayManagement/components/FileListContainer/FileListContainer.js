@@ -2,17 +2,12 @@ import React, { Component } from 'react';
 import { Col, Row } from 'antd';
 
 import MediaTableContainer from '../MediaTableContainer';
+import FileUpload from '../FileUpload';
 
 export default class FileListContainer extends Component {
 
   onAdd = () => {
-    // TODO: Callback bouton "Nouveau fichier"
-    console.log('Nouveau fichier cliqué');
-  }
-
-  onEdit = (id) => {
-    // TODO: Callback bouton "Modifier fichier"
-    console.log(`Modifier fichier ${id} cliqué`);
+    this.fileUpload.open();
   }
 
   render() {
@@ -43,11 +38,11 @@ export default class FileListContainer extends Component {
           <Col offset={1} span={22}>
             <h1>Fichiers</h1>
             <hr style={{marginBottom: '4px'}} />
+            <FileUpload ref={(ref) => this.fileUpload = ref ? ref.getWrappedInstance() : null} />
             <MediaTableContainer
               mediaType="file"
               columns={columns}
-              onAdd={this.onAdd}
-              onEdit={this.onEdit} />
+              onAdd={this.onAdd} />
           </Col>
         </Row>
       </div>

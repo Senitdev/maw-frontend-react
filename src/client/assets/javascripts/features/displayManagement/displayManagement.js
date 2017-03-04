@@ -45,6 +45,8 @@ const DELETE_RELATION_REQUEST = 'maw/displayManagement/DELETE_RELATION_REQUEST';
 const DELETE_RELATION_SUCCESS = 'maw/displayManagement/DELETE_RELATION_SUCCESS';
 const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
 
+const ADD_FILE = 'maw/displayManagement/ADD_FILE';
+
 // Action creators
 
 function deleteRelationRequest(id) {
@@ -609,6 +611,19 @@ function fetchMediaRelation(idMedia) {
   };
 }
 
+function addFile(data) {
+  const payload = {
+    file: {
+      ...normalize.media(data.media),
+      ...normalize.file(data)
+    }
+  };
+  return {
+    type: ADD_FILE,
+    payload
+  };
+}
+
 export const actionCreators = {
   deleteMedia,
   fetchMediaList,
@@ -616,6 +631,7 @@ export const actionCreators = {
   patchMedia,
   fetchMediaRelation,
   patchScene,
+  addFile,
 };
 
 // State initial
@@ -889,6 +905,19 @@ export default function reducer(state: State = initialState, action: any = {}): 
       return {
         ...state,
         fetchError: action.payload.error
+      };
+
+    case ADD_FILE:
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById,
+          [action.payload.file.id]: action.payload.file
+        },
+        file: {
+          ...state.file,
+          items: [...state.file.items, action.payload.file.id]
+        }
       };
 
     default:
