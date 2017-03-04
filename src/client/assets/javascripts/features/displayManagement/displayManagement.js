@@ -266,21 +266,25 @@ function patchMedia(media) {
 
   return (dispatch) => {
     dispatch(patchMediaRequest(media.id));
-    return fetch(url + 'medias/' + media.id + '?return=1&Media=' + JSON.stringify({Media: media}) + '&name=' + media.name, {
+    return fetch(url + 'medias/' + media.id, {
       method: 'PATCH',
-      header: {'content-type': 'application/json'}
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({...normalizeRelationForServer(media), return: 1})
     })
     .then((response) => {
       if (!response.ok) {
-        let error = new Error('patch fail');
-        error.response = response;
-        throw error;
+        throw response;
       }
-      response.json().then(
-        (response) => dispatch(patchMediaSuccess(response.data))
-      );
+      return response.json().then((json) => json.data);
     })
-    .catch((media) => patchMediaFailure(media.id));
+    .then((data) => {
+      dispatch(patchMediaSuccess({
+        ...normalize.media(data)
+      }));
+    })
+    .catch((error) => {
+      dispatch(patchMediaFailure(media.id));
+    });
   };
 }
 
