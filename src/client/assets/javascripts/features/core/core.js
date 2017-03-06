@@ -7,7 +7,6 @@ import { State } from 'models/core';
 // Action Types
 
 const COLLAPSE_SIDE_MENU = 'maw/core/COLLAPSE_SIDE_MENU';
-const TOGGLE_SIDE_MENU = 'maw/core/TOGGLE_SIDE_MENU';
 
 // This will be used in our root reducer and selectors
 
@@ -16,7 +15,7 @@ export const NAME = 'core';
 // Define the initial state for `core` module
 
 const initialState: State = {
-  collapsedSideMenu: false,
+  collapsedSideMenu: !!localStorage.getItem('core.collapsedSideMenu')
 };
 
 // Reducer
@@ -33,12 +32,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
       return state;
     }
 
-    case TOGGLE_SIDE_MENU:
-      return {
-        ...state,
-        collapsedSideMenu: !state.collapsedSideMenu
-      };
-
     default:
       return state;
   }
@@ -47,14 +40,22 @@ export default function reducer(state: State = initialState, action: any = {}): 
 // Action Creators
 
 function collapseSideMenu(collapsed: boolean) {
-  return {
-    type: COLLAPSE_SIDE_MENU,
-    collapsed
+  return (dispatch) => {
+    // Garde l'état du menu en localStorage
+    if (collapsed) {
+      localStorage.setItem('core.collapsedSideMenu', '1');
+    } else {
+      localStorage.setItem('core.collapsedSideMenu', '');
+    }
+    dispatch({
+      type: COLLAPSE_SIDE_MENU,
+      collapsed
+    });
   };
 }
 
 function toggleSideMenu() {
-  return { type: TOGGLE_SIDE_MENU };
+  return (dispatch, getState) => collapseSideMenu(!getState().collapsedSideMenu)(dispatch);
 }
 
 // Selectors
