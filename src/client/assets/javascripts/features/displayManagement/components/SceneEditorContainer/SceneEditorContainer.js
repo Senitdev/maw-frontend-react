@@ -134,6 +134,7 @@ export default class SceneEditorContainer extends Component {
         guestWidth: {value: 0},
         guestHeight: {value: 0},
         startTimeOffset: {value: 0},
+        //duration: {value: this.state.mediaById[ui.draggable.attr("id")].duration},
         duration: {value: -1},
         idRelation: -1, // Id le relation déjà existante (-1 si aucune)
       }])
@@ -141,8 +142,8 @@ export default class SceneEditorContainer extends Component {
   }
 
   listDrop = () => {
-    $("#scene-editor-list, #editor-positions, #editor-duration").unbind('droppable');
-    $("#scene-editor-list, #editor-positions, #editor-duration").droppable({
+    $("#scene-editor-list, #editor-positions").unbind('droppable');
+    $("#scene-editor-list, #editor-positions").droppable({
       drop: this.dropEvent,
     });
   }
@@ -243,7 +244,7 @@ export default class SceneEditorContainer extends Component {
       );
 
       // Séparation de l'écran
-      const shade = (idTemp + 1) * 10 % 100;
+      const shade = (idTemp + 3) * 8 % 100;
       screenSparationsDivs.push(
         <Rnd
           key={idTemp}
@@ -264,16 +265,23 @@ export default class SceneEditorContainer extends Component {
             if (this.state.mediaSelected != idTemp)
               this.setState({mediaSelected: idTemp});
           }}
-          onResizeStop={(direction, styleSize, clientSize, delta) => {
+          onResizeStop={(direction, styleSize, clientSize) => {
             var newMediaInScene = this.state.mediaInScene;
-            newMediaInScene[idTemp].boxHeight.value = Math.round(clientSize.height / this.editorHeight * 100);
-            newMediaInScene[idTemp].boxWidth.value = Math.round(clientSize.width / this.editorWidth * 100);
-            newMediaInScene[idTemp].boxHeight.value = newMediaInScene[idTemp].boxHeight.value > 100 ? 100 : newMediaInScene[idTemp].boxHeight.value;
-            newMediaInScene[idTemp].boxWidth.value = newMediaInScene[idTemp].boxWidth.value > 100 ? 100 : newMediaInScene[idTemp].boxWidth.value;
+            const newHeight = Math.round(clientSize.height / this.editorHeight * 100);
+            const newWidth = Math.round(clientSize.width / this.editorWidth * 100);
+
+            newMediaInScene[idTemp].boxHeight.value = newHeight + newMediaInScene[idTemp].boxTop.value > 100 ? 100 - newMediaInScene[idTemp].boxTop.value : newHeight;
+            newMediaInScene[idTemp].boxWidth.value = newWidth + newMediaInScene[idTemp].boxLeft.value > 100 ? 100 - newMediaInScene[idTemp].boxLeft.value : newWidth;
+
             this.setState({
               mediaInScene: newMediaInScene
             });
-          }}
+            if (this.rnd[idTemp])
+              this.rnd[idTemp].updateSize({
+                width: newMediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth,
+                height: newMediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight,
+              });
+            }}
           onDragStart={() => {
             this.haveDrag[idTemp] = false;
           }}
@@ -296,6 +304,7 @@ export default class SceneEditorContainer extends Component {
       );
 
       // Editeur des durées et z-index
+      const duree = this.state.mediaInScene[idTemp].duration.value == -1 ? media.duration : this.state.mediaInScene[idTemp].duration.value;
       durationElements.push(
         <Row key={idTemp} className="editor-duration">
         <Col span="1" className="editor-duration-buttons">
@@ -315,9 +324,9 @@ export default class SceneEditorContainer extends Component {
         <Col span="23">
           <Rnd
             initial={{
-              x: 0,
+              x: this.state.mediaInScene[idTemp].startTimeOffset.value,
               y: 0,
-              width: 400,
+              width: Math.max(duree, 150),
               height: 44,
             }}
             style={{backgroundColor: '#' + shade + shade + shade}}
@@ -327,8 +336,35 @@ export default class SceneEditorContainer extends Component {
             maxHeight={44}
             bounds={'parent'}
             moveAxis="x"
+            onDragStop={(event, ui) => {
+              var newMediaInScene = this.state.mediaInScene;
+              newMediaInScene[idTemp].startTimeOffset.value = ui.position.left;
+              this.setState({
+                mediaInScene: newMediaInScene
+              });
+            }}
+            onResizeStop={(direction, styleSize, clientSize) => {
+              var newMediaInScene = this.state.mediaInScene;
+              newMediaInScene[idTemp].duration.value = clientSize.width;
+              this.setState({
+                mediaInScene: newMediaInScene
+              });
+            }}
           >
-            {media.name}
+            <ul>
+              <li>{media.name}</li>
+              <li>{this.state.mediaInScene[idTemp].startTimeOffset.value} : Décalage (s)</li>
+              <li>{duree}: Durée (s)</li>
+            </ul>
+            <Button size="small" shape="circle" icon="reload"
+              onClick={() => {
+                var newMediaInScene = this.state.mediaInScene;
+                newMediaInScene[idTemp].duration.value = -1;
+                this.setState({
+                  mediaInScene: newMediaInScene
+                });
+              }}
+            />
           </Rnd>
         </Col>
         </Row>
@@ -354,7 +390,7 @@ export default class SceneEditorContainer extends Component {
               </div>
             }
           >
-          <Tabs.TabPane tab="Éditeur simple" key="1">
+          <Tabs.TabPane tab="Éditeur avancé" key="1">
           <Layout style={{height: '100%'}}>
             <Layout.Sider id="scene-editor-list">
               <h3>Médias dans la scène <Spin spinning={this.state.isFetching} /></h3>
@@ -386,7 +422,7 @@ export default class SceneEditorContainer extends Component {
             </Layout.Content>
           </Layout>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Éditeur avancé" key="2">
+          <Tabs.TabPane tab="Éditeur graphique" key="2">
             <Row>
               <Col id="editor-positions" span="24">
                 <div>

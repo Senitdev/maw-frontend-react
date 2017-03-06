@@ -202,7 +202,7 @@ class SceneEditorForm extends Component {
           <Col span="12">
             <Form.Item
               {...formItemLayout}
-              label="startTimeOffset"
+              label="Décalage en seconde"
               hasFeedback
             >
               {getFieldDecorator('startTimeOffset', {
@@ -219,7 +219,7 @@ class SceneEditorForm extends Component {
           <Col span="12">
             <Form.Item
               {...formItemLayout}
-              label="duration"
+              label="Durée"
               hasFeedback
             >
               <Checkbox checked={this.props.mediaData.duration.value >= 0} onChange={this.props.changeDuration} />

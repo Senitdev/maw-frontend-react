@@ -85,7 +85,10 @@ export default class MediaListContainer extends Component {
         if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
           return (
             <Col key={id.toString()} className="gutter-row" span={8}>
-              <Tooltip placement={tooltipPlacement} title={this.props.mediaById[id].name}>
+              <Tooltip
+                mouseEnterDelay={1}
+                placement={tooltipPlacement}
+                title={this.props.mediaById[id].name}>
                 <div
                   className="media-gutter-box"
                   id={this.props.mediaById[id].id}
