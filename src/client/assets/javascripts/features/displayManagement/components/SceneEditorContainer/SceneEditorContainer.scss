@@ -49,6 +49,9 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   border: 1px solid #989898;
   color: white;
   user-select: none;
+  overflow: hidden;
+  text-align: center;
+  margin-top: 2px;
 }
 
 #editor-duration-menu {

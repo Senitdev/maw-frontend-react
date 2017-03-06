@@ -13,6 +13,8 @@ import Rnd from 'react-rnd';
 
 import SceneEditorForm from './SceneEditorForm';
 
+import { FileViewer } from '../MediaViewers/FileViewer';
+
 import './SceneEditorContainer.scss';
 
 @connect((state) => {
@@ -300,6 +302,7 @@ export default class SceneEditorContainer extends Component {
           }}
         >
           <h4>{media.name}</h4>
+          <FileViewer file={media} />
         </Rnd>
       );
 
