@@ -50,9 +50,11 @@ if (module.hot) {
     const NextApp = require('./Root').default;
 
     render(
-      <AppContainer errorReporter={Redbox}>
-        <NextApp store={store} history={history} />
-      </AppContainer>,
+      <LocaleProvider locale={frBE}>
+        <AppContainer errorReporter={Redbox}>
+          <NextApp store={store} history={history} />
+        </AppContainer>
+      </LocaleProvider>,
       rootEl
     );
   });
