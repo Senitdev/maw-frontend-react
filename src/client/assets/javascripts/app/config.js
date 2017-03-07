@@ -11,3 +11,9 @@ export function logException(ex, context) {
   /*eslint no-console:0*/
   window && window.console && console.error && console.error(ex);
 }
+
+// Objet global de configuration
+// TODO: config différente selon l'environnement (dev/prod)
+export const Config = {
+  API: 'http://test.maw.abcore.fr/',
+};

@@ -6,11 +6,12 @@ import omit from 'lodash/omit';
 import { State } from 'models/displayManagement';
 
 import { NotificationGenerator } from 'features/core/components/NotificationGenerator';
+import { Config } from 'app/config';
 
 import './displayManagement.scss';
 
 export const NAME = 'displayManagement';
-const API = 'http://auth.maw.com/backend-global/';
+
 // Action types
 
 const MEDIA_LIST_REQUEST = 'maw/displayManagement/MEDIA_LIST_REQUEST';
@@ -69,7 +70,7 @@ function deleteRelationFailure(id, error) {
 }
 
 function deleteRelation(id) {
-  const url = API + 'entities/1/modules/3/media-media/';
+  const url = Config.API + 'entities/1/modules/3/media-media/';
 
   return (dispatch) => {
     dispatch(deleteRelationRequest(id));
@@ -130,7 +131,7 @@ function createRelationFailure() {
 function createRelation(relation) {
 
   const relationForServer = normalizeRelationForServer(relation);
-  let url = API + 'entities/1/modules/3/media-media';
+  const url = Config.API + 'entities/1/modules/3/media-media';
 
   return (dispatch) => {
     dispatch(createRelationRequest());
@@ -178,7 +179,7 @@ function patchRelationFailure(id, error) {
 function patchRelation(relation) {
 
   const relationForServer = normalizeRelationForServer(relation);
-  let url = API + 'entities/1/modules/3/media-media/' + relation.id;
+  const url = Config.API + 'entities/1/modules/3/media-media/' + relation.id;
 
   return (dispatch) => {
     dispatch(patchRelationRequest());
@@ -262,7 +263,7 @@ function patchMediaFailure(id) {
   };
 }
 function patchMedia(media) {
-  let url = API + 'entities/1/modules/3/';
+  const url = Config.API + 'entities/1/modules/3/';
 
   return (dispatch) => {
     dispatch(patchMediaRequest(media.id));
@@ -397,7 +398,7 @@ function mediaDetailsFailure(error) {
 }
 
 function fetchMediaDetails(id, type) {
-  const url = API + 'entities/1/modules/3/';
+  const url = Config.API + 'entities/1/modules/3/';
 
   return (dispatch) => {
     dispatch(mediaDetailsRequest(id, type));
@@ -478,7 +479,7 @@ function mediaRelationFailure(error) {
 }
 
 function fetchMediaList(type) {
-  const url = API + 'entities/1/modules/3/';
+  const url = Config.API + 'entities/1/modules/3/';
 
   return (dispatch, getState) => {
     if (getState()[NAME][type].isFetching) {
@@ -571,7 +572,7 @@ function deleteMediaFailure(id/*, error*/) {
 }
 
 function deleteMedia(id) {
-  let url = API + 'entities/1/modules/3/';
+  const url = Config.API + 'entities/1/modules/3/';
 
   return (dispatch) => {
     dispatch(deleteMediaRequest(id));
@@ -592,7 +593,7 @@ function deleteMedia(id) {
 }
 
 function fetchMediaRelation(idMedia) {
-  const url = API + 'entities/1/modules/3/media-media/' + idMedia;
+  const url = Config.API + 'entities/1/modules/3/media-media/' + idMedia;
 
   return (dispatch) => {
 

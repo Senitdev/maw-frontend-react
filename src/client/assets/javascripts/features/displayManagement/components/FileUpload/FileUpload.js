@@ -5,6 +5,7 @@ import { Upload } from 'antd';
 import { NotificationGenerator } from 'features/core/components/NotificationGenerator';
 
 import { actionCreators as displayManagementActions } from 'features/displayManagement';
+import { Config } from 'app/config';
 
 import './FileUpload.scss';
 
@@ -74,7 +75,7 @@ export default class FileUpload extends Component {
       <div className="maw-file-upload">
         <Upload
           name="file"
-          action="http://auth.maw.com/backend-global/entities/1/modules/3/files"
+          action={Config.API + '/entities/1/modules/3/files'}
           data={{return: 1}}
           accept="video/*,image/*"
           showFileList={this.state.fileList.length > 0}

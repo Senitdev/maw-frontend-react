@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
+import { Config } from 'app/config';
+
 export class FileViewer extends Component {
   static propTypes = {
     file: PropTypes.object
@@ -8,7 +10,7 @@ export class FileViewer extends Component {
   render() {
     const { id, mimetype } = this.props.file;
 
-    const fileUrl = 'http://192.168.201.68/backend-global/modules-static-files/Screens/' + id;
+    const fileUrl = Config.API + '/modules-static-files/Screens/' + id;
 
     var viewer = "viewer n'est pas displonible pour ce type de fichier: " + mimetype;
 

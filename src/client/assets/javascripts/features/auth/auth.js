@@ -4,6 +4,7 @@ import { createStructuredSelector } from 'reselect';
 import fetch from 'isomorphic-fetch';
 import { browserHistory } from 'react-router';
 
+import { Config } from 'app/config';
 import { State } from 'models/auth';
 
 // This will be used in our root reducer and selectors
@@ -79,7 +80,7 @@ function login(email, password, rememberMe) {
   return (dispatch) => {
     dispatch(loginRequest());
 
-    return fetch('http://auth.maw.com/backend-global/feats/login', {
+    return fetch(Config.API + 'feats/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +140,7 @@ function register(email, password) {
   return (dispatch) => {
     dispatch(registerRequest());
 
-    return fetch('http://localhost:3001/' + 'users', {
+    return fetch(Config.API + 'users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
