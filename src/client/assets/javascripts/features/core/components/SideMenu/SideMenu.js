@@ -37,7 +37,7 @@ export default class SideMenu extends Component {
   }
 
   /**
-   * Si la route (pathname) change, adapte la "selectedKeys".
+   * Si la route (pathname) change, adapte les "keys".
    * Si le menu change de format (collapsed), adapte les "openKeys".
    */
   componentWillReceiveProps(nextProps) {
@@ -46,10 +46,15 @@ export default class SideMenu extends Component {
     if (pathname != this.props.location.pathname || nextProps.collapsed != this.props.collapsed) {
       const keys = this.findKeys(pathname);
 
-      this.setState({
+      this.setState((prevState) => ({
         selectedKeys: keys.selectedKeys,
-        openKeys: nextProps.collapsed ? [] : keys.openKeys
-      });
+        openKeys: nextProps.collapsed ?
+          // Aucune "openKeys" quand le menu devient "collapsed"
+          []
+          :
+          // Si le menu est ouvert, ajoute les nouvelles "openKeys" aux précédentes
+          [...prevState.openKeys, ...keys.openKeys].filter((elem, pos, arr) => arr.indexOf(elem) == pos)
+      }));
     }
   }
 
