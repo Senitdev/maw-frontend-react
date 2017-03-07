@@ -17,3 +17,12 @@
   text-align: right;
   font-style: italic;
 }
+
+.calendar-details .ant-row {
+  margin-bottom: 5px;
+}
+
+.fc-time-grid-event.selected {
+  border: 1px #111111 solid;
+  background-color: #3a99ad;
+}

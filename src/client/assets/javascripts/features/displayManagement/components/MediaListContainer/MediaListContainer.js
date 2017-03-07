@@ -55,12 +55,6 @@ export default class MediaListContainer extends Component {
   render() {
     $(document).ready(function() {
       $('#media-list-container .media-gutter-box').each(function() {
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-          title: $.trim($(this).text()), // use the element's text as the event title
-          stick: true // maintain when user navigates (see docs on the renderEvent method)
-        });
-
         // make the event draggable using jQuery UI
         $(this).draggable({
           zIndex: 999,
@@ -82,6 +76,8 @@ export default class MediaListContainer extends Component {
         const tooltipPlacement = count % 3 == 0 ? 'left' : (count % 3 == 2 ? 'right' : 'top');
         count++;
 
+        const dataEvent = '{"idMedia": ' + id + ', "title": "' + this.props.mediaById[id].name + '"}';
+
         if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
           return (
             <Col key={id.toString()} className="gutter-row" span={8}>
@@ -91,7 +87,8 @@ export default class MediaListContainer extends Component {
                 title={this.props.mediaById[id].name}>
                 <div
                   className="media-gutter-box"
-                  id={this.props.mediaById[id].id}
+                  id={id}
+                  data-event={dataEvent}
                   >
                   <Icon type="user" />
                   <br />

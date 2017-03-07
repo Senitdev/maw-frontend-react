@@ -48,7 +48,8 @@ export default class SceneEditorContainer extends Component {
       mediaSelected: -1,
       mediaEdit: {
         id: -1,
-        name: ''
+        name: '',
+        type: 'scene'
       },
       isFetching: true,
     };
@@ -376,7 +377,7 @@ export default class SceneEditorContainer extends Component {
 
     return (
       <Layout className="display-management-content-layout">
-        <Layout.Sider><MediaListContainer /></Layout.Sider>
+        <Layout.Sider width="auto"><MediaListContainer /></Layout.Sider>
         <Layout.Content id="scene-list-container">
           <Tabs
             style={{height: '100%', display: 'flex', flexDirection: 'column'}}
