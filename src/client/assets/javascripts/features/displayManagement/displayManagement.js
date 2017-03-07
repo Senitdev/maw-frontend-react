@@ -97,13 +97,13 @@ function camelToSnake(s) {
 function snakeToCamel(s) {
   return s.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('_','');});
 }
-function normalizeRelationForServer(relation) {
+function normalizeObjectForServer(relation) {
   var relationForServer = {};
   for (let key in relation)
     relationForServer[camelToSnake(key)] = relation[key];
   return relationForServer;
 }
-function normalizeRelation(relationFromServer) {
+function normalizeObjectForClient(relationFromServer) {
   var relation = {};
   for (let key in relationFromServer)
     relation[snakeToCamel(key)] = relationFromServer[key];
@@ -130,7 +130,7 @@ function createRelationFailure() {
 
 function createRelation(relation) {
 
-  const relationForServer = normalizeRelationForServer(relation);
+  const relationForServer = normalizeObjectForServer(relation);
   const url = Config.API + 'entities/1/modules/3/media-media';
 
   return (dispatch) => {
@@ -150,7 +150,7 @@ function createRelation(relation) {
       response.json()
       .then((response) => {
         relation.id = response.data.id;
-        dispatch(createRelationSuccess(normalizeRelation(relation)));
+        dispatch(createRelationSuccess(normalizeObjectForClient(relation)));
       });
     })
     .catch((error) => dispatch(createRelationFailure(relation.id, error)));
@@ -178,7 +178,7 @@ function patchRelationFailure(id, error) {
 
 function patchRelation(relation) {
 
-  const relationForServer = normalizeRelationForServer(relation);
+  const relationForServer = normalizeObjectForServer(relation);
   const url = Config.API + 'entities/1/modules/3/media-media/' + relation.id;
 
   return (dispatch) => {
@@ -194,14 +194,14 @@ function patchRelation(relation) {
         error.response = response;
         throw error;
       }
-      dispatch(patchRelationSuccess(normalizeRelation(relation)));
+      dispatch(patchRelationSuccess(normalizeObjectForClient(relation)));
     })
     .catch((error) => dispatch(patchRelationFailure(relation.id, error)));
   };
 }
 
 //Prend des relations provenant d'un formulaire pour le mettre en forme, prêt à être transmit au action.
-function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene) {
+function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
   var normalizedRelations = {};
 
   for (let key in patchedOrCreatedRelations) { //Pour chaque relation à MàJ ou crée...
@@ -211,7 +211,7 @@ function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene) {
       let relation = patchedOrCreatedRelations[key]; //Etrait la relation
       normalizedRelations[key]['id'] = relation['idRelation'];
       if (normalizedRelations[key]['id'] < 0) { //Si on a affaire à une création, on doit renseigner hostMedia et guestMedia
-        normalizedRelations[key]['hostMediaId'] = scene['id'];
+        normalizedRelations[key]['hostMediaId'] = sceneId;
         normalizedRelations[key]['guestMediaId'] = parseInt(relation['id']);
       }
       for (let subKey in relation) {
@@ -224,22 +224,55 @@ function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene) {
   }
   return normalizedRelations;
 }
-function patchScene(deletedRelations, patchedOrCreatedRelations, scene) {
 
-  const normalizedRelationsFromSceneEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, scene);
-
-  return (dispatch) => {
-    deletedRelations.forEach((deletedRelation) => {
-      dispatch(deleteRelation(deletedRelation));
-    });
-    for (let key in normalizedRelationsFromSceneEditor) {
-      if (normalizedRelationsFromSceneEditor[key].id > -1) {
-        dispatch(patchRelation(normalizedRelationsFromSceneEditor[key]));
-      } else {
-        dispatch(createRelation(normalizedRelationsFromSceneEditor[key]));
-      }
-    }
+//Prend une scène et détermine si cette dernière existe sur le serveur ou pas.
+//Si n'existe pas, crée une scène et retourne l'id de cette scene sous forme de promise.
+function createScene(scene) {
+  const url = Config.API + 'entities/1/modules/3/';
+  let sceneForServer = {
+    name: scene.name,
+    ratio_numerator: 16,
+    ratio_denominator: 9,
+    duration: 0,
+    type: 'scene',
   };
+
+  return new Promise((resolve, reject) => {
+    if (scene.id < 0) {
+      fetch(url + 'medias', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({...sceneForServer, return: 1})
+      }).then((response) => {
+        if(!response.ok) {
+          reject(response);
+        }
+        response.json()
+        .then((response) => {
+          resolve(response.data.id);
+        });
+      });
+    } else
+      resolve(scene.id);
+  });
+}
+function featPatchOrCreateScene(deletedRelations, patchedOrCreatedRelations, scene) {
+  return (dispatch) =>
+    createScene(scene) //Crée une scène au besoins
+    .then((sceneId) => {
+      dispatch(fetchMediaDetails(sceneId, 'scene'));
+      const normalizedRelationsFromSceneEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId);
+      deletedRelations.forEach((deletedRelation) => {
+        dispatch(deleteRelation(deletedRelation));
+      });
+      for (let key in normalizedRelationsFromSceneEditor) {
+        if (normalizedRelationsFromSceneEditor[key].id > -1) {
+          dispatch(patchRelation(normalizedRelationsFromSceneEditor[key]));
+        } else {
+          dispatch(createRelation(normalizedRelationsFromSceneEditor[key]));
+        }
+      }
+    });
 }
 
 function patchMediaRequest(id) {
@@ -270,7 +303,7 @@ function patchMedia(media) {
     return fetch(url + 'medias/' + media.id, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({...normalizeRelationForServer(media), return: 1})
+      body: JSON.stringify({...normalizeObjectForServer(media), return: 1})
     })
     .then((response) => {
       if (!response.ok) {
@@ -283,7 +316,7 @@ function patchMedia(media) {
         ...normalize.media(data)
       }));
     })
-    .catch((error) => {
+    .catch(() => {
       dispatch(patchMediaFailure(media.id));
     });
   };
@@ -635,7 +668,7 @@ export const actionCreators = {
   fetchMediaDetails,
   patchMedia,
   fetchMediaRelation,
-  patchScene,
+  featPatchOrCreateScene,
   addFile,
 };
 
