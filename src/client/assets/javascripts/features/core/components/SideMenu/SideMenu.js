@@ -14,8 +14,8 @@ export default class SideMenu extends Component {
     router: PropTypes.object.isRequired,
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       openKeys: [],
