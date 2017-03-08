@@ -5,6 +5,13 @@ const { Item, SubMenu } = Menu;
 
 import './SideMenu.scss';
 
+function getItemLinkPath(item) {
+  return item.props.isRouterLink ?
+    item.props.to != null ? item.props.to : (item.key || item.props.eventKey)
+    :
+    null;
+}
+
 @withRouter
 export default class SideMenu extends Component {
 
@@ -19,80 +26,121 @@ export default class SideMenu extends Component {
 
     this.state = {
       openKeys: [],
-      selectedKeys: [],
+      selectedItem: {
+        linkPath: null,
+        key: null,
+        keyPath: [],
+      },
     };
   }
 
   /**
-   * Lorsque le menu s'est affiché, définit les "openKeys" et la "selectedKeys" en fonction de
-   * "pathname" (la route) et de si le menu est "collapsed" ou non.
+   * Lorsque le menu s'affiche, cherche l'item sélectionné en fonction de la
+   * route courante (pathname) et définit les "openKeys" en fonction de si le
+   * menu est "collapsed" ou non.
    */
   componentDidMount() {
-    const keys = this.findKeys(this.props.location.pathname);
+    const selectedItem = this.findSelectedItem(this.props.location.pathname);
 
     this.setState({
-      selectedKeys: keys.selectedKeys,
-      openKeys: this.props.collapsed ? [] : keys.openKeys
+      selectedItem,
+      openKeys: this.props.collapsed ? [] : selectedItem.keyPath
     });
   }
 
   /**
-   * Si la route (pathname) change, adapte les "keys".
    * Si le menu change de format (collapsed), adapte les "openKeys".
+   * Si la route change, cherche le "selectedItem".
    */
   componentWillReceiveProps(nextProps) {
-    const { pathname } = nextProps.location;
 
-    if (pathname != this.props.location.pathname || nextProps.collapsed != this.props.collapsed) {
-      const keys = this.findKeys(pathname);
+    if (nextProps.collapsed != this.props.collapsed) {
+      // Si le menu devient "collapsed", retire les open keys
+      if (nextProps.collapsed) {
+        this.setState({ openKeys: [] });
+      }
+      // S'il devient non "collapsed", ajoute la "keyPath" de l'item sélectionné comme "openKeys"
+      else {
+        this.setState((prevState) => ({
+          openKeys: [...prevState.selectedItem.keyPath]
+        }));
+      }
+    }
+
+    const nextPathname = nextProps.location.pathname;
+
+    // Si la route change et qu'elle ne correspond plus à celle de l'item sélectionné,
+    // cherche le nouvel item correspondant
+    if (nextPathname != this.state.selectedItem.linkPath) {
+      const selectedItem = this.findSelectedItem(nextPathname);
 
       this.setState((prevState) => ({
-        selectedKeys: keys.selectedKeys,
-        openKeys: nextProps.collapsed ?
-          // Aucune "openKeys" quand le menu devient "collapsed"
-          []
-          :
-          // Si le menu est ouvert, ajoute les nouvelles "openKeys" aux précédentes
-          [...prevState.openKeys, ...keys.openKeys].filter((elem, pos, arr) => arr.indexOf(elem) == pos)
+        selectedItem,
+        openKeys: [...prevState.openKeys, ...selectedItem.keyPath].filter((elem, pos, arr) => arr.indexOf(elem) == pos)
       }));
     }
   }
 
   /**
-   * Cherche dans le menu la "selectedKeys" et les "openKeys".
+   * Ne met à jour le menu que si l'item sélectionné, les "openKeys" ou "collapsed" ont changé.
    */
-  findKeys(pathname) {
+  shouldComponentUpdate(nextProps, nextState) {
 
-    // Utilise une fonction récursive pour récupérer les "keys" dans le menu
-    let keys = (function findOpenKeysRec(menuNode) {
+    // Test "collapsed" et "selectedItem"
+    if (nextProps.collapsed != this.props.collapsed ||
+        nextState.selectedItem.linkPath != this.state.selectedItem.linkPath)
+    {
+      return true;
+    }
+    // Test les "openKeys"
+    if (nextState.openKeys.length == this.state.openKeys.length) {
+      for (let i = 0; i < nextState.openKeys.length; i++) {
+        if (nextState.openKeys[i] != this.state.openKeys[i]) {
+          return true;
+        }
+      }
+    } else {
+      return true;
+    }
+    // Aucun changement
+    return false;
+  }
+
+  /**
+   * Cherche dans le menu l'item correspondant à la route (pathname).
+   */
+  findSelectedItem(pathname) {
+    // Utilise une fonction récursive pour trouver l'item
+    let selectedItem = (function findSelectedItemRec(menuNode) {
 
       // Si le noeud est un item avec le prop "isRouterLink" valant "true"
       if (menuNode.props && menuNode.props.isRouterLink) {
-        // Si le chemin du lien correspond à la route (pathname), la "key" de
-        // l'item est retournée en tant que "selectedKeys"
-        const linkPathReg = new RegExp('^' + (menuNode.props.to || menuNode.key));
-        if (pathname.match(linkPathReg)) {
+        // Si le chemin du lien correspond à la route (pathname), l'item est trouvé
+        const linkPath = getItemLinkPath(menuNode);
+        if (pathname.match(new RegExp('^' + linkPath))) {
           return {
-            selectedKeys: [ menuNode.key ],
-            openKeys: []
+            linkPath,
+            key: menuNode.key,
+            keyPath: []
           };
         }
       }
-      // Sinon, si le noeud a des enfants
+      // Sinon, si le noeud a des enfants,
       else if (menuNode.props && menuNode.props.children) {
         const children = menuNode.props.children instanceof Array ? menuNode.props.children : [ menuNode.props.children ];
 
         // Explore les enfants en appelant récursivement cette fonction
         for (let child of children) {
-          let keys = findOpenKeysRec(child);
+          let selectedItem = findSelectedItemRec(child);
 
-          // Si des clés sont remontées de la branche enfant, l'item sélectionné a donc été trouvé dans celle-ci
-          if (keys) {
-            // Ajoute la key du noeud courant (s'il y en a une) aux openKeys et les retourne
+          // Si l'item sélectionné est remonté de la branche enfant
+          if (selectedItem) {
+            // Ajoute la key du noeud courant (s'il y en a une) au "keyPath" de l'item sélectionné
             if (menuNode.key) {
-              keys.openKeys = [ menuNode.key, ...keys.openKeys ];
+              selectedItem.keyPath.push(menuNode.key);
             }
-            return keys;
+            // Remonte l'item sélectionné
+            return selectedItem;
           }
         }
       }
@@ -101,7 +149,7 @@ export default class SideMenu extends Component {
 
     })(this.menu);
 
-    return keys ? keys : { selectedKeys: [], openKeys: [] };
+    return selectedItem ? selectedItem : { linkPath: null, key: null, keyPath: [] };
   }
 
   /**
@@ -115,17 +163,22 @@ export default class SideMenu extends Component {
   }
 
   /**
-   * Callback déclenché par un clic sur un item du menu.
-   * Si l'item a le prop "to" définit, sa valeur est utilisée pour la navigation, sinon c'est sa "key".
+   * Callback déclenché par un clic sur un item du menu. Si l'item a le prop
+   * "isRouterLink" valant "true", il est considéré comme un lien de router et
+   * un changement de page est effectué.
    */
   onCLick = (target) => {
-    if (target.item.props.isRouterLink) {
-      this.props.router.push(target.item.props.to || target.key);
-    }
+    const linkPath = getItemLinkPath(target.item);
+    this.setState({
+      selectedItem: {
+        linkPath,
+        key: target.key,
+        keyPath: target.keyPath,
+      }
+    }, () => this.props.router.push(this.state.selectedItem.linkPath));
   }
 
   render() {
-
     return (
       <Menu
         id="SideMenu"
@@ -133,7 +186,7 @@ export default class SideMenu extends Component {
         mode={this.props.collapsed ? 'vertical' : 'inline'}
         className={this.props.collapsed ? 'collapsed' : ''}
         openKeys={this.state.openKeys}
-        selectedKeys={this.state.selectedKeys}
+        selectedKeys={[this.state.selectedItem.key]}
         onOpenChange={this.onOpenChange}
         onClick={this.onCLick}>
 
