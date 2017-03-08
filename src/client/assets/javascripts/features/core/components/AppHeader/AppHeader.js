@@ -21,7 +21,7 @@ export default class AppHeader extends Component {
     const menu = (
       <Menu>
         <Menu.Item>
-          <a onClick={this.props.authActions.logout}>Déconnexion <Icon type="logout" /></a>
+          <a onClick={this.props.authActions.logout}><Icon type="logout" /> Déconnexion</a>
         </Menu.Item>
       </Menu>
     );
