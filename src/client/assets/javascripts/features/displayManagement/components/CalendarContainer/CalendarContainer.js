@@ -35,6 +35,11 @@ const offsetUnixMax = 7 * 24 * 3600;
 }))
 export default class CalendarContainer extends Component {
 
+  // ask for `router` from context
+  static contextTypes = {
+    router: React.PropTypes.object
+  }
+
   static propTypes = {
     actions: PropTypes.object.isRequired,
     idAgenda: PropTypes.string.isRequired,
@@ -249,7 +254,11 @@ export default class CalendarContainer extends Component {
   getIndexByIdFull = (idFull) => this.state.mediaInCalendar.findIndex((e) => e.idFull === idFull);
 
   submitChange = () => {
-    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInCalendar, this.state.calendarEdit);
+    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInCalendar, this.state.calendarEdit)
+    .then((mediaId) => {
+      if (this.state.calendarEdit.id < 0)
+        this.context.router.push('/display-management/agenda/' + mediaId);
+    });
   }
   render() {
     const format = 'HH:mm';

@@ -316,6 +316,7 @@ function normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, agendaId)
   return normalizedRelations;
 }
 
+//Retourne l'id du média crée/patché sous forme de promise
 function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations, media) {
   const mediaForServer = {
     id: media.id,
@@ -326,31 +327,45 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
     type: media.type,
   };
 
-  return (dispatch) => {
+  return (dispatch) => new Promise((resolve, reject) =>
     dispatch(createMedia(mediaForServer))
     .then((mediaBis) => {
+      var allPromise = [];
       var normalizedRelationsFromEditor;
       if (media.type == 'scene')
         normalizedRelationsFromEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, mediaBis.id);
       else if (media.type == 'agenda')
         normalizedRelationsFromEditor = normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, mediaBis.id);
+      else {
+        NotificationGenerator.raise('Erreur', 'Un problème à été rencontré durant la sauvegarde. Vérifiez votre connection internet et réessayer.', 'error');
+        throw 'error in featPatchOrCreateFromEditor(): wrong type of media.';
+      }
       //supprime les relations a suprimer.
       deletedRelations.forEach((deletedRelation) => {
-        dispatch(deleteRelation(deletedRelation));
+        allPromise.push(dispatch(deleteRelation(deletedRelation)));
       });
 
       //Patch ou crée les relations.
       for (let key in normalizedRelationsFromEditor) {
         if (normalizedRelationsFromEditor[key].id > -1) {
-          dispatch(patchRelation(normalizedRelationsFromEditor[key]));
+          allPromise.push(dispatch(patchRelation(normalizedRelationsFromEditor[key])));
         } else {
-          dispatch(createRelation(normalizedRelationsFromEditor[key]));
+          allPromise.push(dispatch(createRelation(normalizedRelationsFromEditor[key])));
         }
       }
-      NotificationGenerator.raise('Succès', 'La sauvegarde a été effectuée.', 'success');
+
+      Promise.all(allPromise).then(() => {
+        NotificationGenerator.raise('Succès', 'La sauvegarde a été effectuée.', 'success');
+        resolve(mediaBis.id);
+      });
     })
-    .catch(() => NotificationGenerator.raise('Erreur', 'Un problème à été rencontré durant la sauvegarde. Vérifiez votre connection internet et réessayer.', 'error'));
-  };
+    .catch(() => {
+      NotificationGenerator.raise('Erreur', 'Un problème à été rencontré durant la sauvegarde. Vérifiez votre connection internet et réessayer.', 'error');
+      reject();
+    })
+  );
+
+
 }
 
 function patchMediaRequest(id) {

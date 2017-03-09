@@ -33,6 +33,11 @@ import './SceneEditorContainer.scss';
 }))
 export default class SceneEditorContainer extends Component {
 
+  // ask for `router` from context
+  static contextTypes = {
+    router: React.PropTypes.object
+  }
+
   static propTypes = {
     actions: PropTypes.object.isRequired,
     mediaById: PropTypes.object.isRequired,
@@ -214,7 +219,11 @@ export default class SceneEditorContainer extends Component {
     // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
     // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
     // send(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
-    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
+    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit)
+    .then((mediaId) => {
+      if (this.state.mediaEdit.id < 0)
+        this.context.router.push('/display-management/scene/' + mediaId);
+    });
   }
 
   moveMediaInScene = (id, deplacement) => {
