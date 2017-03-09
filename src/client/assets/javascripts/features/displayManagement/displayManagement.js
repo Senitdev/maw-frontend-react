@@ -22,6 +22,10 @@ const MEDIA_DETAILS_REQUEST = 'maw/displayManagement/MEDIA_DETAILS_REQUEST';
 const MEDIA_DETAILS_SUCCESS = 'maw/displayManagement/MEDIA_DETAILS_SUCCESS';
 const MEDIA_DETAILS_FAILURE = 'maw/displayManagement/MEDIA_DETAILS_FAILURE';
 
+const CREATE_MEDIA_REQUEST = 'maw/displayManagement/CREATE_MEDIA_REQUEST';
+const CREATE_MEDIA_SUCCESS = 'maw/displayManagement/CREATE_MEDIA_SUCCESS';
+const CREATE_MEDIA_FAILURE = 'maw/displayManagement/CREATE_MEDIA_FAILURE';
+
 const PATCH_MEDIA_REQUEST = 'maw/displayManagement/PATCH_MEDIA_REQUEST';
 const PATCH_MEDIA_SUCCESS = 'maw/displayManagement/PATCH_MEDIA_SUCCESS';
 const PATCH_MEDIA_FAILURE = 'maw/displayManagement/PATCH_MEDIA_FAILURE';
@@ -49,6 +53,63 @@ const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
 const ADD_FILE = 'maw/displayManagement/ADD_FILE';
 
 // Action creators
+
+function createMediaRequest() {
+  return {
+    type: CREATE_MEDIA_REQUEST,
+    payload: { }
+  };
+}
+function createMediaSuccess(media) {
+  return {
+    type: CREATE_MEDIA_SUCCESS,
+    payload: { media }
+  };
+}
+function createMediaFailure() {
+  return {
+    type: CREATE_MEDIA_FAILURE,
+    payload: { }
+  };
+}
+
+//Prend un media et détermine si cette dernière existe sur le serveur ou pas.
+//Si n'existe pas, crée un media, puis fetch les détails et retourne le media.
+function createMedia(media) {
+  const url = Config.API + 'entities/1/modules/3/medias';
+
+  return (dispatch) =>
+    new Promise((resolve, reject) => {
+      if(media.id < 0) {
+        dispatch(createMediaRequest);
+        fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({...normalizeObjectForServer(media), return: 1})
+        }).then(
+          (response) => {
+            if(!response.ok) {
+              throw response;
+            }
+            return response.json();
+          }
+        ).then(
+          (json) => {
+            dispatch(createMediaSuccess(json.data));
+            dispatch(fetchMediaDetails(json.data.id)).then(() => {
+              resolve(json.data);
+            });
+          },
+          (error) => {
+            dispatch(createMediaFailure);
+            reject(error);
+          }
+        );
+      } else {
+        resolve(media);
+      }
+    });
+}
 
 function deleteRelationRequest(id) {
   return {
@@ -225,54 +286,38 @@ function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
   return normalizedRelations;
 }
 
-//Prend une scène et détermine si cette dernière existe sur le serveur ou pas.
-//Si n'existe pas, crée une scène et retourne l'id de cette scene sous forme de promise.
-function createScene(scene) {
-  const url = Config.API + 'entities/1/modules/3/';
-  let sceneForServer = {
-    name: scene.name,
-    ratio_numerator: 16,
-    ratio_denominator: 9,
+}
+
+function featPatchOrCreateScene(deletedRelations, patchedOrCreatedRelations, media) {
+  const sceneForServer = {
+    id: media.id,
+    name: media.name,
+    ratioNumerator: 16,
+    ratioDenominator: 9,
     duration: 0,
-    type: 'scene',
+    type: media.type,
   };
 
-  return new Promise((resolve, reject) => {
-    if (scene.id < 0) {
-      fetch(url + 'medias', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({...sceneForServer, return: 1})
-      }).then((response) => {
-        if(!response.ok) {
-          reject(response);
-        }
-        response.json()
-        .then((response) => {
-          resolve(response.data.id);
-        });
-      });
-    } else
-      resolve(scene.id);
-  });
-}
-function featPatchOrCreateScene(deletedRelations, patchedOrCreatedRelations, scene) {
-  return (dispatch) =>
-    createScene(scene) //Crée une scène au besoins
-    .then((sceneId) => {
-      dispatch(fetchMediaDetails(sceneId, 'scene'));
-      const normalizedRelationsFromSceneEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId);
+  return (dispatch) => {
+    dispatch(createMedia(sceneForServer))
+    .then((mediaBis) => {
+      const normalizedRelationsFromEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, mediaBis.id);
+
+      //supprime les relations a suprimer.
       deletedRelations.forEach((deletedRelation) => {
         dispatch(deleteRelation(deletedRelation));
       });
-      for (let key in normalizedRelationsFromSceneEditor) {
-        if (normalizedRelationsFromSceneEditor[key].id > -1) {
-          dispatch(patchRelation(normalizedRelationsFromSceneEditor[key]));
+
+      //Patch ou crée les relations.
+      for (let key in normalizedRelationsFromEditor) {
+        if (normalizedRelationsFromEditor[key].id > -1) {
+          dispatch(patchRelation(normalizedRelationsFromEditor[key]));
         } else {
-          dispatch(createRelation(normalizedRelationsFromSceneEditor[key]));
+          dispatch(createRelation(normalizedRelationsFromEditor[key]));
         }
       }
     });
+  };
 }
 
 function patchMediaRequest(id) {
@@ -713,6 +758,22 @@ export default function reducer(state: State = initialState, action: any = {}): 
     //TODO case PATCH_RELATION_FAILURE
     //TODO case CREATE_RELATION_REQUEST
     //TODO case CREATE_RELATION_FAILURE
+
+    case CREATE_MEDIA_SUCCESS: {
+      const newMedia = action.payload.media;
+      console.log(newMedia);
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById,
+          [newMedia.id]: newMedia
+        },
+        [newMedia.type]: {
+          ...state[newMedia.type],
+          items: state[newMedia.type].items.concat(newMedia.id)
+        }
+      };
+    }
 
     case CREATE_RELATION_SUCCESS: {
       var newRelationsWithGuests = (state.mediaById[action.payload.relation.hostMediaId].relationsWithGuests).slice();
