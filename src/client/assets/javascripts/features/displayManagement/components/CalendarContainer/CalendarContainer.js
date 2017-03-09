@@ -19,14 +19,15 @@ const offsetUnix = 342000;
 const offsetUnixMax = 7 * 24 * 3600;
 
 @connect((state) => {
-  const { mediaById, file, scene, agenda, relationsById } = state[displayManagementName];
+  const { mediaById, file, scene, agenda, relationsById, isFetchingDetails } = state[displayManagementName];
 
   const mediaByType = { file, scene, agenda };
 
   return {
     mediaByType,
     mediaById,
-    relationsById
+    relationsById,
+    isFetchingDetails
   };
 
 }, (dispatch) => ({
@@ -37,6 +38,7 @@ export default class CalendarContainer extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     idAgenda: PropTypes.string.isRequired,
+    isFetchingDetails: PropTypes.bool.isRequired,
     mediaById: PropTypes.object.isRequired,
     mediaByType: PropTypes.object.isRequired,
   };
@@ -51,8 +53,7 @@ export default class CalendarContainer extends Component {
         id: -1,
         name: '',
         type: 'agenda'
-      },
-      isFetching: true,
+      }
     };
   }
 
@@ -65,14 +66,10 @@ export default class CalendarContainer extends Component {
       }
     });
 
-    if (idCalendar >= 0)
-      this.props.actions.fetchMediaDetails(idCalendar);
-    else
-      this.setState({
-        isFetching: false
-      });
     this.props.actions.fetchMediaList('file');
     this.props.actions.fetchMediaList('scene');
+    if (idCalendar >= 0)
+      this.props.actions.fetchMediaDetails(idCalendar);
   }
 
   componentDidMount() {
@@ -185,7 +182,7 @@ export default class CalendarContainer extends Component {
         });
       }
     }
-    if (Object.keys(nextProps.relationsById).length > 0 && Object.keys(nextProps.mediaById).length > 0 && this.state.isFetching) {
+    if (!nextProps.isFetchingDetails) {
       var mediaInCalendar = [];
       var eventsTemp = [];
       for (var index in nextProps.relationsById) {
@@ -209,15 +206,15 @@ export default class CalendarContainer extends Component {
           });
         }
       }
-      this.setState({
-        mediaInCalendar: mediaInCalendar,
-        isFetching: false
-      }, () => {
-        for (var i = 0; i < eventsTemp.length; i++) {
-          const eventTemp = eventsTemp[i];
-          setTimeout(() => $('#calendar').fullCalendar('renderEvent', eventTemp, true), 200);
-        }
-      });
+      if (mediaInCalendar.length > 0)
+        this.setState({
+          mediaInCalendar: mediaInCalendar
+        }, () => {
+          for (var i = 0; i < eventsTemp.length; i++) {
+            const eventTemp = eventsTemp[i];
+            $('#calendar').fullCalendar('renderEvent', eventTemp, true);
+          }
+        });
     }
   }
 
@@ -389,7 +386,7 @@ export default class CalendarContainer extends Component {
               Déplacez des médias dans l'agenda !
             </span>
             <br />
-            <Spin style={{margin: '5px'}} spinning={this.state.isFetching} />
+            <Spin style={{margin: '5px'}} spinning={this.props.isFetchingDetails} />
           </div>
         }
         <div id="calendar" />
