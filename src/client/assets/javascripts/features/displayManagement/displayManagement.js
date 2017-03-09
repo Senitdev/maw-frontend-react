@@ -156,17 +156,17 @@ function camelToSnake(s) {
 function snakeToCamel(s) {
   return s.replace(/(_\w)/g, function(m){return m[1].toUpperCase();});
 }
-function normalizeObjectForServer(relation) {
-  var relationForServer = {};
-  for (let key in relation)
-    relationForServer[camelToSnake(key)] = relation[key];
-  return relationForServer;
+function normalizeObjectForServer(object) {
+  var objectForServer = {};
+  for (let key in object)
+    objectForServer[camelToSnake(key)] = object[key];
+  return objectForServer;
 }
-function normalizeObjectForClient(relationFromServer) {
-  var relation = {};
-  for (let key in relationFromServer)
-    relation[snakeToCamel(key)] = relationFromServer[key];
-  return relation;
+function normalizeObjectForClient(objectFromServer) {
+  var object = {};
+  for (let key in objectFromServer)
+    object[snakeToCamel(key)] = objectFromServer[key];
+  return object;
 }
 function createRelationRequest() {
   return {
@@ -180,10 +180,10 @@ function createRelationSuccess(relation) {
     payload: { relation }
   };
 }
-function createRelationFailure() {
+function createRelationFailure(error) {
   return {
     type: CREATE_RELATION_FAILURE,
-    payload: { }
+    payload: { error }
   };
 }
 
