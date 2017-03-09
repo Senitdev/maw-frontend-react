@@ -217,10 +217,10 @@ export default class SceneEditorContainer extends Component {
   }
 
   moveMediaInScene = (id, deplacement) => {
-    var newMedias = this.state.mediaInScene;
-    var temp = this.state.mediaInScene[id];
+    var newMedias = this.state.mediaInScene.slice();
+
     newMedias[id] = this.state.mediaInScene[id + deplacement];
-    newMedias[id + deplacement] = temp;
+    newMedias[id + deplacement] = this.state.mediaInScene[id];
     this.setState({
       mediaInScene: newMedias,
     });

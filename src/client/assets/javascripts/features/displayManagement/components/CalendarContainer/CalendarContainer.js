@@ -10,7 +10,7 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import 'fullcalendar/dist/locale/fr.js';
 
-import { Row, Col, Badge, TimePicker, Input, Button, Icon, InputNumber } from 'antd';
+import { Row, Col, Badge, TimePicker, Input, Button, Icon, InputNumber, Spin } from 'antd';
 import moment from 'moment';
 
 import './CalendarContainer.scss';
@@ -65,14 +65,15 @@ export default class CalendarContainer extends Component {
       }
     });
 
-    this.props.actions.fetchMediaList('file');
-    this.props.actions.fetchMediaList('scene');
     if (idCalendar >= 0)
       this.props.actions.fetchMediaDetails(idCalendar);
     else
       this.setState({
         isFetching: false
       });
+      this.props.actions.fetchMediaList('file');
+      this.props.actions.fetchMediaList('scene');
+
   }
 
   componentDidMount() {
@@ -148,6 +149,22 @@ export default class CalendarContainer extends Component {
             mediaInCalendar: newMedia
           });
         },
+        eventAfterRender: (event) => {
+          if (event.idRelation) {
+            var id = this.state.mediaInCalendar.findIndex((e) => e.idRelation === event.idRelation);
+            if (this.state.mediaInCalendar[id] && !this.state.mediaInCalendar[id].idFull) {
+              var newMediaInCalendar = this.state.mediaInCalendar;
+              newMediaInCalendar[id].idFull = event._id;
+              this.setState({
+                ...this.state.mediaInCalendar,
+                [id]: {
+                  ...this.state.mediaInCalendar[id],
+                  idFull: event._id
+                }
+              });
+            }
+          }
+        },
       });
 
       // Suppression des numéros des jours (affichage seulement de lun., etc)
@@ -169,20 +186,35 @@ export default class CalendarContainer extends Component {
         });
       }
     }
-    if (nextProps.relationsById) {
+    if (Object.keys(nextProps.relationsById).length > 0 && Object.keys(nextProps.mediaById).length > 0 && this.state.isFetching) {
       var mediaInCalendar = [];
+      var eventsTemp = [];
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
-        mediaInCalendar.push({
-          id: relation.guestMediaId,
+        eventsTemp.push({
+          title: nextProps.mediaById[relation.guestMediaId].name,
+          start:  moment.unix(offsetUnix + relation.startTimeOffset),
+          end: moment.unix(offsetUnix + relation.startTimeOffset + relation.duration),
+          idMedia: relation.guestMediaId,
           startTimeOffset: relation.startTimeOffset,
           duration: relation.duration,
-          idRelation: relation.id, // Id le relation déjà existante
+          idRelation: relation.id,
+        });
+        mediaInCalendar.push({
+            idFull: null,
+            id: relation.guestMediaId,
+            startTimeOffset: relation.startTimeOffset,
+            duration: relation.duration,
+            idRelation: relation.id,
         });
       }
       this.setState({
         mediaInCalendar: mediaInCalendar,
         isFetching: false
+      }, () => {
+        for (var i = 0; i < eventsTemp.length; i++) {
+          $('#calendar').fullCalendar('renderEvent', eventsTemp[i], true);
+        }
       });
     }
   }
@@ -190,13 +222,15 @@ export default class CalendarContainer extends Component {
   mediaDeleted = [];
 
   onChangeHour = (time, dateString, calendarOption) => {
-    var newTime = time.hours() + ":";
-    if (time.minutes() < 30)
-      newTime = newTime + "00";
-    else
-      newTime = newTime + "30";
-    $('#calendar').fullCalendar('option', calendarOption, newTime);
-    $('#calendar').find('.fc-header-toolbar').remove();
+    if (time) {
+      var newTime = time.hours() + ":";
+      if (time.minutes() < 30)
+        newTime = newTime + "00";
+      else
+        newTime = newTime + "30";
+      $('#calendar').fullCalendar('option', calendarOption, newTime);
+      $('#calendar').find('.fc-header-toolbar').remove();
+    }
   }
 
   removeMediaInCalendar = (id) => {
@@ -352,6 +386,8 @@ export default class CalendarContainer extends Component {
             <span>
               Déplacez des médias dans l'agenda !
             </span>
+            <br />
+            <Spin style={{margin: '5px'}} spinning={this.state.isFetching} />
           </div>
         }
         <div id="calendar" />
