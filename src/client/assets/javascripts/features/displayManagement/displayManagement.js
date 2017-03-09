@@ -154,7 +154,7 @@ function camelToSnake(s) {
   return s.replace(/([A-Z])/g, function($1){return "_"+$1.toLowerCase();});
 }
 function snakeToCamel(s) {
-  return s.replace(/(\-[a-z])/g, function($1){return $1.toUpperCase().replace('_','');});
+  return s.replace(/(_\w)/g, function(m){return m[1].toUpperCase();});
 }
 function normalizeObjectForServer(relation) {
   var relationForServer = {};
