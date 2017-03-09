@@ -10,7 +10,7 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import 'fullcalendar/dist/locale/fr.js';
 
-import { Row, Col, Badge, TimePicker, Input, Button, Icon } from 'antd';
+import { Row, Col, Badge, TimePicker, Input, Button, Icon, InputNumber } from 'antd';
 import moment from 'moment';
 
 import './CalendarContainer.scss';
@@ -293,30 +293,48 @@ export default class CalendarContainer extends Component {
                 </Col>
               </Row>
               <Row>
-                <Col span="6">
-                  Durée :
+                <Col span="3">
+                  Heures :
                 </Col>
                 <Col span="6">
-                  <TimePicker
-                    value={moment.unix(eventSelected.duration - 3600)}
-                    format={format}
-                    onChange={(m) => {
+                  <InputNumber size="small" min={0} value={Math.floor((eventSelected.duration) / 3600)}
+                    onChange={(val) => {
                       var newEvent = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
-                      newEvent.end = moment.unix(newEvent.start.unix() + m.unix());
+                      var newDuration = val * 3600 + eventSelected.duration % 3600;
+                      newEvent.end = moment.unix(newEvent.start.unix() + newDuration - 3600);
                       $('#calendar').fullCalendar('updateEvent', newEvent);
 
                       var newMedia = this.state.mediaInCalendar;
-                      newMedia[idEventSelected].duration = m.unix();
+                      newMedia[idEventSelected].duration = newDuration;
                       this.setState({
                         mediaInCalendar: newMedia
                       });
                     }}
-                    />
+                  />
+                </Col>
+                <Col span="3">
+                  Minutes :
                 </Col>
                 <Col span="6">
+                  <InputNumber size="small" min={0} max={59} value={Math.floor((eventSelected.duration) % 3600 / 60)}
+                    onChange={(val) => {
+                      var newEvent = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
+                      const newDuration = val * 60 + Math.floor(eventSelected.duration / 3600) * 3600;
+                      newEvent.end = moment.unix(newEvent.start.unix() + newDuration - 3600);
+                      $('#calendar').fullCalendar('updateEvent', newEvent);
+
+                      var newMedia = this.state.mediaInCalendar;
+                      newMedia[idEventSelected].duration = newDuration;
+                      this.setState({
+                        mediaInCalendar: newMedia
+                      });
+                    }}
+                  />
+                </Col>
+                <Col span="3">
                   Décalage :
                 </Col>
-                <Col span="6">
+                <Col span="3">
                   {eventSelected.startTimeOffset}
                 </Col>
               </Row>
