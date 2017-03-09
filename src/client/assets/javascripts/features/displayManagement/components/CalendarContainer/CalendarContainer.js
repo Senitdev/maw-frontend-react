@@ -220,7 +220,7 @@ export default class CalendarContainer extends Component {
   getIndexByIdFull = (idFull) => this.state.mediaInCalendar.findIndex((e) => e.idFull === idFull);
 
   submitChange = () => {
-    console.log(this.mediaDeleted, this.state.mediaInCalendar, this.state.calendarEdit);
+    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInCalendar, this.state.calendarEdit);
   }
   render() {
     const format = 'HH:mm';

@@ -261,7 +261,7 @@ function patchRelation(relation) {
   };
 }
 
-//Prend des relations provenant d'un formulaire pour le mettre en forme, prêt à être transmit au action.
+//Prend des relations provenant d'un formulaire de scene pour le mettre en forme, prêt à être transmit au action.
 function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
   var normalizedRelations = {};
 
@@ -285,11 +285,38 @@ function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
   }
   return normalizedRelations;
 }
+//Prend des relations provenant d'un formulaire d'agenda pour le mettre en forme, prêt à être transmit au action.
+function normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, agendaId) {
+  var normalizedRelations = {};
 
+  for (let key in patchedOrCreatedRelations) { //Pour chaque relation à MàJ ou crée...
+    normalizedRelations[key] = {};
+
+    if (patchedOrCreatedRelations.hasOwnProperty(key)) {
+      let relation = patchedOrCreatedRelations[key]; //Etrait la relation
+      normalizedRelations[key]['id'] = relation['idRelation'];
+      if (normalizedRelations[key]['id'] < 0) { //Si on a affaire à une création, on doit renseigner hostMedia et guestMedia
+        normalizedRelations[key]['hostMediaId'] = agendaId;
+        normalizedRelations[key]['guestMediaId'] = parseInt(relation['id']);
+      }
+      normalizedRelations[key]['duration'] = relation['duration'];
+      normalizedRelations[key]['startTimeOffset'] = relation['startTimeOffset'];
+      normalizedRelations[key]['boxLeft'] = 0;
+      normalizedRelations[key]['boxTop'] = 0;
+      normalizedRelations[key]['boxWidth'] = 100;
+      normalizedRelations[key]['boxHeight'] = 100;
+      normalizedRelations[key]['guestLeft'] = 0;
+      normalizedRelations[key]['guestTop'] = 0;
+      normalizedRelations[key]['guestWidth'] = 100;
+      normalizedRelations[key]['guestHeight'] = 100;
+    }
+  }
+
+  return normalizedRelations;
 }
 
-function featPatchOrCreateScene(deletedRelations, patchedOrCreatedRelations, media) {
-  const sceneForServer = {
+function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations, media) {
+  const mediaForServer = {
     id: media.id,
     name: media.name,
     ratioNumerator: 16,
@@ -299,10 +326,13 @@ function featPatchOrCreateScene(deletedRelations, patchedOrCreatedRelations, med
   };
 
   return (dispatch) => {
-    dispatch(createMedia(sceneForServer))
+    dispatch(createMedia(mediaForServer))
     .then((mediaBis) => {
-      const normalizedRelationsFromEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, mediaBis.id);
-
+      var normalizedRelationsFromEditor;
+      if (media.type == 'scene')
+        normalizedRelationsFromEditor = normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, mediaBis.id);
+      else if (media.type == 'agenda')
+        normalizedRelationsFromEditor = normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, mediaBis.id);
       //supprime les relations a suprimer.
       deletedRelations.forEach((deletedRelation) => {
         dispatch(deleteRelation(deletedRelation));
@@ -713,7 +743,7 @@ export const actionCreators = {
   fetchMediaDetails,
   patchMedia,
   fetchMediaRelation,
-  featPatchOrCreateScene,
+  featPatchOrCreateFromEditor,
   addFile,
 };
 
@@ -761,7 +791,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
 
     case CREATE_MEDIA_SUCCESS: {
       const newMedia = action.payload.media;
-      console.log(newMedia);
       return {
         ...state,
         mediaById: {
