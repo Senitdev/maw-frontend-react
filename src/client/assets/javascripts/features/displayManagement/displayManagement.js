@@ -66,10 +66,10 @@ function createMediaSuccess(media) {
     payload: { media }
   };
 }
-function createMediaFailure() {
+function createMediaFailure(error) {
   return {
     type: CREATE_MEDIA_FAILURE,
-    payload: { }
+    payload: { error }
   };
 }
 
@@ -81,7 +81,7 @@ function createMedia(media) {
   return (dispatch) =>
     new Promise((resolve, reject) => {
       if(media.id < 0) {
-        dispatch(createMediaRequest);
+        dispatch(createMediaRequest());
         fetch(url, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -96,12 +96,10 @@ function createMedia(media) {
         ).then(
           (json) => {
             dispatch(createMediaSuccess(json.data));
-            dispatch(fetchMediaDetails(json.data.id)).then(() => {
-              resolve(json.data);
-            });
+            resolve(json.data);
           },
           (error) => {
-            dispatch(createMediaFailure);
+            dispatch(createMediaFailure(error));
             reject(error);
           }
         );
@@ -346,7 +344,9 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
           dispatch(createRelation(normalizedRelationsFromEditor[key]));
         }
       }
-    });
+      NotificationGenerator.raise('Succès', 'La sauvegarde a été effectuée.', 'success');
+    })
+    .catch(() => NotificationGenerator.raise('Erreur', 'Un problème à été rencontré durant la sauvegarde. Vérifiez votre connection internet et réessayer.', 'error'));
   };
 }
 
@@ -795,7 +795,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
         ...state,
         mediaById: {
           ...state.mediaById,
-          [newMedia.id]: newMedia
+          [newMedia.id]: {
+            ...newMedia,
+            relationsWithGuests: [],
+            relationsWithHosts: []
+          }
         },
         [newMedia.type]: {
           ...state[newMedia.type],
