@@ -191,22 +191,24 @@ export default class CalendarContainer extends Component {
       var eventsTemp = [];
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
-        eventsTemp.push({
-          title: nextProps.mediaById[relation.guestMediaId].name,
-          start:  moment.unix(offsetUnix + relation.startTimeOffset),
-          end: moment.unix(offsetUnix + relation.startTimeOffset + relation.duration),
-          idMedia: relation.guestMediaId,
-          startTimeOffset: relation.startTimeOffset,
-          duration: relation.duration,
-          idRelation: relation.id,
-        });
-        mediaInCalendar.push({
-            idFull: null,
-            id: relation.guestMediaId,
+        if (relation.hostMediaId == this.state.calendarEdit.id) {
+          eventsTemp.push({
+            title: nextProps.mediaById[relation.guestMediaId].name,
+            start:  moment.unix(offsetUnix + relation.startTimeOffset),
+            end: moment.unix(offsetUnix + relation.startTimeOffset + relation.duration),
+            idMedia: relation.guestMediaId,
             startTimeOffset: relation.startTimeOffset,
             duration: relation.duration,
             idRelation: relation.id,
-        });
+          });
+          mediaInCalendar.push({
+              idFull: null,
+              id: relation.guestMediaId,
+              startTimeOffset: relation.startTimeOffset,
+              duration: relation.duration,
+              idRelation: relation.id,
+          });
+        }
       }
       this.setState({
         mediaInCalendar: mediaInCalendar,
