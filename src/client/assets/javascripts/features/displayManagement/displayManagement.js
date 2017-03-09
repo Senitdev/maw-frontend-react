@@ -206,13 +206,13 @@ function createRelation(relation) {
         error.response = response;
         throw error;
       }
-      response.json()
-      .then((response) => {
-        relation.id = response.data.id;
-        dispatch(createRelationSuccess(normalizeObjectForClient(relation)));
-      });
+      return response.json();
+    }).then((response) => {
+      relation.id = response.data.id;
+      dispatch(createRelationSuccess(normalizeObjectForClient(response.data)));
+      return response.data;
     })
-    .catch((error) => dispatch(createRelationFailure(relation.id, error)));
+    .catch((error) => dispatch(createRelationFailure(error)));
   };
 }
 
@@ -253,7 +253,10 @@ function patchRelation(relation) {
         error.response = response;
         throw error;
       }
-      dispatch(patchRelationSuccess(normalizeObjectForClient(relation)));
+      return response.json();
+    }).then((response) => {
+      dispatch(patchRelationSuccess(normalizeObjectForClient(response.data)));
+      return response.data;
     })
     .catch((error) => dispatch(patchRelationFailure(relation.id, error)));
   };
@@ -390,6 +393,7 @@ function patchMedia(media) {
       dispatch(patchMediaSuccess({
         ...normalize.media(data)
       }));
+      return data;
     })
     .catch(() => {
       dispatch(patchMediaFailure(media.id));
@@ -719,6 +723,7 @@ function fetchMediaRelation(idMedia) {
         //console.log(data);
 
         dispatch(mediaRelationSuccess(data));
+        return data;
       })
       .catch((error) => dispatch(mediaRelationFailure(error)));
   };
