@@ -71,9 +71,8 @@ export default class CalendarContainer extends Component {
       this.setState({
         isFetching: false
       });
-      this.props.actions.fetchMediaList('file');
-      this.props.actions.fetchMediaList('scene');
-
+    this.props.actions.fetchMediaList('file');
+    this.props.actions.fetchMediaList('scene');
   }
 
   componentDidMount() {
@@ -215,7 +214,8 @@ export default class CalendarContainer extends Component {
         isFetching: false
       }, () => {
         for (var i = 0; i < eventsTemp.length; i++) {
-          $('#calendar').fullCalendar('renderEvent', eventsTemp[i], true);
+          const eventTemp = eventsTemp[i];
+          setTimeout(() => $('#calendar').fullCalendar('renderEvent', eventTemp, true), 200);
         }
       });
     }
