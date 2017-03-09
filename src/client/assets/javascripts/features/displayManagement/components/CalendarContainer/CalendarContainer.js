@@ -10,7 +10,7 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import 'fullcalendar/dist/locale/fr.js';
 
-import { Row, Col, Badge, TimePicker, Input, Button } from 'antd';
+import { Row, Col, Badge, TimePicker, Input, Button, Icon } from 'antd';
 import moment from 'moment';
 
 import './CalendarContainer.scss';
@@ -207,13 +207,9 @@ export default class CalendarContainer extends Component {
     var newMediaInCalendar = this.state.mediaInCalendar;
     newMediaInCalendar.splice(id, 1);
 
-    var newMediaSelected = this.state.mediaSelected;
-    if (id == this.state.mediaSelected)
-      newMediaSelected = -1;
-
     this.setState({
       mediaInCalendar: newMediaInCalendar,
-      mediaSelected: newMediaSelected
+      mediaSelected: -1
     });
   }
 
@@ -227,7 +223,6 @@ export default class CalendarContainer extends Component {
 
     const idEventSelected = this.getIndexByIdFull(this.state.mediaSelected);
     const eventSelected = this.state.mediaInCalendar[idEventSelected];
-    console.log(eventSelected);
     return (
       <div id="calendar-container">
         <Row className="calendar-details">
@@ -276,8 +271,12 @@ export default class CalendarContainer extends Component {
             </Row>
             <Badge status="default" text="Propriétés de l'agenda" />
           </Col>
-          {eventSelected &&
-          <Col span="11" offset="2">
+          <Col span="12" offset="1">
+            {this.state.mediaSelected == -1 &&
+              <div>Cliquez sur une entrée dans l'agenda pour modifier ces informations.</div>
+            }
+            {eventSelected &&
+            <div>
               <Row>
                 <Col span="14">
                   <h3>{this.props.mediaById[eventSelected.id].name}</h3>
@@ -321,10 +320,22 @@ export default class CalendarContainer extends Component {
                   {eventSelected.startTimeOffset}
                 </Col>
               </Row>
+            </div>
+            }
             <Badge status="default" text="Planification du média" />
           </Col>
-        }
         </Row>
+        {this.state.mediaInCalendar.length == 0 &&
+          <div id="drop-empty-calendar">
+            <span>
+              <Icon type="arrow-down" />
+            </span>
+            <br />
+            <span>
+              Déplacez des médias dans l'agenda !
+            </span>
+          </div>
+        }
         <div id="calendar" />
       </div>
     );
