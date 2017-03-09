@@ -60,8 +60,8 @@ export default class SceneEditorContainer extends Component {
     this.setState({
       mediaEdit: {
         ...this.state.mediaEdit,
-        id: !isNaN(idScene) ? idScene : -1
-      }
+        id: !isNaN(idScene) ? idScene : -1,
+      },
     });
 
     this.props.actions.fetchMediaList('file');
@@ -90,20 +90,21 @@ export default class SceneEditorContainer extends Component {
       var mediaInScene = [];
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
-        mediaInScene.push({
-          id: relation.guestMediaId,
-          boxLeft: {value: relation.boxLeft},
-          boxTop: {value: relation.boxTop},
-          boxWidth: {value: relation.boxWidth},
-          boxHeight: {value: relation.boxHeight},
-          guestLeft: {value: relation.guestLeft},
-          guestTop: {value: relation.guestTop},
-          guestWidth: {value: relation.guestWidth},
-          guestHeight: {value: relation.guestHeight},
-          startTimeOffset: {value: relation.startTimeOffset},
-          duration: {value: relation.duration},
-          idRelation: relation.id, // Id le relation déjà existante
-        });
+        if (relation.hostMediaId == this.state.mediaEdit.id)
+          mediaInScene.push({
+            id: relation.guestMediaId,
+            boxLeft: {value: relation.boxLeft},
+            boxTop: {value: relation.boxTop},
+            boxWidth: {value: relation.boxWidth},
+            boxHeight: {value: relation.boxHeight},
+            guestLeft: {value: relation.guestLeft},
+            guestTop: {value: relation.guestTop},
+            guestWidth: {value: relation.guestWidth},
+            guestHeight: {value: relation.guestHeight},
+            startTimeOffset: {value: relation.startTimeOffset},
+            duration: {value: relation.duration},
+            idRelation: relation.id, // Id le relation déjà existante
+          });
       }
       this.setState({
         mediaInScene: mediaInScene,
@@ -221,6 +222,16 @@ export default class SceneEditorContainer extends Component {
 
     newMedias[id] = this.state.mediaInScene[id + deplacement];
     newMedias[id + deplacement] = this.state.mediaInScene[id];
+
+    this.rnd[id].updatePosition({
+      x: this.state.mediaInScene[id + deplacement].boxLeft.value / 100 * this.editorWidth,
+      y: this.state.mediaInScene[id + deplacement].boxTop.value / 100 * this.editorHeight
+    });
+    this.rnd[id + deplacement].updatePosition({
+      x: this.state.mediaInScene[id].boxLeft.value / 100 * this.editorWidth,
+      y: this.state.mediaInScene[id].boxTop.value / 100 * this.editorHeight
+    });
+
     this.setState({
       mediaInScene: newMedias,
     });
