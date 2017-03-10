@@ -6,6 +6,7 @@ import { Layout, Menu, Icon, Col, Dropdown, Button } from 'antd';
 import { actionCreators as authActions, selector } from 'features/auth';
 
 import './AppHeader.scss';
+import logo from 'images/LogoMAWwTxt.png';
 
 @connect(selector, (dispatch) => ({
   authActions: bindActionCreators(authActions, dispatch),
@@ -28,7 +29,7 @@ export default class AppHeader extends Component {
     return (
       <Layout.Header id="AppHeader">
         <Col span={23}>
-          <h1>My Access Web</h1>
+          <img src={logo} id='logo' />
         </Col>
         <Col span={1}>
           {this.props.auth.loggedIn && (
