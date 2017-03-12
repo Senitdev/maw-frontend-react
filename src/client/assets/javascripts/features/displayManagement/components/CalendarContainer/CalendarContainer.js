@@ -27,7 +27,7 @@ const offsetUnixMax = 7 * 24 * 3600;
     mediaByType,
     mediaById,
     relationsById,
-    isFetchingDetails
+    isFetchingDetails: isFetchingDetails != undefined ? isFetchingDetails : true
   };
 
 }, (dispatch) => ({
@@ -54,6 +54,7 @@ export default class CalendarContainer extends Component {
     this.state = {
       mediaInCalendar: [],
       mediaSelected: -1,
+      isFetching: true,
       calendarEdit: {
         id: -1,
         name: '',
@@ -75,6 +76,10 @@ export default class CalendarContainer extends Component {
     this.props.actions.fetchMediaList('scene');
     if (idCalendar >= 0)
       this.props.actions.fetchMediaDetails(idCalendar);
+    else
+      this.setState({
+        isFetching: false
+      });
   }
 
   componentDidMount() {
@@ -187,7 +192,7 @@ export default class CalendarContainer extends Component {
         });
       }
     }
-    if (!nextProps.isFetchingDetails) {
+    if (!nextProps.isFetchingDetails && this.state.isFetching) {
       var mediaInCalendar = [];
       var eventsTemp = [];
       for (var index in nextProps.relationsById) {
@@ -211,15 +216,15 @@ export default class CalendarContainer extends Component {
           });
         }
       }
-      if (mediaInCalendar.length > 0)
-        this.setState({
-          mediaInCalendar: mediaInCalendar
-        }, () => {
-          for (var i = 0; i < eventsTemp.length; i++) {
-            const eventTemp = eventsTemp[i];
-            $('#calendar').fullCalendar('renderEvent', eventTemp, true);
-          }
-        });
+      this.setState({
+        isFetching: false,
+        mediaInCalendar: mediaInCalendar
+      }, () => {
+        for (var i = 0; i < eventsTemp.length; i++) {
+          const eventTemp = eventsTemp[i];
+          $('#calendar').fullCalendar('renderEvent', eventTemp, true);
+        }
+      });
     }
   }
 
@@ -395,7 +400,7 @@ export default class CalendarContainer extends Component {
               Déplacez des médias dans l'agenda !
             </span>
             <br />
-            <Spin style={{margin: '5px'}} spinning={this.props.isFetchingDetails} />
+            <Spin style={{margin: '5px'}} spinning={this.state.isFetching} />
           </div>
         }
         <div id="calendar" />
