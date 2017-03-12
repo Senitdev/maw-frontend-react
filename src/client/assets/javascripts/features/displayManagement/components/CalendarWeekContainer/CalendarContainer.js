@@ -15,8 +15,8 @@ import moment from 'moment';
 
 import './CalendarContainer.scss';
 
-const format = 'HH:mm';
-var defaultDuration = (allDay) => {return allDay ? 86400 : 7200;};
+const offsetUnix = 342000;
+const offsetUnixMax = 7 * 24 * 3600;
 
 @connect((state) => {
   const { mediaById, file, scene, agenda, relationsById, isFetchingDetails } = state[displayManagementName];
@@ -88,12 +88,12 @@ export default class CalendarContainer extends Component {
       $('#calendar').fullCalendar({
         locale: 'fr',
         header: {
-          left:   'title',
-          center: 'month agendaWeek agendaDay',
-          right:  'today prev,next'
+          left: '',
+          center: '',
+          right: ''
         },
         height: 'auto',
-        defaultTimedEventDuration: moment.duration(defaultDuration(false), 'seconds'),
+        defaultView: 'agendaWeek',
         editable: true,
         droppable: true,
         businessHours: {
@@ -103,24 +103,27 @@ export default class CalendarContainer extends Component {
         },
         minTime: '07:00:00',
         maxTime: '20:00:00',
+        defaultDate: moment('1970-01-05'),
         eventOverlap: false,
         eventReceive: (event) => {
           this.setState({
             mediaInCalendar: this.state.mediaInCalendar.concat([{
               idFull: event._id,
               id: event.idMedia,
-              startTimeOffset: event.start.unix() - 3600,
-              duration: defaultDuration(event.allDay),
+              startTimeOffset: event.start.unix() - offsetUnix - 3600,
+              duration: 7200,
               idRelation: -1,
             }]),
             mediaSelected: event._id,
-          }, () => $('#calendar').fullCalendar('rerenderEvents'));
+          });
+          $('#calendar').fullCalendar('rerenderEvents');
         },
         eventClick: function(event) {
           if (thisReact.state.mediaSelected != event._id) {
             thisReact.setState({
               mediaSelected: event._id,
-            }, () => $('#calendar').fullCalendar('rerenderEvents'));
+            });
+            $('#calendar').fullCalendar('rerenderEvents');
           }
         },
         eventRender: function(event, element) {
@@ -141,8 +144,12 @@ export default class CalendarContainer extends Component {
           const idEventSelected = thisReact.getIndexByIdFull(event._id);
 
           var newMedia = thisReact.state.mediaInCalendar;
-          newMedia[idEventSelected].startTimeOffset = event.start.unix() - 3600;
-          newMedia[idEventSelected].duration = event.end == null ? defaultDuration(event.allDay) : event.end.unix() - event.start.unix();
+          newMedia[idEventSelected].startTimeOffset = event.start.unix() - offsetUnix - 3600;
+          if (newMedia[idEventSelected].startTimeOffset + newMedia[idEventSelected].duration > offsetUnixMax) {
+            newMedia[idEventSelected].duration = offsetUnixMax - newMedia[idEventSelected].startTimeOffset ;
+            //event.end = moment.unix(event.start.unix() + newMedia[idEventSelected].duration - 3600);
+            //$('#calendar').fullCalendar('updateEvent', event);
+          }
 
           thisReact.setState({
             mediaInCalendar: newMedia
@@ -165,6 +172,12 @@ export default class CalendarContainer extends Component {
           }
         },
       });
+
+      // Suppression des numéros des jours (affichage seulement de lun., etc)
+      $('#calendar').find('.fc-head').find('.fc-day-header').find('span').each(function() {
+        $(this).html($(this).html().substring(0, 4));
+      });
+      $('#calendar').find('.fc-header-toolbar').remove();
     });
   }
 
@@ -185,18 +198,14 @@ export default class CalendarContainer extends Component {
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
         if (relation.hostMediaId == this.state.calendarEdit.id) {
-          const start = moment.unix(relation.startTimeOffset);
-          const end = moment.unix(relation.startTimeOffset + relation.duration);
-          const allDay = (relation.duration % defaultDuration(true) == 0 && start.format(format) === '00:00');
           eventsTemp.push({
             title: nextProps.mediaById[relation.guestMediaId].name,
-            start: start,
-            end: end,
+            start:  moment.unix(offsetUnix + relation.startTimeOffset),
+            end: moment.unix(offsetUnix + relation.startTimeOffset + relation.duration),
             idMedia: relation.guestMediaId,
             startTimeOffset: relation.startTimeOffset,
             duration: relation.duration,
             idRelation: relation.id,
-            allDay: allDay,
           });
           mediaInCalendar.push({
               idFull: null,
@@ -223,15 +232,13 @@ export default class CalendarContainer extends Component {
 
   onChangeHour = (time, dateString, calendarOption) => {
     if (time) {
-      var newTime = "24:00";
-      if (time.hours() < 23) {
-        newTime = time.hours() + ":";
-        if (time.minutes() < 30)
-          newTime = newTime + "00";
-        else
-          newTime = newTime + "30";
-      }
+      var newTime = time.hours() + ":";
+      if (time.minutes() < 30)
+        newTime = newTime + "00";
+      else
+        newTime = newTime + "30";
       $('#calendar').fullCalendar('option', calendarOption, newTime);
+      $('#calendar').find('.fc-header-toolbar').remove();
     }
   }
 
@@ -259,11 +266,10 @@ export default class CalendarContainer extends Component {
     });
   }
   render() {
+    const format = 'HH:mm';
+
     const idEventSelected = this.getIndexByIdFull(this.state.mediaSelected);
     const eventSelected = this.state.mediaInCalendar[idEventSelected];
-
-    if (idEventSelected >= 0)
-      var eventFull = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
     return (
       <div id="calendar-container">
         <Row className="calendar-details">
@@ -338,11 +344,12 @@ export default class CalendarContainer extends Component {
                   Heures :
                 </Col>
                 <Col span="6">
-                  <InputNumber disabled={eventFull.allDay} size="small" min={0} value={Math.floor((eventSelected.duration) / 3600)}
+                  <InputNumber size="small" min={0} value={Math.floor((eventSelected.duration) / 3600)}
                     onChange={(val) => {
+                      var newEvent = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
                       var newDuration = val * 3600 + eventSelected.duration % 3600;
-                      eventFull.end = moment.unix(eventFull.start.unix() + newDuration - 3600);
-                      $('#calendar').fullCalendar('updateEvent', eventFull);
+                      newEvent.end = moment.unix(newEvent.start.unix() + newDuration - 3600);
+                      $('#calendar').fullCalendar('updateEvent', newEvent);
 
                       var newMedia = this.state.mediaInCalendar;
                       newMedia[idEventSelected].duration = newDuration;
@@ -356,11 +363,12 @@ export default class CalendarContainer extends Component {
                   Minutes :
                 </Col>
                 <Col span="6">
-                  <InputNumber disabled={eventFull.allDay} size="small" min={0} max={59} value={Math.floor((eventSelected.duration) % 3600 / 60)}
+                  <InputNumber size="small" min={0} max={59} value={Math.floor((eventSelected.duration) % 3600 / 60)}
                     onChange={(val) => {
+                      var newEvent = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
                       const newDuration = val * 60 + Math.floor(eventSelected.duration / 3600) * 3600;
-                      eventFull.end = moment.unix(eventFull.start.unix() + newDuration - 3600);
-                      $('#calendar').fullCalendar('updateEvent', eventFull);
+                      newEvent.end = moment.unix(newEvent.start.unix() + newDuration - 3600);
+                      $('#calendar').fullCalendar('updateEvent', newEvent);
 
                       var newMedia = this.state.mediaInCalendar;
                       newMedia[idEventSelected].duration = newDuration;

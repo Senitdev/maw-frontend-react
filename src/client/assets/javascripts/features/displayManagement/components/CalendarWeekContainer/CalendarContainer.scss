@@ -1,7 +1,3 @@
-#calendar {
-  margin-top: 10px;
-}
-
 #calendar-container {
   overflow: hidden;
 }
@@ -31,7 +27,7 @@
   margin-bottom: 5px;
 }
 
-.fc-time-grid-event.selected, .fc-day-grid-event.selected {
+.fc-time-grid-event.selected {
   border: 1px #111111 solid;
   background-color: #3a99ad;
 }

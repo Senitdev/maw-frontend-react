@@ -76,7 +76,7 @@ export default class MediaListContainer extends Component {
         const tooltipPlacement = count % 3 == 0 ? 'left' : (count % 3 == 2 ? 'right' : 'top');
         count++;
 
-        const dataEvent = '{"idMedia": ' + id + ', "title": "' + this.props.mediaById[id].name + '"}';
+        const dataEvent = '{"idMedia": ' + id + ', "stick": true, "title": "' + this.props.mediaById[id].name + '"}';
 
         if (!this.state.searchText || this.props.mediaById[id].name.match(reg))
           return (
