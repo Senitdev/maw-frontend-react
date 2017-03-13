@@ -7,7 +7,7 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import $ from 'jquery';
 import '../../../../utils/jquery-ui.min';
 
-import { Layout, Button, Input, Icon, Spin, Tabs, Row, Col } from 'antd';
+import { Layout, Button, Input, Icon, Spin, Tabs, Row, Col, InputNumber } from 'antd';
 
 import Rnd from 'react-rnd';
 
@@ -57,6 +57,7 @@ export default class SceneEditorContainer extends Component {
         type: 'scene'
       },
       isFetching: true,
+      scaling: 60,
     };
   }
 
@@ -122,13 +123,21 @@ export default class SceneEditorContainer extends Component {
     this.listDrop();
     this.editorHeight = document.getElementById('editor-positions').clientHeight;
     this.editorWidth = document.getElementById('editor-positions').clientWidth;
+    this.editorDurationWidth = document.getElementById('editor-duration-menu').clientWidth / 24 * 23 - 6;
+
+    for (var i = 0; i < this.state.mediaInScene.length; i++) {
+      this.rndDuration[i].updatePosition({x: Math.round(this.state.mediaInScene[i].startTimeOffset.value / this.state.scaling * this.editorDurationWidth)});
+      this.rndDuration[i].updateSize({width: Math.max(Math.round(this.state.mediaInScene[i].duration.value / this.state.scaling * this.editorDurationWidth), 150)});
+    }
   }
 
   mediaDeleted = [];
   editorHeight = 0;
   editorWidth = 0;
+  editorDurationWidth = 0;
   haveDrag = [];
   rnd = [];
+  rndDuration = [];
 
   dropEvent = (event, ui) => {
     this.setState({
@@ -345,12 +354,13 @@ export default class SceneEditorContainer extends Component {
             }}
             type="dashed" shape="circle" icon="caret-down" size="small" />
         </Col>
-        <Col span="23">
+        <Col span="23" className="editor-duration-container">
           <Rnd
+            ref={(c) => { this.rndDuration[idTemp] = c; }}
             initial={{
-              x: this.state.mediaInScene[idTemp].startTimeOffset.value,
+              x: Math.round(this.state.mediaInScene[idTemp].startTimeOffset.value / this.state.scaling * this.editorDurationWidth),
               y: 0,
-              width: Math.max(duree, 150),
+              width: Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 150),
               height: 44,
             }}
             style={{backgroundColor: '#' + shade + shade + shade}}
@@ -362,14 +372,30 @@ export default class SceneEditorContainer extends Component {
             moveAxis="x"
             onDragStop={(event, ui) => {
               var newMediaInScene = this.state.mediaInScene;
-              newMediaInScene[idTemp].startTimeOffset.value = ui.position.left;
+              newMediaInScene[idTemp].startTimeOffset.value = Math.round(ui.position.left / this.editorDurationWidth * this.state.scaling);
+              if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
+                newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
+
               this.setState({
                 mediaInScene: newMediaInScene
               });
             }}
             onResizeStop={(direction, styleSize, clientSize) => {
               var newMediaInScene = this.state.mediaInScene;
-              newMediaInScene[idTemp].duration.value = clientSize.width;
+              switch (direction) {
+                case 'left':
+                case 'bottomLeft':
+                case 'topLeft':
+                  //newMediaInScene[idTemp].startTimeOffset.value = Math.round(clientSize.width / this.editorDurationWidth * this.state.scaling);
+
+                  break;
+                default:
+                  newMediaInScene[idTemp].duration.value = Math.floor(clientSize.width / this.editorDurationWidth * this.state.scaling);
+                  if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
+                    newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
+                  break;
+              }
+
               this.setState({
                 mediaInScene: newMediaInScene
               });
@@ -456,6 +482,11 @@ export default class SceneEditorContainer extends Component {
             </Row>
             <Row id="editor-duration-menu">
               <Col span="12"><h4>Médias</h4></Col>
+              <Col span="12">Échelle en seconde : <InputNumber onChange={(val) => {
+                this.setState({
+                  scaling: val
+                });
+              }} size="small" min={1} value={this.state.scaling} /></Col>
             </Row>
             {durationElements}
           </Tabs.TabPane>

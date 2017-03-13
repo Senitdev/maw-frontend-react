@@ -7,6 +7,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 #scene-editor-list {
   display: flex;
   flex-direction: column;
+  padding-left: 5px;
 }
 
 #scene-editor-list li {
@@ -59,6 +60,11 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   user-select: none;
 }
 
+.editor-duration-container {
+  //background-color: #e4e4e4;
+  box-shadow: inset 0px 0px 9px -1px;
+}
+
 #editor-duration-menu {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -72,7 +78,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   border: 1px solid black;
   padding: 3px;
   margin-bottom: 1px;
-  overflow-x: scroll;
+  overflow-x: hidden;
   overflow-y: hidden;
 }
 
@@ -81,16 +87,13 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   display: block;
 }
 
-.editor-duration .editor-duration-buttons {
-  border-right: 1px solid black;
-}
-
 .editor-separation-element {
   width: 100px;
   height: 44px !important;
   background-color: rgb(random(256)-1,random(256)-1,random(256)-1);
   color: white;
   user-select: none !important;
+  padding-left: 1px;
 }
 
 .editor-separation-element button {

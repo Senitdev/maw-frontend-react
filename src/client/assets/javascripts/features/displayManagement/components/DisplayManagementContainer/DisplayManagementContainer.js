@@ -49,7 +49,7 @@ export default class DisplayManagementContainer extends Component {
             {pathsView}
           </Breadcrumb>
         </Layout.Header>
-        <Layout.Content style={{paddingRight: '17px'}}>
+        <Layout.Content style={{paddingRight: '17px', overflowY: 'scroll'}}>
           {this.props.children}
         </Layout.Content>
       </Layout>

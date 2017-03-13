@@ -219,7 +219,7 @@ class SceneEditorForm extends Component {
           <Col span="12">
             <Form.Item
               {...formItemLayout}
-              label="Durée"
+              label="Durée en seconde"
               hasFeedback
             >
               <Checkbox checked={this.props.mediaData.duration.value >= 0} onChange={this.props.changeDuration} />
