@@ -53,6 +53,10 @@ export const MediaTypes = {
     key: 'agenda',
     name: 'Agendas',
   },
+  SCENE: {
+    key: 'scene',
+    name: 'Scènes',
+  },
 };
 
 export type State = {
