@@ -241,17 +241,17 @@ export default class SceneEditorContainer extends Component {
     newMedias[id] = this.state.mediaInScene[id + deplacement];
     newMedias[id + deplacement] = this.state.mediaInScene[id];
 
-    this.rnd[id].updatePosition({
-      x: this.state.mediaInScene[id + deplacement].boxLeft.value / 100 * this.editorWidth,
-      y: this.state.mediaInScene[id + deplacement].boxTop.value / 100 * this.editorHeight
-    });
-    this.rnd[id + deplacement].updatePosition({
-      x: this.state.mediaInScene[id].boxLeft.value / 100 * this.editorWidth,
-      y: this.state.mediaInScene[id].boxTop.value / 100 * this.editorHeight
-    });
-
     this.setState({
       mediaInScene: newMedias,
+    }, () => {
+      this.rnd[id + deplacement].updatePosition({
+        x: this.state.mediaInScene[id + deplacement].boxLeft.value / 100 * this.editorWidth,
+        y: this.state.mediaInScene[id + deplacement].boxTop.value / 100 * this.editorHeight
+      });
+      this.rnd[id].updatePosition({
+        x: this.state.mediaInScene[id].boxLeft.value / 100 * this.editorWidth,
+        y: this.state.mediaInScene[id].boxTop.value / 100 * this.editorHeight
+      });
     });
   }
 
@@ -288,11 +288,23 @@ export default class SceneEditorContainer extends Component {
             width: this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth,
             height: this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight,
           }}
+          resizeGrid={[this.editorWidth / 100, this.editorHeight / 100]}
+          moveGrid={[this.editorWidth / 100, this.editorHeight / 100]}
           className="editor-position"
           minWidth={1}
           minHeight={1}
           bounds={'parent'}
           moveAxis="both"
+          isResizable={{
+            top: true,
+            right: true,
+            bottom: true,
+            left: false,
+            topRight: true,
+            bottomRight: true,
+            bottomLeft: false,
+            topLeft: false
+          }}
           onClick={() => {
             if (this.state.mediaSelected != idTemp)
               this.setState({mediaSelected: idTemp});
@@ -363,13 +375,25 @@ export default class SceneEditorContainer extends Component {
               width: Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 150),
               height: 44,
             }}
+            resizeGrid={[this.editorDurationWidth / this.state.scaling, 1]}
+            moveGrid={[this.editorDurationWidth / this.state.scaling, 1]}
             style={{backgroundColor: '#' + shade + shade + shade}}
             className="editor-separation-element"
             minWidth={1}
             minHeight={44}
-            maxHeight={44}
+            maxHeight={45}
             bounds={'parent'}
             moveAxis="x"
+            isResizable={{
+              top: true,
+              right: true,
+              bottom: true,
+              left: false,
+              topRight: true,
+              bottomRight: true,
+              bottomLeft: false,
+              topLeft: false
+            }}
             onDragStop={(event, ui) => {
               var newMediaInScene = this.state.mediaInScene;
               newMediaInScene[idTemp].startTimeOffset.value = Math.round(ui.position.left / this.editorDurationWidth * this.state.scaling);

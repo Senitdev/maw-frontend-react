@@ -12,7 +12,7 @@ export class FileViewer extends Component {
 
     const fileUrl = Config.API + '/modules-static-files/Screens/' + id;
 
-    var viewer = "viewer n'est pas displonible pour ce type de fichier: " + mimetype;
+    var viewer = <div>viewer n'est pas displonible pour ce type de fichier: {mimetype}</div>;
 
     if(mimetype) {
       if (mimetype.search('image') === 0) {
