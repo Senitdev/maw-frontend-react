@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Checkbox, InputNumber, Row, Col } from 'antd';
+import { Form, Switch, InputNumber, Row, Col, Radio } from 'antd';
 
 const SceneEditorForm = Form.create({
 
@@ -59,10 +59,18 @@ class SceneEditorForm extends Component {
     return (
       <Form onSubmit={this.handleSubmit}>
         <Row>
-          <Col span="6">
+          <Col span={12}>
+            <h3>Position :</h3>
+          </Col>
+          <Col span={12}>
+            <h3>Dimension :</h3>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="x %"
+              label="x"
               hasFeedback
             >
               {getFieldDecorator('boxLeft', {
@@ -73,30 +81,13 @@ class SceneEditorForm extends Component {
                 }]
               })(
                 <InputNumber min={0} max={100} />
-              )}
+              )} %
             </Form.Item>
           </Col>
-          <Col span="6">
+          <Col offset={6} span={6}>
             <Form.Item
               {...formItemLayout}
-              label="y %"
-              hasFeedback
-            >
-              {getFieldDecorator('boxTop', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
-              )}
-            </Form.Item>
-          </Col>
-          <Col span="6">
-            <Form.Item
-              {...formItemLayout}
-              label="largeur %"
+              label="largeur"
               hasFeedback
             >
               {getFieldDecorator('boxWidth', {
@@ -107,13 +98,32 @@ class SceneEditorForm extends Component {
                 }]
               })(
                 <InputNumber min={0} max={100} />
-              )}
+              )} %
             </Form.Item>
           </Col>
-          <Col span="6">
+        </Row>
+        <Row>
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="hauteur %"
+              label="y"
+              hasFeedback
+            >
+              {getFieldDecorator('boxTop', {
+                rules: [{
+                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
+                }, {
+                  required: true, message: 'Veuillez rentrer un nombre!',
+                }]
+              })(
+                <InputNumber min={0} max={100} />
+              )} %
+            </Form.Item>
+          </Col>
+          <Col offset={6} span={6}>
+            <Form.Item
+              {...formItemLayout}
+              label="hauteur"
               hasFeedback
             >
               {getFieldDecorator('boxHeight', {
@@ -124,15 +134,16 @@ class SceneEditorForm extends Component {
                 }]
               })(
                 <InputNumber min={0} max={100} />
-              )}
+              )} %
             </Form.Item>
           </Col>
         </Row>
+        {/*
         <Row>
-          <Col span="6">
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="guestLeft"
+              label="Intégrant x"
               hasFeedback
             >
               {getFieldDecorator('guestLeft', {
@@ -146,10 +157,10 @@ class SceneEditorForm extends Component {
               )}
             </Form.Item>
           </Col>
-          <Col span="6">
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="guestTop"
+              label="Intégrant y"
               hasFeedback
             >
               {getFieldDecorator('guestTop', {
@@ -163,10 +174,10 @@ class SceneEditorForm extends Component {
               )}
             </Form.Item>
           </Col>
-          <Col span="6">
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="guestWidth"
+              label="Intégrant largeur"
               hasFeedback
             >
               {getFieldDecorator('guestWidth', {
@@ -180,10 +191,10 @@ class SceneEditorForm extends Component {
               )}
             </Form.Item>
           </Col>
-          <Col span="6">
+          <Col span={6}>
             <Form.Item
               {...formItemLayout}
-              label="guestHeight"
+              label="Intégrant hauteur"
               hasFeedback
             >
               {getFieldDecorator('guestHeight', {
@@ -198,11 +209,17 @@ class SceneEditorForm extends Component {
             </Form.Item>
           </Col>
         </Row>
+        */}
         <Row>
-          <Col span="12">
+          <Col span="24">
+            <h3>Temps :</h3>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
             <Form.Item
               {...formItemLayout}
-              label="Décalage en seconde"
+              label="Démarre à "
               hasFeedback
             >
               {getFieldDecorator('startTimeOffset', {
@@ -213,26 +230,29 @@ class SceneEditorForm extends Component {
                 }]
               })(
                 <InputNumber step={0.001}/>
-              )}
+              )} secondes
             </Form.Item>
           </Col>
-          <Col span="12">
+          <Col span={12}>
             <Form.Item
-              {...formItemLayout}
-              label="Durée en seconde"
-              hasFeedback
-            >
-              <Checkbox checked={this.props.mediaData.duration.value >= 0} onChange={this.props.changeDuration} />
-              {getFieldDecorator('duration', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
+              hasFeedback >
+            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
+              <Radio value={1}>
+                S'affiche pendant :
+
+                {getFieldDecorator('duration', {
+                  rules: [{
+                    type: 'number', message: 'Veuillez rentrer un nombre valide!',
                   }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
+                    required: true, message: 'Veuillez rentrer un nombre!',
                   }]
-              })(
-                <InputNumber disabled={this.props.mediaData.duration.value < 0} step={0.001} />
-              )}
-            </Form.Item>
+                })(
+                   <InputNumber style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value < 0} step={0.001} />
+                )}
+                secondes</Radio><br />
+              <Radio value={2}><span>S'affiche éternellement</span></Radio>
+            </Radio.Group>
+           </Form.Item>
           </Col>
         </Row>
       </Form>

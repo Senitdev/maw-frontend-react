@@ -167,8 +167,8 @@ export default class SceneEditorContainer extends Component {
         boxHeight: {value: 100},
         guestLeft: {value: 0},
         guestTop: {value: 0},
-        guestWidth: {value: 0},
-        guestHeight: {value: 0},
+        guestWidth: {value: 100},
+        guestHeight: {value: 100},
         startTimeOffset: {value: 0},
         //duration: {value: this.state.mediaById[ui.draggable.attr("id")].duration},
         duration: {value: -1},
@@ -214,6 +214,7 @@ export default class SceneEditorContainer extends Component {
   }
 
   handleFormChange = (changedFields) => {
+    console.log(changedFields);
     var newMedias = this.state.mediaInScene;
     newMedias[this.state.mediaSelected] = {...this.state.mediaInScene[this.state.mediaSelected], ...changedFields};
     this.setState({
@@ -224,7 +225,7 @@ export default class SceneEditorContainer extends Component {
 
   changeDuration = (e) => {
     var newMedias = this.state.mediaInScene;
-    newMedias[this.state.mediaSelected].duration.value = e.target.checked ? 0 : -1;
+    newMedias[this.state.mediaSelected].duration.value = e.target.value == 1 ? 0 : -1;
     this.setState({
       mediaInScene: newMedias,
     });
