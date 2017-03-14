@@ -4,10 +4,13 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   background: none;
 }
 
+#scene-editor-list h3 {
+  padding-left: 5px;
+}
+
 #scene-editor-list {
   display: flex;
   flex-direction: column;
-  padding-left: 5px;
 }
 
 #scene-editor-list li {

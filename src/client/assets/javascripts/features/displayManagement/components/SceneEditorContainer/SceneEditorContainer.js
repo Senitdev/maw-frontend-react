@@ -107,8 +107,8 @@ export default class SceneEditorContainer extends Component {
             guestTop: {value: relation.guestTop},
             guestWidth: {value: relation.guestWidth},
             guestHeight: {value: relation.guestHeight},
-            startTimeOffset: {value: relation.startTimeOffset},
-            duration: {value: relation.duration},
+            startTimeOffset: {value: relation.startTimeOffset / 1000},
+            duration: {value: relation.duration / 1000},
             idRelation: relation.id, // Id le relation déjà existante
           });
       }
@@ -127,7 +127,7 @@ export default class SceneEditorContainer extends Component {
 
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
       this.rndDuration[i].updatePosition({x: Math.round(this.state.mediaInScene[i].startTimeOffset.value / this.state.scaling * this.editorDurationWidth)});
-      this.rndDuration[i].updateSize({width: Math.max(Math.round(this.state.mediaInScene[i].duration.value / this.state.scaling * this.editorDurationWidth), 150)});
+      this.rndDuration[i].updateSize({width: Math.max(Math.round(this.state.mediaInScene[i].duration.value / this.state.scaling * this.editorDurationWidth), 30)});
     }
   }
 
@@ -227,8 +227,15 @@ export default class SceneEditorContainer extends Component {
     // this.mediaDeleted : contient les id des relations à supprimer
     // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
     // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
-    // send(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit);
-    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInScene, this.state.mediaEdit)
+
+    var newMediasWithMS = this.state.mediaInScene.slice();
+    newMediasWithMS.map((m) => {
+      m.startTimeOffset.value *= 1000;
+      m.duration.value *= 1000;
+      return m;
+    });
+
+    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, newMediasWithMS, this.state.mediaEdit)
     .then((mediaId) => {
       if (this.state.mediaEdit.id < 0)
         this.context.router.push('/display-management/scene/' + mediaId);
@@ -349,7 +356,7 @@ export default class SceneEditorContainer extends Component {
       );
 
       // Editeur des durées et z-index
-      const duree = this.state.mediaInScene[idTemp].duration.value == -1 ? media.duration : this.state.mediaInScene[idTemp].duration.value;
+      const duree = (this.state.mediaInScene[idTemp].duration.value == -1 ? media.duration : this.state.mediaInScene[idTemp].duration.value);
       durationElements.push(
         <Row key={idTemp} className="editor-duration">
         <Col span="1" className="editor-duration-buttons">
@@ -372,7 +379,7 @@ export default class SceneEditorContainer extends Component {
             initial={{
               x: Math.round(this.state.mediaInScene[idTemp].startTimeOffset.value / this.state.scaling * this.editorDurationWidth),
               y: 0,
-              width: Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 150),
+              width: Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 30),
               height: 44,
             }}
             resizeGrid={[this.editorDurationWidth / this.state.scaling, 1]}
@@ -406,19 +413,9 @@ export default class SceneEditorContainer extends Component {
             }}
             onResizeStop={(direction, styleSize, clientSize) => {
               var newMediaInScene = this.state.mediaInScene;
-              switch (direction) {
-                case 'left':
-                case 'bottomLeft':
-                case 'topLeft':
-                  //newMediaInScene[idTemp].startTimeOffset.value = Math.round(clientSize.width / this.editorDurationWidth * this.state.scaling);
-
-                  break;
-                default:
-                  newMediaInScene[idTemp].duration.value = Math.floor(clientSize.width / this.editorDurationWidth * this.state.scaling);
-                  if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
-                    newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
-                  break;
-              }
+              newMediaInScene[idTemp].duration.value = Math.round(clientSize.width / this.editorDurationWidth * this.state.scaling);
+              if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
+                newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
 
               this.setState({
                 mediaInScene: newMediaInScene
@@ -459,8 +456,8 @@ export default class SceneEditorContainer extends Component {
                   style={{marginRight: '20px'}}
                   value={this.state.mediaEdit.name}
                   onChange={this.changeName}
-                  placeholder="Nom de la scène" />
-                <Button onClick={this.submitChange} type="primary" size="large">Sauvegarder</Button>
+                  placeholder="Indiquez un nom de scène" />
+                <Button disabled={this.state.mediaEdit.name == ''} onClick={this.submitChange} type="primary" size="large">Sauvegarder</Button>
               </div>
             }
           >

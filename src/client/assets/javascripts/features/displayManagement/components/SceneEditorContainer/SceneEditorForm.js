@@ -212,7 +212,7 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber />
+                <InputNumber step={0.001}/>
               )}
             </Form.Item>
           </Col>
@@ -230,7 +230,7 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                   }]
               })(
-                <InputNumber disabled={this.props.mediaData.duration.value < 0} />
+                <InputNumber disabled={this.props.mediaData.duration.value < 0} step={0.001} />
               )}
             </Form.Item>
           </Col>
