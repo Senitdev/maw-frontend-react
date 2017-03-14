@@ -128,6 +128,15 @@ export default class SceneEditorContainer extends Component {
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
       this.rndDuration[i].updatePosition({x: Math.round(this.state.mediaInScene[i].startTimeOffset.value / this.state.scaling * this.editorDurationWidth)});
       this.rndDuration[i].updateSize({width: Math.max(Math.round(this.state.mediaInScene[i].duration.value / this.state.scaling * this.editorDurationWidth), 30)});
+
+      this.rnd[i].updatePosition({
+        x: this.state.mediaInScene[i].boxLeft.value / 100 * this.editorWidth,
+        y: this.state.mediaInScene[i].boxTop.value / 100 * this.editorHeight,
+      });
+      this.rnd[i].updateSize({
+        width: this.state.mediaInScene[i].boxWidth.value / 100 * this.editorWidth,
+        height: this.state.mediaInScene[i].boxHeight.value / 100 * this.editorHeight
+      });
     }
   }
 
@@ -201,8 +210,7 @@ export default class SceneEditorContainer extends Component {
     this.setState({
       mediaInScene: newMedias,
     });
-    if (this.rnd[this.state.mediaSelected])
-      this.rnd[this.state.mediaSelected].updatePosition({ x: this.state.mediaInScene[this.state.mediaSelected].boxLeft.value / 100 * this.editorWidth, y: this.state.mediaInScene[this.state.mediaSelected].boxTop.value / 100 * this.editorHeight });
+    //if (this.rnd[this.state.mediaSelected]) this.rnd[this.state.mediaSelected].updatePosition({ x: this.state.mediaInScene[this.state.mediaSelected].boxLeft.value / 100 * this.editorWidth, y: this.state.mediaInScene[this.state.mediaSelected].boxTop.value / 100 * this.editorHeight });
   }
 
   changeDuration = (e) => {
@@ -237,8 +245,7 @@ export default class SceneEditorContainer extends Component {
 
     this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, newMediasWithMS, this.state.mediaEdit)
     .then((mediaId) => {
-      if (this.state.mediaEdit.id < 0)
-        this.context.router.push('/display-management/scene/' + mediaId);
+      this.context.router.push('/display-management/scene/');
     });
   }
 
@@ -250,7 +257,7 @@ export default class SceneEditorContainer extends Component {
 
     this.setState({
       mediaInScene: newMedias,
-    }, () => {
+    }/*, () => {
       this.rnd[id + deplacement].updatePosition({
         x: this.state.mediaInScene[id + deplacement].boxLeft.value / 100 * this.editorWidth,
         y: this.state.mediaInScene[id + deplacement].boxTop.value / 100 * this.editorHeight
@@ -259,7 +266,7 @@ export default class SceneEditorContainer extends Component {
         x: this.state.mediaInScene[id].boxLeft.value / 100 * this.editorWidth,
         y: this.state.mediaInScene[id].boxTop.value / 100 * this.editorHeight
       });
-    });
+    }*/);
   }
 
   render() {
@@ -327,11 +334,12 @@ export default class SceneEditorContainer extends Component {
             this.setState({
               mediaInScene: newMediaInScene
             });
+            /*
             if (this.rnd[idTemp])
               this.rnd[idTemp].updateSize({
                 width: newMediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth,
                 height: newMediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight,
-              });
+              });*/
             }}
           onDragStart={() => {
             this.haveDrag[idTemp] = false;

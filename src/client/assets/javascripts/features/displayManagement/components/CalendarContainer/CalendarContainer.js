@@ -185,24 +185,24 @@ export default class CalendarContainer extends Component {
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
         if (relation.hostMediaId == this.state.calendarEdit.id) {
-          const start = moment.unix(relation.startTimeOffset);
-          const end = moment.unix(relation.startTimeOffset + relation.duration);
+          const start = moment.unix(relation.startTimeOffset / 1000);
+          const end = moment.unix((relation.startTimeOffset + relation.duration) / 1000);
           const allDay = (relation.duration % defaultDuration(true) == 0 && start.format(format) === '00:00');
           eventsTemp.push({
             title: nextProps.mediaById[relation.guestMediaId].name,
             start: start,
             end: end,
             idMedia: relation.guestMediaId,
-            startTimeOffset: relation.startTimeOffset,
-            duration: relation.duration,
+            startTimeOffset: relation.startTimeOffset / 1000,
+            duration: relation.duration / 1000,
             idRelation: relation.id,
             allDay: allDay,
           });
           mediaInCalendar.push({
               idFull: null,
               id: relation.guestMediaId,
-              startTimeOffset: relation.startTimeOffset,
-              duration: relation.duration,
+              startTimeOffset: relation.startTimeOffset / 1000,
+              duration: relation.duration / 1000,
               idRelation: relation.id,
           });
         }
@@ -252,10 +252,27 @@ export default class CalendarContainer extends Component {
   getIndexByIdFull = (idFull) => this.state.mediaInCalendar.findIndex((e) => e.idFull === idFull);
 
   submitChange = () => {
-    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, this.state.mediaInCalendar, this.state.calendarEdit)
-    .then((mediaId) => {
-      if (this.state.calendarEdit.id < 0)
-        this.context.router.push('/display-management/agenda/' + mediaId);
+    const idCalendar = Number(this.props.idAgenda);
+    this.setState({
+      calendarEdit: {
+        ...this.state.calendarEdit,
+        id: !isNaN(idCalendar) ? idCalendar : -1
+      }
+    }, () => {
+
+      var newMediasWithMS = this.state.mediaInCalendar.slice();
+      newMediasWithMS = newMediasWithMS.map((m) =>
+        ({
+          ...m,
+          startTimeOffset: m.startTimeOffset * 1000,
+          duration: m.duration * 1000,
+        })
+      );
+
+      this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, newMediasWithMS, this.state.calendarEdit)
+      .then((mediaId) => {
+        this.context.router.push('/display-management/agenda/');
+      });
     });
   }
   render() {
@@ -290,7 +307,7 @@ export default class CalendarContainer extends Component {
                       }
                     });
                   }}
-                  placeholder="Nom de l'agenda" />
+                  placeholder="Indiquez un nom d'agenda" />
               </Col>
             </Row>
             <Row>
@@ -305,6 +322,7 @@ export default class CalendarContainer extends Component {
               </Col>
               <Col span="12">
                 <Button
+                  disabled={this.state.calendarEdit.name == ''}
                   onClick={this.submitChange}
                   style={{float: 'right'}}
                   type="primary" size="large">Sauvegarder</Button>
