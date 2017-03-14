@@ -532,7 +532,11 @@ function fetchMediaDetails(id, type) {
     let promiseArray = [];
 
     promiseArray.push(
-      fetch(url + 'feats/media-inclusion-tree?id=' + id)
+      fetch(url + 'feats/media-inclusion-tree', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: id})
+      })
         .then((response) => {
           if (!response.ok) {
             let error = new Error('mediaDetails fetch fail');
