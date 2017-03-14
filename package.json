@@ -27,6 +27,7 @@
     "tunnel": "lt --port 3000"
   },
   "devDependencies": {
+    "babel": "6.23.0",
     "babel-cli": "6.14.0",
     "babel-core": "6.14.0",
     "babel-eslint": "6.1.2",
@@ -40,6 +41,7 @@
     "babel-preset-es2015": "6.14.0",
     "babel-preset-react": "6.11.1",
     "babel-preset-stage-0": "6.5.0",
+    "babelify": "7.3.0",
     "chai": "3.5.0",
     "chai-jquery": "2.0.0",
     "cheerio": "0.22.0",
@@ -80,6 +82,11 @@
   "dependencies": {
     "antd": "2.8.0",
     "autoprefixer": "6.4.1",
+    "babel": "6.23.0",
+    "babel-core": "6.14.0",
+    "babel-loader": "6.2.5",
+    "babel-preset-es2015": "6.14.0",
+    "babel-preset-react": "6.11.1",
     "babel-runtime": "6.11.6",
     "classnames": "2.2.5",
     "express": "4.14.0",
@@ -100,6 +107,7 @@
     "redux-logger": "2.6.1",
     "redux-promise": "0.5.3",
     "redux-thunk": "2.2.0",
-    "reselect": "2.5.3"
+    "reselect": "2.5.3",
+    "webpack": "2.1.0-beta.21"
   }
 }

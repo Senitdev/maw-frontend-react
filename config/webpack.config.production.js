@@ -30,6 +30,7 @@ module.exports = merge(config, {
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin(GLOBALS),
     new webpack.optimize.DedupePlugin(),
+    /*
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
@@ -40,6 +41,7 @@ module.exports = merge(config, {
       },
       sourceMap: false
     }),
+    */
     new webpack.LoaderOptionsPlugin({
       minimize: true,
       debug: false
@@ -63,6 +65,7 @@ module.exports = merge(config, {
         loader: ExtractTextPlugin.extract({
           fallbackLoader: 'style',
           loader: [
+            'babel',
             { loader: 'css', query: { sourceMap: true } },
             'postcss',
             { loader: 'sass', query: { outputStyle: 'compressed' } }
