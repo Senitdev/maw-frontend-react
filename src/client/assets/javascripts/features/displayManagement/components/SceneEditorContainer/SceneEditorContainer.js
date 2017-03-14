@@ -296,11 +296,11 @@ export default class SceneEditorContainer extends Component {
           bounds={'parent'}
           moveAxis="both"
           isResizable={{
-            top: true,
+            top: false,
             right: true,
             bottom: true,
             left: false,
-            topRight: true,
+            topRight: false,
             bottomRight: true,
             bottomLeft: false,
             topLeft: false
