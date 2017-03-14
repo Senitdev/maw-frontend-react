@@ -94,9 +94,16 @@ export default class SceneEditorContainer extends Component {
     }
     if (nextProps.relationsById) {
       var mediaInScene = [];
+      var maxScale = this.state.scaling;
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
-        if (relation.hostMediaId == this.state.mediaEdit.id)
+        if (relation.hostMediaId == this.state.mediaEdit.id) {
+          const startTimeOffset = relation.startTimeOffset / 1000;
+          const duration = relation.duration / 1000;
+          const end = startTimeOffset + duration;
+          if (end > maxScale)
+            maxScale = end;
+
           mediaInScene.push({
             id: relation.guestMediaId,
             boxLeft: {value: relation.boxLeft},
@@ -107,14 +114,16 @@ export default class SceneEditorContainer extends Component {
             guestTop: {value: relation.guestTop},
             guestWidth: {value: relation.guestWidth},
             guestHeight: {value: relation.guestHeight},
-            startTimeOffset: {value: relation.startTimeOffset / 1000},
-            duration: {value: relation.duration / 1000},
+            startTimeOffset: {value: startTimeOffset},
+            duration: {value: duration},
             idRelation: relation.id, // Id le relation déjà existante
           });
+        }
       }
       this.setState({
         mediaInScene: mediaInScene,
-        isFetching: false
+        isFetching: false,
+        scaling: maxScale
       });
     }
   }
