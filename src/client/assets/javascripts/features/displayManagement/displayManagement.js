@@ -67,6 +67,24 @@ function attachScreenToAgenda(screen, relation) {
   );
 }
 
+function claimScreen(id, name) {
+  const url = 'entities/1/modules/3/feats/claim-global-screen';
+
+  return (dispatch) => new Promise((resolve, reject) => {
+    fetch(Config.API + url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id: id, name: name})
+    }).then(
+      (response) => {
+        if(!response.ok) {
+          reject(response);
+        }
+        dispatch(fetchMediaList('screen'));
+      }
+    ).then(() => resolve());
+  });
+}
 
 function createMediaRequest() {
   return {
@@ -784,6 +802,7 @@ export const actionCreators = {
   patchMedia,
   fetchMediaRelation,
   featPatchOrCreateFromEditor,
+  claimScreen,
   addFile,
 };
 

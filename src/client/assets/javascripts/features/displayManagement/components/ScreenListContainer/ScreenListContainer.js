@@ -18,14 +18,87 @@ export default class ScreenListContainer extends Component {
     actions: PropTypes.object.isRequired,
   };
 
+  state = {
+    confirmLoading: false,
+    visible: false,
+    nameValue: '',
+    codeValue: '',
+    textFieldCode: '',
+    textFieldName: '',
+    confirmText: '',
+  }
 
   componentWillMount() {
     this.props.actions.fetchMediaList('agenda');
   }
 
   onAdd = () => {
-    // TODO: Callback bouton "Nouvel écran"
-    console.log('Nouvel écran cliqué');
+    this.setState({
+      visible: true,
+    });
+  }
+
+  handleChangeNameValue = (value) => {
+    this.setState({
+      nameValue: value.target.value
+    });
+  }
+
+  handleChangeCodeValue = (value) => {
+    this.setState({
+      codeValue: value.target.value
+    });
+  }
+
+  handleAdd = () => {
+    if (!(this.state.codeValue.length > 0)) {
+      this.setState({
+        textFieldCode: 'Obligatoire',
+        textFieldName: 'Optionel',
+        confirmText: `Veuillez entrer le code d'identification de votre télévisieur.`
+      });
+      return;
+    }
+    this.setState({
+      confirmLoading: true,
+    });
+    this.props.actions.claimScreen(this.state.codeValue, this.state.nameValue)
+    .then(() => {
+      this.setState({
+        confirmLoading: false,
+        visible: false,
+        nameValue: '',
+        codeValue: '',
+        textFieldCode: '',
+        textFieldName: '',
+        confirmText: '',
+      });
+
+    })
+    .catch((error) => {
+      if(error.status == 404) {
+        this.setState({
+          confirmLoading: false,
+          confirmText: `Le code entré n'est pas reconnu. Vérifier qu'il n'y ai pas d'erreur de saisi.`,
+        });
+      } else if (error.status == 400) {
+        this.setState({
+          confirmLoading: false,
+          confirmText: `Cet écran est déjà associé à un autre compte. si vous en êtes le propriétaire, veuillez réinitialiser l'écran.`,
+        });
+      } else {
+        this.setState({
+          confirmLoading: false,
+          confirmText: `Une erreur est survenu, veuillez vérifier votre connection à internet et réessayer.`,
+        });
+      }
+    });
+  }
+
+  handleCancel = () => {
+    this.setState({
+      visible: false,
+    });
   }
 
   onEdit = (id) => {
@@ -69,6 +142,28 @@ export default class ScreenListContainer extends Component {
 
     return (
       <div>
+        <Modal title="Entrer le code à chiffre affiché par le téléviseur."
+          visible={this.state.visible}
+          onOk={this.handleAdd}
+          confirmLoading={this.state.confirmLoading}
+          onCancel={this.handleCancel}
+        >
+          Code d'identification du téléviseur
+          <Input
+            addonBefore={this.state.textFieldCode}
+            value={this.state.codeValue}
+            onChange={this.handleChangeCodeValue}
+            onPressEnter={this.handleAdd}
+          />
+          Nom donné au téléviseur
+          <Input
+            addonBefore={this.state.textFieldName}
+            value={this.state.nameValue}
+            onChange={this.handleChangeNameValue}
+            onPressEnter={this.handleAdd}
+          />
+          <div style={{color: 'red'}}>{this.state.confirmText}</div>
+        </Modal>
         <Row>
           <Col offset={1} span={22}>
             <h1>Écrans</h1>
