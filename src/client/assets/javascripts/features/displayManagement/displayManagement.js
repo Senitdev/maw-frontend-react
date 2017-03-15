@@ -778,6 +778,7 @@ function addFile(data) {
 export const actionCreators = {
   attachScreenToAgenda,
   deleteMedia,
+  deleteRelation,
   fetchMediaList,
   fetchMediaDetails,
   patchMedia,
