@@ -25,7 +25,6 @@ export default class MediaTable extends Component {
         title: 'ID',
         dataIndex: 'id',
         key: 'id',
-        width: 44,
         sorter: (a, b) => b.id - a.id
       },
       name: {
