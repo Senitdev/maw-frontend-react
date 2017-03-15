@@ -57,7 +57,8 @@ export class AgendaSelectorContainer extends Component {
    */
   onItemMenuClick = (agenda) => {
     if (agenda.key == -1) {
-      this.props.actions.deleteRelation(this.props.screen.relationsWithGuests[0]);
+      if (this.getCurrentAgenda().id != undefined)
+        this.props.actions.deleteRelation(this.props.screen.relationsWithGuests[0]);
       return;
     }
     const relation = {
