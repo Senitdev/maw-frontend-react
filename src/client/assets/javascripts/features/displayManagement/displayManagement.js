@@ -53,6 +53,20 @@ const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
 const ADD_FILE = 'maw/displayManagement/ADD_FILE';
 
 // Action creators
+function attachScreenToAgenda(screen, relation) {
+  return (dispatch) => new Promise(
+    (resolve, reject) => {
+      if (screen.relationsWithGuests[0])
+        dispatch(deleteRelation(screen.relationsWithGuests[0]))
+        .then(() => dispatch(createRelation(relation)))
+        .then(() => resolve())
+        .catch(() => reject());
+      else
+        dispatch(createRelation(relation));
+    }
+  );
+}
+
 
 function createMediaRequest() {
   return {
@@ -762,6 +776,7 @@ function addFile(data) {
 }
 
 export const actionCreators = {
+  attachScreenToAgenda,
   deleteMedia,
   fetchMediaList,
   fetchMediaDetails,

@@ -1,11 +1,27 @@
-import React, { Component } from 'react';
-import { Icon, Col, Row, Tooltip } from 'antd';
+import React, { Component, PropTypes } from 'react';
+import { Icon, Input, Col, Modal, Row, Tooltip } from 'antd';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 import MediaTableContainer from '../MediaTableContainer';
+import { AgendaSelectorContainer } from './AgendaSelectorContainer';
 
 import './ScreenListContainer.scss';
+import { actionCreators as displayManagementActions } from '../../';
 
+@connect(undefined, (dispatch) => ({
+  actions: bindActionCreators(displayManagementActions, dispatch)
+}))
 export default class ScreenListContainer extends Component {
+
+  static propTypes = {
+    actions: PropTypes.object.isRequired,
+  };
+
+
+  componentWillMount() {
+    this.props.actions.fetchMediaList('agenda');
+  }
 
   onAdd = () => {
     // TODO: Callback bouton "Nouvel écran"
@@ -42,6 +58,12 @@ export default class ScreenListContainer extends Component {
         key: 'status',
         className: 'screen-status',
         render: statusColumnRender
+      },
+      {
+        title: 'Agenda',
+        key: 'agenda',
+        className: 'agenda',
+        render: (screen) => (<AgendaSelectorContainer screen={screen}/>)
       }
     ];
 
