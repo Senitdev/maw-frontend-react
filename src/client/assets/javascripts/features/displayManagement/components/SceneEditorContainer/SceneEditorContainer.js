@@ -6,6 +6,7 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 
 import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
+import 'jquery-ui/ui/widgets/droppable';
 
 import { Layout, Button, Input, Icon, Spin, Tabs, Row, Col, InputNumber } from 'antd';
 
