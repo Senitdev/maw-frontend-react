@@ -78,6 +78,14 @@ function loginFailure(error) {
 
 function login(email, password, rememberMe) {
   return (dispatch) => {
+    if (email == 'demo@maw.com' && password == 'maw') {
+      localStorage.setItem('userId', 1);
+      dispatch(loginSuccess(1, 'demo@maw.com', rememberMe));
+    } else {
+      dispatch(loginFailure(''));
+    }
+  };
+  /*return (dispatch) => {
     dispatch(loginRequest());
 
     return fetch(Config.API + 'feats/login', {
@@ -104,6 +112,7 @@ function login(email, password, rememberMe) {
       dispatch(loginFailure(error));
     });
   };
+  */
 }
 
 function logout() {
