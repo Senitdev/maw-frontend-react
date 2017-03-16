@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Menu, Dropdown, Button, Icon } from 'antd';
+import { Menu, Dropdown, Button, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -80,6 +80,7 @@ export class AgendaSelectorContainer extends Component {
   }
 
   render() {
+    var currentAgenda = this.getCurrentAgenda().name;
     var agendaItems = [];
     for (let i=0; i < this.props.agendas.length; i++) {
       const agenda = this.props.mediaById[this.props.agendas[i]];
@@ -93,9 +94,11 @@ export class AgendaSelectorContainer extends Component {
     );
     return (
       <Dropdown overlay={agendaMenu} trigger={['click']}>
-        <Button style={{ width: '140px' }} loading={this.props.isFetchingDetails}>
-          {this.getCurrentAgenda().name}<Icon type="down" style={{ float: 'right' }} />
-        </Button>
+        <Tooltip title={currentAgenda} placement="top" mouseEnterDelay={0.6}>
+          <Button className='buttonAgendaSelector' icon='down' loading={this.props.isFetchingDetails}>
+            {currentAgenda}
+          </Button>
+        </Tooltip>
       </Dropdown>
     );
   }
