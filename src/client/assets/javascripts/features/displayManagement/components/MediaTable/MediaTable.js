@@ -40,12 +40,6 @@ export default class MediaTable extends Component {
         key: 'ratio',
         render: (text, media) => `${media.ratioNumerator} / ${media.ratioDenominator}`
       },
-      duration: {
-        title: 'Durée',
-        dataIndex: 'duration',
-        key: 'duration',
-        render: (text, media) => (media.duration ? media.duration : '-')
-      },
       createdAt: {
         title: 'Date de création',
         dataIndex: 'createdAt',
