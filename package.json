@@ -92,6 +92,7 @@
     "express": "4.14.0",
     "fullcalendar": "3.2.0",
     "isomorphic-fetch": "2.2.1",
+    "jquery-ui": "1.12.1",
     "json-server": "0.9.4",
     "lodash": "4.15.0",
     "raven-js": "3.6.1",

@@ -30,7 +30,6 @@ module.exports = merge(config, {
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin(GLOBALS),
     new webpack.optimize.DedupePlugin(),
-    /*
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
@@ -41,7 +40,6 @@ module.exports = merge(config, {
       },
       sourceMap: false
     }),
-    */
     new webpack.LoaderOptionsPlugin({
       minimize: true,
       debug: false

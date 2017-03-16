@@ -6,7 +6,7 @@ import { actionCreators as displayManagementActions, NAME as displayManagementNa
 import { Input, Row, Col, Icon, Tooltip } from 'antd';
 
 import $ from 'jquery';
-import '../../../../utils/jquery-ui.min';
+import 'jquery-ui/ui/widgets/draggable';
 
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';

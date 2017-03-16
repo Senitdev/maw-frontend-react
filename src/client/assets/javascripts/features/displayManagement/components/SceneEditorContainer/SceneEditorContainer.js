@@ -5,7 +5,7 @@ import MediaListContainer from '../MediaListContainer';
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 
 import $ from 'jquery';
-import '../../../../utils/jquery-ui.min';
+import 'jquery-ui/ui/widgets/draggable';
 
 import { Layout, Button, Input, Icon, Spin, Tabs, Row, Col, InputNumber } from 'antd';
 
