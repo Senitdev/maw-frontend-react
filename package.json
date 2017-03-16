@@ -19,6 +19,7 @@
     "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.production.js --progress",
     "postbuild": "npm run build:html",
     "build:serve": "http-server build/client -p 3003 --cors -o",
+    "deploy:test": "npm run build & scp -r build/client/* maw@abcore.fr:react-test/",
     "lint": "eslint config/ src/client/scripts/ src/client/assets/javascripts/ --ext .js",
     "jscs": "jscs src/js/",
     "typecheck": "flow",
