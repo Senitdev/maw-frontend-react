@@ -63,7 +63,6 @@ module.exports = merge(config, {
         loader: ExtractTextPlugin.extract({
           fallbackLoader: 'style',
           loader: [
-            'babel',
             { loader: 'css', query: { sourceMap: true } },
             'postcss',
             { loader: 'sass', query: { outputStyle: 'compressed' } }
