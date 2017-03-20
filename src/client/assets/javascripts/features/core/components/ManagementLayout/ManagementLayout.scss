@@ -18,6 +18,7 @@
     top: 0px;
     bottom: 48px;
     overflow-y: auto;
+    overflow-x: hidden;
   }
   .ant-layout-sider.ant-layout-sider-collapsed .siderContent {
     overflow: visible;
