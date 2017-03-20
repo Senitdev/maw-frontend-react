@@ -103,7 +103,7 @@ export default class MediaListContainer extends Component {
 
       groupsMedia.push(
         <Row className="group-media-list" gutter={16} key={MediaTypes[key].key}>
-          <Col offset={1} span={23}><h3>{MediaTypes[key].name}</h3></Col>
+          <Col offset={0} span={23}><h3>{MediaTypes[key].name}</h3><hr /></Col>
           {medias[MediaTypes[key].key]}
         </Row>
       );
