@@ -1,12 +1,11 @@
 #displayManagementLayout {
   height: 100%;
 }
-$primary-color: #f4f4f4;
+$primary-color: #f1f1f1;
 #displayManagementLayout > .ant-layout-header {
   background-color: $primary-color !important;
-  border-bottom: solid 1px #ddd;
-  height: 48px;
-  line-height: 48px;
+  height: 34px;
+  line-height: 34px;
 }
 #displayManagementLayout > div > div > .ant-layout-sider {
   background-color: $primary-color !important;
@@ -21,7 +20,7 @@ $primary-color: #f4f4f4;
 }
 
 #displayManagementLayout .ant-layout-content {
-  padding: 5px;
+  padding: 0px 5px 0 5px;
   background-color: #f1f1f1;
   display: block;
   overflow-x: visible;
