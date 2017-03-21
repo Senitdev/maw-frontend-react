@@ -311,8 +311,10 @@ function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
       for (let subKey in relation) {
         if (subKey in relation)
           if (relation[subKey].value != null)
-            if (relation[subKey].value > -1 || subKey == 'duration')
+            if (relation[subKey].value > -1)
               normalizedRelations[key][subKey] = relation[subKey].value;
+            else if (subKey == 'duration')
+              normalizedRelations[key][subKey] = relation[subKey].value/1000;
       }
     }
   }
