@@ -6,7 +6,9 @@ export class FileViewer extends Component {
   static propTypes = {
     displayControls: PropTypes.bool,
     file: PropTypes.object,
+    height: PropTypes.number,
     videoControls: PropTypes.string,
+    width: PropTypes.number,
   }
 
   state = {
@@ -15,26 +17,30 @@ export class FileViewer extends Component {
   }
 
   componentDidMount() {
-
     const { id, mimetype } = this.props.file;
     const fileUrl = Config.API + '/modules-static-files/Screens/' + id;
+
+    const sizes = {
+      width: this.props.width ? this.props.width : '380px',
+      height: this.props.height ? this.props.height : 'auto',
+    };
 
     if(mimetype) {
       if (mimetype.search('image') === 0) {
         this.setState({
           mod: `image`,
-          viewer: <img width='380px' src={fileUrl} />,
+          viewer: <img {...sizes} src={fileUrl} />,
         });
       } else if (mimetype.search('video') === 0) {
         if (this.props.displayControls)
           this.setState({
             mod: 'video',
-            viewer: <video width='380px' ref={(r) => this.videoPlayer = r} src={fileUrl} controls />,
+            viewer: <video {...sizes} ref={(r) => this.videoPlayer = r} src={fileUrl} controls />,
           });
         else
           this.setState({
             mod: 'video',
-            viewer: <video width='380px' ref={(r) => this.videoPlayer = r} src={fileUrl} />,
+            viewer: <video {...sizes} ref={(r) => this.videoPlayer = r} src={fileUrl} />,
           });
       }
     }
