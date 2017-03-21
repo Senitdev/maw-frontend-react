@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 
-import { Input, Row, Col, Icon, Tooltip } from 'antd';
+import { Input, Row, Col, Icon, Tooltip, Collapse } from 'antd';
 
 import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -68,6 +68,7 @@ export default class MediaListContainer extends Component {
 
     const medias = [];
     const groupsMedia = [];
+    var defaultActiveKey = [];
     var count = 0;
 
     for (let key of Object.keys(MediaTypes)) {
@@ -102,23 +103,30 @@ export default class MediaListContainer extends Component {
       });
 
       groupsMedia.push(
-        <Row className="group-media-list" gutter={16} key={MediaTypes[key].key}>
-          <Col offset={0} span={23}><h3>{MediaTypes[key].name}</h3><hr /></Col>
-          {medias[MediaTypes[key].key]}
-        </Row>
+          <Collapse.Panel header={<h3>{MediaTypes[key].name}</h3>} key={MediaTypes[key].key}>
+            <Row className="group-media-list" gutter={16}>
+              {medias[MediaTypes[key].key]}
+            </Row>
+          </Collapse.Panel>
       );
+
+      defaultActiveKey.push(MediaTypes[key].key);
     }
 
     return (
       <div id="media-list-container" className="media-list-container">
-        <Row justify="center" align="top">
+        <Row
+          justify="center" align="top"
+          style={{marginBottom: '5px'}} >
           <Col offset={1} span={6}><h2>Media</h2></Col>
           <Col span={16}><Input.Search
             placeholder="Recherche"
             onChange={this.onInputChange}
           /></Col>
         </Row>
-        {groupsMedia}
+        <Collapse defaultActiveKey={defaultActiveKey} bordered={false}>
+          {groupsMedia}
+        </Collapse>
       </div>
     );
   }
