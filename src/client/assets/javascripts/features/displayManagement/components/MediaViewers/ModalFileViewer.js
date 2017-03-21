@@ -33,14 +33,16 @@ export class ModalFileViewer extends Component {
           <Button icon='eye' onClick={this.showModal} />
         </Tooltip>
         <Modal title={name}
+               key='modalViewer'
                visible={this.state.visible}
                onOk={this.handleOk}
                onCancel={this.handleCancel}
                width='400px'
                footer={null} >
+          {this.state.visible ?
           <FileViewer
             file={this.props.file}
-          />
+          /> : null}
         </Modal>
       </span>
     );
