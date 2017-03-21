@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Switch, InputNumber, Row, Col, Radio } from 'antd';
+import { Form, Collapse, InputNumber, Radio } from 'antd';
 
 const SceneEditorForm = Form.create({
 
@@ -52,24 +52,11 @@ class SceneEditorForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const formItemLayout = {
-      labelCol: { span: 10 },
-      wrapperCol: { span: 14 },
-    };
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Row>
-          <Col span={12}>
-            <h3>Position :</h3>
-          </Col>
-          <Col span={12}>
-            <h3>Dimension :</h3>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={6}>
+        <Collapse defaultActiveKey={['1', '2', '3']} bordered={false}>
+          <Collapse.Panel header={<h3>Positions</h3>} key="1">
             <Form.Item
-              {...formItemLayout}
               label="x"
               hasFeedback
             >
@@ -83,29 +70,7 @@ class SceneEditorForm extends Component {
                 <InputNumber min={0} max={100} />
               )} %
             </Form.Item>
-          </Col>
-          <Col offset={6} span={6}>
             <Form.Item
-              {...formItemLayout}
-              label="largeur"
-              hasFeedback
-            >
-              {getFieldDecorator('boxWidth', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
-              )} %
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={6}>
-            <Form.Item
-              {...formItemLayout}
               label="y"
               hasFeedback
             >
@@ -119,10 +84,23 @@ class SceneEditorForm extends Component {
                 <InputNumber min={0} max={100} />
               )} %
             </Form.Item>
-          </Col>
-          <Col offset={6} span={6}>
+          </Collapse.Panel>
+          <Collapse.Panel header={<h3>Dimensions</h3>} key="2">
             <Form.Item
-              {...formItemLayout}
+              label="largeur"
+              hasFeedback
+            >
+              {getFieldDecorator('boxWidth', {
+                rules: [{
+                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
+                }, {
+                  required: true, message: 'Veuillez rentrer un nombre!',
+                }]
+              })(
+                <InputNumber min={0} max={100} />
+              )} %
+            </Form.Item>
+            <Form.Item
               label="hauteur"
               hasFeedback
             >
@@ -136,8 +114,44 @@ class SceneEditorForm extends Component {
                 <InputNumber min={0} max={100} />
               )} %
             </Form.Item>
-          </Col>
-        </Row>
+          </Collapse.Panel>
+          <Collapse.Panel header={<h3>Temps</h3>} key="3">
+            <Form.Item
+              label="Démarre à "
+              hasFeedback
+            >
+              {getFieldDecorator('startTimeOffset', {
+                rules: [{
+                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
+                }, {
+                  required: true, message: 'Veuillez rentrer un nombre!',
+                }]
+              })(
+                <InputNumber step={0.001}/>
+              )} s
+            </Form.Item>
+            <Form.Item
+              hasFeedback >
+            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
+              <Radio value={2}><span>S'affiche éternellement</span></Radio>
+              <br />
+              <Radio value={1}>
+                Pendant :
+
+                {getFieldDecorator('duration', {
+                  rules: [{
+                    type: 'number', message: 'Veuillez rentrer un nombre valide!',
+                  }, {
+                    required: true, message: 'Veuillez rentrer un nombre!',
+                  }]
+                })(
+                   <InputNumber style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value < 0} step={0.001} />
+                )}
+                s</Radio>
+            </Radio.Group>
+           </Form.Item>
+          </Collapse.Panel>
+        </Collapse>
         {/*
         <Row>
           <Col span={6}>
@@ -210,51 +224,6 @@ class SceneEditorForm extends Component {
           </Col>
         </Row>
         */}
-        <Row>
-          <Col span="24">
-            <h3>Temps :</h3>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={12}>
-            <Form.Item
-              {...formItemLayout}
-              label="Démarre à "
-              hasFeedback
-            >
-              {getFieldDecorator('startTimeOffset', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber step={0.001}/>
-              )} secondes
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              hasFeedback >
-            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
-              <Radio value={1}>
-                S'affiche pendant :
-
-                {getFieldDecorator('duration', {
-                  rules: [{
-                    type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                  }, {
-                    required: true, message: 'Veuillez rentrer un nombre!',
-                  }]
-                })(
-                   <InputNumber style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value < 0} step={0.001} />
-                )}
-                secondes</Radio><br />
-              <Radio value={2}><span>S'affiche éternellement</span></Radio>
-            </Radio.Group>
-           </Form.Item>
-          </Col>
-        </Row>
       </Form>
     );
   }
