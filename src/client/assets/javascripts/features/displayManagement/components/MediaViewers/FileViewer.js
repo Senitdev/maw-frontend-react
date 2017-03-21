@@ -6,9 +6,9 @@ export class FileViewer extends Component {
   static propTypes = {
     displayControls: PropTypes.bool,
     file: PropTypes.object,
-    height: PropTypes.number,
+    height: PropTypes.string,
     videoControls: PropTypes.string,
-    width: PropTypes.number,
+    width: PropTypes.string,
   }
 
   state = {
