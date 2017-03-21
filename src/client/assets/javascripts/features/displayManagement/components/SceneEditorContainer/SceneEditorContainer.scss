@@ -4,32 +4,11 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   background: none;
 }
 
-#scene-editor-list h3 {
-  padding-left: 5px;
-}
-
-#scene-editor-list {
-  display: flex;
-  flex-direction: column;
-}
-
-#scene-editor-list li {
-  padding: 5px;
-  word-break: break-word;
-}
-
-#scene-editor-list li.selected {
-  background-color: #ddd;
-}
-
-#scene-editor-list > ul > li button {
-  float: right;
-}
-
 #drop-empty-container {
-  margin: 5px;
+  margin: auto;
   padding-top: 20px;
-  height: 100%;
+  height: 20%;
+  width: 20%;
   border: 1px dashed black;
   text-align: center;
 }

@@ -8,13 +8,12 @@ import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/droppable';
 
-import { Layout, Button, Input, Icon, Spin, Tabs, Row, Col, InputNumber } from 'antd';
+import { Layout, Button, Input, Icon, Row, Col, InputNumber } from 'antd';
 
 import Rnd from 'react-rnd';
 
 import SceneEditorForm from './SceneEditorForm';
-
-import { FileViewer } from '../MediaViewers/FileViewer';
+import SceneEditorViewPort from './SceneEditorViewPort';
 
 import './SceneEditorContainer.scss';
 
@@ -138,15 +137,6 @@ export default class SceneEditorContainer extends Component {
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
       this.rndDuration[i].updatePosition({x: Math.round(this.state.mediaInScene[i].startTimeOffset.value / this.state.scaling * this.editorDurationWidth)});
       this.rndDuration[i].updateSize({width: Math.max(Math.round(this.state.mediaInScene[i].duration.value / this.state.scaling * this.editorDurationWidth), 30)});
-
-      this.rnd[i].updatePosition({
-        x: this.state.mediaInScene[i].boxLeft.value / 100 * this.editorWidth,
-        y: this.state.mediaInScene[i].boxTop.value / 100 * this.editorHeight,
-      });
-      this.rnd[i].updateSize({
-        width: this.state.mediaInScene[i].boxWidth.value / 100 * this.editorWidth,
-        height: this.state.mediaInScene[i].boxHeight.value / 100 * this.editorHeight
-      });
     }
   }
 
@@ -155,7 +145,6 @@ export default class SceneEditorContainer extends Component {
   editorWidth = 0;
   editorDurationWidth = 0;
   haveDrag = [];
-  rnd = [];
   rndDuration = [];
 
   dropEvent = (event, ui) => {
@@ -215,13 +204,11 @@ export default class SceneEditorContainer extends Component {
   }
 
   handleFormChange = (changedFields) => {
-    console.log(changedFields);
     var newMedias = this.state.mediaInScene;
     newMedias[this.state.mediaSelected] = {...this.state.mediaInScene[this.state.mediaSelected], ...changedFields};
     this.setState({
       mediaInScene: newMedias,
     });
-    //if (this.rnd[this.state.mediaSelected]) this.rnd[this.state.mediaSelected].updatePosition({ x: this.state.mediaInScene[this.state.mediaSelected].boxLeft.value / 100 * this.editorWidth, y: this.state.mediaInScene[this.state.mediaSelected].boxTop.value / 100 * this.editorHeight });
   }
 
   changeDuration = (e) => {
@@ -268,110 +255,51 @@ export default class SceneEditorContainer extends Component {
 
     this.setState({
       mediaInScene: newMedias,
-    }/*, () => {
-      this.rnd[id + deplacement].updatePosition({
-        x: this.state.mediaInScene[id + deplacement].boxLeft.value / 100 * this.editorWidth,
-        y: this.state.mediaInScene[id + deplacement].boxTop.value / 100 * this.editorHeight
-      });
-      this.rnd[id].updatePosition({
-        x: this.state.mediaInScene[id].boxLeft.value / 100 * this.editorWidth,
-        y: this.state.mediaInScene[id].boxTop.value / 100 * this.editorHeight
-      });
-    }*/);
+    });
   }
 
   render() {
-    var mediaListLi = [];
     var screenSparationsDivs = [];
     var durationElements = [];
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
       let idTemp = i;
       const media = this.props.mediaById[this.state.mediaInScene[idTemp].id];
-      var className = idTemp == this.state.mediaSelected ? 'selected' : '';
-      mediaListLi.push(
-        <li key={idTemp} className={className}>
-          <a
-            onClick={() => this.selecteMediaInScene(idTemp)}
-            title={media.name}
-            >
-              {media.name}
-            </a>
-          <Button type="danger" icon="delete" size="small" onClick={() => this.removeMediaInScene(idTemp)} />
-        </li>
-      );
 
       // Séparation de l'écran
       const shade = (idTemp + 3) * 8 % 100;
       screenSparationsDivs.push(
-        <Rnd
+        <SceneEditorViewPort
           key={idTemp}
-          style={{backgroundColor: '#' + shade + shade + shade}}
-          ref={(c) => { this.rnd[idTemp] = c; }}
-          initial={{
-            x: this.state.mediaInScene[idTemp].boxLeft.value / 100 * this.editorWidth,
-            y: this.state.mediaInScene[idTemp].boxTop.value / 100 * this.editorHeight,
-            width: this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth,
-            height: this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight,
-          }}
-          resizeGrid={[this.editorWidth / 100, this.editorHeight / 100]}
-          moveGrid={[this.editorWidth / 100, this.editorHeight / 100]}
-          className="editor-position"
-          minWidth={1}
-          minHeight={1}
-          bounds={'parent'}
-          moveAxis="both"
-          isResizable={{
-            top: false,
-            right: true,
-            bottom: true,
-            left: false,
-            topRight: false,
-            bottomRight: true,
-            bottomLeft: false,
-            topLeft: false
-          }}
+          backgroundColor={'#' + shade + shade + shade}
+          editorHeight={this.editorHeight}
+          editorWidth={this.editorWidth}
+          x={this.state.mediaInScene[idTemp].boxLeft.value / 100 * this.editorWidth}
+          y={this.state.mediaInScene[idTemp].boxTop.value / 100 * this.editorHeight}
+          width={this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth}
+          height={this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight}
           onClick={() => {
             if (this.state.mediaSelected != idTemp)
               this.setState({mediaSelected: idTemp});
           }}
-          onResizeStop={(direction, styleSize, clientSize) => {
+          onResizeStop={(newHeight, newWidth) => {
             var newMediaInScene = this.state.mediaInScene;
-            const newHeight = Math.round(clientSize.height / this.editorHeight * 100);
-            const newWidth = Math.round(clientSize.width / this.editorWidth * 100);
-
             newMediaInScene[idTemp].boxHeight.value = newHeight + newMediaInScene[idTemp].boxTop.value > 100 ? 100 - newMediaInScene[idTemp].boxTop.value : newHeight;
             newMediaInScene[idTemp].boxWidth.value = newWidth + newMediaInScene[idTemp].boxLeft.value > 100 ? 100 - newMediaInScene[idTemp].boxLeft.value : newWidth;
 
             this.setState({
               mediaInScene: newMediaInScene
             });
-            /*
-            if (this.rnd[idTemp])
-              this.rnd[idTemp].updateSize({
-                width: newMediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth,
-                height: newMediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight,
-              });*/
-            }}
-          onDragStart={() => {
-            this.haveDrag[idTemp] = false;
           }}
-          onDrag={() => {
-            this.haveDrag[idTemp] = true;
+          onDragStop={(newX, newY) => {
+            var newMediaInScene = this.state.mediaInScene;
+            newMediaInScene[idTemp].boxTop.value = newY;
+            newMediaInScene[idTemp].boxLeft.value = newX;
+            this.setState({
+              mediaInScene: newMediaInScene
+            });
           }}
-          onDragStop={(event, ui) => {
-            if (this.haveDrag[idTemp]) {
-              var newMediaInScene = this.state.mediaInScene;
-              newMediaInScene[idTemp].boxTop.value = Math.round(ui.position.top / this.editorHeight * 100);
-              newMediaInScene[idTemp].boxLeft.value = Math.round(ui.position.left / this.editorWidth * 100);
-              this.setState({
-                mediaInScene: newMediaInScene
-              });
-            }
-          }}
-        >
-          <h4>{media.name}</h4>
-          <FileViewer file={media} />
-        </Rnd>
+          media={media}
+         />
       );
 
       // Editeur des durées et z-index
@@ -410,6 +338,10 @@ export default class SceneEditorContainer extends Component {
             maxHeight={45}
             bounds={'parent'}
             moveAxis="x"
+            onClick={() => {
+              if (this.state.mediaSelected != idTemp)
+                this.setState({mediaSelected: idTemp});
+            }}
             isResizable={{
               top: false,
               right: true,
@@ -465,27 +397,9 @@ export default class SceneEditorContainer extends Component {
       <Layout className="display-management-content-layout">
         <Layout.Sider width="auto"><MediaListContainer /></Layout.Sider>
         <Layout.Content id="scene-list-container">
-          <Tabs
-            style={{height: '100%', display: 'flex', flexDirection: 'column'}}
-            defaultActiveKey="2"
-            onChange={() => setTimeout(this.listDrop, 800)}
-            tabBarExtraContent={
-              <div style={{display: 'flex'}}>
-                <Input
-                  style={{marginRight: '20px'}}
-                  value={this.state.mediaEdit.name}
-                  onChange={this.changeName}
-                  placeholder="Indiquez un nom de scène" />
-                <Button disabled={this.state.mediaEdit.name == ''} onClick={this.submitChange} type="primary" size="large">Sauvegarder</Button>
-              </div>
-            }
-          >
-          <Tabs.TabPane tab="Éditeur avancé" key="1">
-          <Layout style={{height: '100%'}}>
-            <Layout.Sider id="scene-editor-list">
-              <h3>Médias dans la scène <Spin spinning={this.state.isFetching} /></h3>
-              {
-                this.state.mediaInScene.length == 0 ?
+          <Row>
+            <Col id="editor-positions" span="24">
+              { this.state.mediaInScene.length == 0 ?
                   <div id="drop-empty-container">
                     <span>
                       <Icon type="arrow-down" />
@@ -496,42 +410,57 @@ export default class SceneEditorContainer extends Component {
                     </span>
                   </div>
                 :
-                  <ul>
-                    {mediaListLi}
-                  </ul>
+                  <div>
+                    {screenSparationsDivs}
+                  </div>
               }
-            </Layout.Sider>
-            <Layout.Content>
-              { this.state.mediaSelected >= 0 &&
-                <SceneEditorForm
-                  onChange={this.handleFormChange}
-                  mediaData={this.state.mediaInScene[this.state.mediaSelected]}
-                  changeDuration={this.changeDuration}
-                />
-              }
-            </Layout.Content>
-          </Layout>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Éditeur graphique" key="2">
-            <Row>
-              <Col id="editor-positions" span="24">
-                <div>
-                {screenSparationsDivs}
-                </div>
-              </Col>
-            </Row>
-            <Row id="editor-duration-menu">
-              <Col span="12"><h4>Médias</h4></Col>
-              <Col span="12">Échelle en seconde : <InputNumber onChange={(val) => {
-                this.setState({
-                  scaling: val
-                });
-              }} size="small" min={1} value={this.state.scaling} /></Col>
-            </Row>
-            {durationElements}
-          </Tabs.TabPane>
-          </Tabs>
+            </Col>
+          </Row>
+          <Row id="editor-duration-menu">
+            <Col span="12"><h4>Médias</h4></Col>
+            <Col span="12">Échelle en seconde : <InputNumber onChange={(val) => {
+              this.setState({
+                scaling: val
+              });
+            }} size="small" min={1} value={this.state.scaling} /></Col>
+          </Row>
+          {durationElements}
         </Layout.Content>
+        <Layout.Sider width={250}>
+          <div style={{padding: '5px', backgroundColor: '#eeeeee'}}>
+            <Input
+              style={{}}
+              value={this.state.mediaEdit.name}
+              onChange={this.changeName}
+              placeholder="Indiquez un nom de scène" />
+            <Button
+              loading={this.state.isFetching}
+              style={{padding: '5px', display: 'block', margin: '10px auto'}}
+              disabled={this.state.mediaEdit.name == ''}
+              onClick={this.submitChange}
+              type="primary" size="large">Sauvegarder</Button>
+          </div>
+          <hr />
+          { this.state.mediaSelected == -1 ?
+            <div>Cliquez sur un média pour modifier ces informations.</div>
+          :
+            <div>
+              <h2 style={{padding: '5px', wordBreak: 'break-word'}}>
+                {this.props.mediaById[this.state.mediaInScene[this.state.mediaSelected].id].name}
+                <Button
+                  style={{float: 'right'}}
+                  type="danger" icon="delete" size="small"
+                  onClick={() => this.removeMediaInScene(this.state.mediaSelected)} />
+              </h2>
+              <SceneEditorForm
+                onChange={this.handleFormChange}
+                mediaData={this.state.mediaInScene[this.state.mediaSelected]}
+                changeDuration={this.changeDuration}
+              />
+            </div>
+          }
+
+        </Layout.Sider>
       </Layout>
     );
   }
