@@ -42,6 +42,7 @@ export class ModalFileViewer extends Component {
           {this.state.visible ?
           <FileViewer
             file={this.props.file}
+            displayControls
           /> : null}
         </Modal>
       </span>
