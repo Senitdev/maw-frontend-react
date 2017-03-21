@@ -62,7 +62,7 @@ export default class SceneEditorViewPort extends Component {
           topLeft: false
         }}
         onClick={this.props.onClick}
-        onResizeStop={(direction, styleSize, clientSize) => {
+        onResize={(direction, styleSize, clientSize) => {
           const newHeight = Math.round(clientSize.height / this.props.editorHeight * 100);
           const newWidth = Math.round(clientSize.width / this.props.editorWidth * 100);
 
