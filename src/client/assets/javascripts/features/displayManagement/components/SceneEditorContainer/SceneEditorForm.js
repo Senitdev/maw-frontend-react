@@ -124,9 +124,7 @@ class SceneEditorForm extends Component {
             </Form.Item>
             <Form.Item
               hasFeedback >
-            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value > 0 ? 1 : 2}>
-              <Radio value={2}><span>S'affiche éternellement</span></Radio>
-              <br />
+            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
               <Radio value={1}>
                 Pendant :
 
