@@ -13,6 +13,7 @@ import { Layout, Button, Input, Icon, Row, Col, InputNumber } from 'antd';
 import SceneEditorForm from './SceneEditorForm';
 import SceneEditorViewPort from './SceneEditorViewPort';
 import SceneEditorDuration from './SceneEditorDuration';
+import SceneEditorCursor from './SceneEditorCursor';
 
 import './SceneEditorContainer.scss';
 
@@ -57,6 +58,8 @@ export default class SceneEditorContainer extends Component {
       },
       isFetching: true,
       scaling: 60,
+      interval: 0,
+      mediaControls: 'pause',
     };
   }
 
@@ -140,6 +143,9 @@ export default class SceneEditorContainer extends Component {
   editorWidth = 0;
   editorDurationWidth = 0;
   haveDrag = [];
+
+  timer;
+  startTime = 0;
 
   dropEvent = (event, ui) => {
     const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 0;
@@ -254,50 +260,70 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
+  tick = () => {
+    if (this.state.interval >= this.state.mediaEdit.duration) {
+      clearInterval(this.timer);
+      this.setState({
+        mediaControls: 'pause',
+      });
+    } else {
+      this.setState({
+        interval: Date.now() - this.startTime,
+      });
+    }
+  }
+
   render() {
     var screenSparationsDivs = [];
     var durationElements = [];
     for (var i = 0; i < this.state.mediaInScene.length; i++) {
       let idTemp = i;
       const media = this.props.mediaById[this.state.mediaInScene[idTemp].id];
+      const relation = this.state.mediaInScene[idTemp];
 
       // Séparation de l'écran
       const shade = (this.state.mediaInScene[idTemp].zIndex.value  + 3) * 8 % 100;
-      screenSparationsDivs.push(
-        <SceneEditorViewPort
-          key={idTemp}
-          zIndex={this.state.mediaInScene[idTemp].zIndex.value + 10}
-          backgroundColor={'#' + shade + shade + shade}
-          editorHeight={this.editorHeight}
-          editorWidth={this.editorWidth}
-          x={this.state.mediaInScene[idTemp].boxLeft.value / 100 * this.editorWidth}
-          y={this.state.mediaInScene[idTemp].boxTop.value / 100 * this.editorHeight}
-          width={this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth}
-          height={this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight}
-          onClick={() => {
-            if (this.state.mediaSelected != idTemp)
-              this.setState({mediaSelected: idTemp});
-          }}
-          onResizeStop={(newHeight, newWidth) => {
-            var newMediaInScene = this.state.mediaInScene;
-            newMediaInScene[idTemp].boxHeight.value = newHeight + newMediaInScene[idTemp].boxTop.value > 100 ? 100 - newMediaInScene[idTemp].boxTop.value : newHeight;
-            newMediaInScene[idTemp].boxWidth.value = newWidth + newMediaInScene[idTemp].boxLeft.value > 100 ? 100 - newMediaInScene[idTemp].boxLeft.value : newWidth;
+      if (((relation.startTimeOffset.value <= (this.state.interval)) &&
+          (relation.startTimeOffset.value + relation.duration.value >= (this.state.interval))) ||
+          (relation.duration.value == 0)) {
+        screenSparationsDivs.push(
+          <SceneEditorViewPort
+            key={idTemp}
+            zIndex={this.state.mediaInScene[idTemp].zIndex.value + 10}
+            backgroundColor={'#' + shade + shade + shade}
+            editorHeight={this.editorHeight}
+            editorWidth={this.editorWidth}
+            x={this.state.mediaInScene[idTemp].boxLeft.value / 100 * this.editorWidth}
+            y={this.state.mediaInScene[idTemp].boxTop.value / 100 * this.editorHeight}
+            width={this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth}
+            height={this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight}
+            onClick={() => {
+              if (this.state.mediaSelected != idTemp)
+                this.setState({mediaSelected: idTemp});
+            }}
+            onResizeStop={(newHeight, newWidth) => {
+              var newMediaInScene = this.state.mediaInScene;
+              newMediaInScene[idTemp].boxHeight.value = newHeight + newMediaInScene[idTemp].boxTop.value > 100 ? 100 - newMediaInScene[idTemp].boxTop.value : newHeight;
+              newMediaInScene[idTemp].boxWidth.value = newWidth + newMediaInScene[idTemp].boxLeft.value > 100 ? 100 - newMediaInScene[idTemp].boxLeft.value : newWidth;
 
-            this.setState({
-              mediaInScene: newMediaInScene
-            });
-          }}
-          onDragStop={(newX, newY) => {
-            var newMediaInScene = this.state.mediaInScene;
-            newMediaInScene[idTemp].boxTop.value = newY;
-            newMediaInScene[idTemp].boxLeft.value = newX;
-            this.setState({
-              mediaInScene: newMediaInScene
-            });
-          }}
-          media={media}
-         />
-      );
+              this.setState({
+                mediaInScene: newMediaInScene
+              });
+            }}
+            onDragStop={(newX, newY) => {
+              var newMediaInScene = this.state.mediaInScene;
+              newMediaInScene[idTemp].boxTop.value = newY;
+              newMediaInScene[idTemp].boxLeft.value = newX;
+              this.setState({
+                mediaInScene: newMediaInScene
+              });
+            }}
+            media={media}
+            mediaControls={!isNaN(this.state.mediaControls) ? String(this.state.mediaControls - relation.startTimeOffset.value) : this.state.mediaControls}
+            offset={relation.startTimeOffset.value}
+           />
+         );
+       }
 
       // Editeur des durées et z-index
       const duree = (this.state.mediaInScene[idTemp].duration.value == 0 ? this.state.scaling - this.state.mediaInScene[idTemp].startTimeOffset.value : this.state.mediaInScene[idTemp].duration.value);
@@ -391,12 +417,60 @@ export default class SceneEditorContainer extends Component {
             </Col>
           </Row>
           <Row id="editor-duration-menu">
-            <Col span="12"><h4>Médias</h4></Col>
-            <Col span="12">Échelle en seconde : <InputNumber onChange={(val) => {
+            <Col span="4"><h4>Médias</h4></Col>
+            <Col offset='6' span="5">
+              <Button onClick={() => {
+                  clearInterval(this.timer);
+                  this.setState({
+                    interval: 0,
+                    mediaControls: 'pause',
+                  }, () => this.setState({mediaControls: '0'}));
+                }} icon='step-backward' />
+              <Button onClick={() => {
+                  clearInterval(this.timer);
+                  this.setState({
+                    mediaControls: 'pause',
+                  }, () => {
+                  });
+                }} icon='pause' />
+              <Button onClick={() => {
+                  this.setState({
+                    mediaControls: 'play',
+                  }, () => {
+                    this.startTime = Date.now() - this.state.interval;
+                    clearInterval(this.timer);
+                    this.timer = setInterval(this.tick, 50);
+                  });
+                }} icon='caret-right' />
+            </Col>
+            <Col offset='5' span="4">Échelle en seconde : <InputNumber onChange={(val) => {
               this.setState({
                 scaling: val * 1000
               });
             }} size="small" min={1} step={0.001} value={this.state.scaling / 1000} /></Col>
+          </Row>
+          <Row>
+            <Col offset='2' span='22' className="editor-cursor-container">
+              <SceneEditorCursor
+                backgroundColor='green'
+                cursorWidth={5}
+                scaling={this.state.scaling}
+                editorDurationWidth={this.editorDurationWidth}
+                height={7 + this.state.mediaInScene.length * 53}
+                x={Math.round((this.state.interval) / this.state.scaling * this.editorDurationWidth)}
+                onDragStop={(newStart) =>
+                  this.setState({
+                    interval: newStart,
+                    mediaControls: newStart.toString(),
+                  })
+                }
+                onDragStart={() =>
+                  this.setState({
+                    mediaControls: 'pause'
+                  })
+                }
+              />
+            </Col>
           </Row>
           {durationElements}
         </Layout.Content>

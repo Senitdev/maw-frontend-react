@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import Rnd from 'react-rnd';
 import { Button, Row, Col } from 'antd';
 
+const scale = 100;
+
 export default class SceneEditorDuration extends Component {
 
   static propTypes = {
@@ -34,7 +36,7 @@ export default class SceneEditorDuration extends Component {
 
     return (
       <Row className="editor-duration">
-      <Col span="1" className="editor-duration-buttons">
+      <Col span="2" className="editor-duration-buttons">
         <Button
           disabled={this.props.id == 0}
           onClick={() => {
@@ -48,7 +50,7 @@ export default class SceneEditorDuration extends Component {
           }}
           type="dashed" shape="circle" icon="caret-down" size="small" />
       </Col>
-      <Col span="23" className="editor-duration-container">
+      <Col span="22" className="editor-duration-container">
         <Rnd
           ref={(c) => { this.rnd = c; }}
           initial={{

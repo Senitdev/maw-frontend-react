@@ -10,6 +10,7 @@ export default class SceneEditorViewPort extends Component {
     editorWidth: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     media: PropTypes.object.isRequired,
+    mediaControls: PropTypes.string,
     onClick: PropTypes.func.isRequired,
     onDragStop: PropTypes.func.isRequired,
     onResizeStop: PropTypes.func.isRequired,
@@ -88,6 +89,7 @@ export default class SceneEditorViewPort extends Component {
       >
         <FileViewer
           file={this.props.media}
+          videoControls={this.props.mediaControls}
           width='100%'
           height='100%' />
       </Rnd>
