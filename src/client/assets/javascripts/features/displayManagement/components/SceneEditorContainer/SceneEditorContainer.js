@@ -98,7 +98,7 @@ export default class SceneEditorContainer extends Component {
         const relation = nextProps.relationsById[index];
         if (relation.hostMediaId == this.state.mediaEdit.id) {
           const startTimeOffset = relation.startTimeOffset / 1000;
-          const duration = relation.duration ? relation.duration / 1000 : -1;
+          const duration = relation.duration ? relation.duration / 1000 : 0;
           const end = startTimeOffset + duration;
           if (end > maxScale)
             maxScale = end;
@@ -142,7 +142,7 @@ export default class SceneEditorContainer extends Component {
   haveDrag = [];
 
   dropEvent = (event, ui) => {
-    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration / 1000 : -1;
+    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration / 1000 : 0;
     this.setState({
       mediaInScene: this.state.mediaInScene.concat([{
         id: ui.draggable.attr("id"),
@@ -209,7 +209,7 @@ export default class SceneEditorContainer extends Component {
 
   changeDuration = (e) => {
     var newMedias = this.state.mediaInScene.slice();
-    newMedias[this.state.mediaSelected].duration.value = e.target.value == 1 ? 0 : -1;
+    newMedias[this.state.mediaSelected].duration.value = e.target.value == 1 ? 1 : 0;
     this.setState({
       mediaInScene: newMedias,
     });
@@ -295,7 +295,7 @@ export default class SceneEditorContainer extends Component {
       );
 
       // Editeur des durées et z-index
-      const duree = (this.state.mediaInScene[idTemp].duration.value == -1 ? this.state.scaling - this.state.mediaInScene[idTemp].startTimeOffset.value : this.state.mediaInScene[idTemp].duration.value);
+      const duree = (this.state.mediaInScene[idTemp].duration.value == 0 ? this.state.scaling - this.state.mediaInScene[idTemp].startTimeOffset.value : this.state.mediaInScene[idTemp].duration.value);
       durationElements.push(
         <SceneEditorDuration
           key={idTemp}
@@ -345,12 +345,12 @@ export default class SceneEditorContainer extends Component {
               <ul>
                 <li>{media.name}</li>
                 <li>{this.state.mediaInScene[idTemp].startTimeOffset.value} : Décalage (s)</li>
-                <li>{this.state.mediaInScene[idTemp].duration.value == -1 ? <span>&infin;</span> : this.state.mediaInScene[idTemp].duration.value}: Durée (s)</li>
+                <li>{this.state.mediaInScene[idTemp].duration.value == 0 ? <span>&infin;</span> : this.state.mediaInScene[idTemp].duration.value}: Durée (s)</li>
               </ul>
               <Button title="Réinitialiser la durée" size="small" shape="circle" icon="reload"
                 onClick={() => {
                   var newMediaInScene = this.state.mediaInScene;
-                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration / 1000 : -1;
+                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration / 1000 : 0;
                   this.setState({
                     mediaInScene: newMediaInScene
                   });

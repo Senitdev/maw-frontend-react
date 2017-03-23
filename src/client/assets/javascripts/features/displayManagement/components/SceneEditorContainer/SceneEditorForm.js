@@ -132,7 +132,7 @@ class SceneEditorForm extends Component {
             </Form.Item>
             <Form.Item
               hasFeedback >
-            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
+            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value > 0 ? 1 : 2}>
               <Radio value={2}><span>S'affiche éternellement</span></Radio>
               <br />
               <Radio value={1}>
@@ -145,7 +145,7 @@ class SceneEditorForm extends Component {
                     required: true, message: 'Veuillez rentrer un nombre!',
                   }]
                 })(
-                   <InputNumber style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value < 0} step={0.001} />
+                   <InputNumber min={0.001} style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value <= 0} step={0.001} />
                 )}
                 s</Radio>
             </Radio.Group>
