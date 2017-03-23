@@ -18,7 +18,7 @@ export class FileViewer extends Component {
 
   componentDidMount() {
     const { id, mimetype } = this.props.file;
-    const fileUrl = Config.API + '/modules-static-files/Screens/' + id;
+    const fileUrl = Config.API + '/modules-static-files/Screens/tenants/1/original/' + id;
 
     const sizes = {
       width: this.props.width ? this.props.width : '380px',
