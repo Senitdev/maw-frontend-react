@@ -25,7 +25,8 @@ const SceneEditorForm = Form.create({
         ...props.mediaData.boxWidth
       },
       duration: {
-        ...props.mediaData.duration
+        ...props.mediaData.duration,
+        value: props.mediaData.duration.value / 1000
       },
       guestHeight: {
         ...props.mediaData.guestHeight
@@ -40,7 +41,8 @@ const SceneEditorForm = Form.create({
         ...props.mediaData.guestWidth
       },
       startTimeOffset: {
-        ...props.mediaData.startTimeOffset
+        ...props.mediaData.startTimeOffset,
+        value: props.mediaData.startTimeOffset.value / 1000
       },
     };
   },

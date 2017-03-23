@@ -97,8 +97,8 @@ export default class SceneEditorContainer extends Component {
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
         if (relation.hostMediaId == this.state.mediaEdit.id) {
-          const startTimeOffset = relation.startTimeOffset / 1000;
-          const duration = relation.duration ? relation.duration / 1000 : 0;
+          const startTimeOffset = relation.startTimeOffset;
+          const duration = relation.duration ? relation.duration : 0;
           const end = startTimeOffset + duration;
           if (end > maxScale)
             maxScale = end;
@@ -130,9 +130,9 @@ export default class SceneEditorContainer extends Component {
 
   componentDidUpdate() {
     this.listDrop();
-    this.editorHeight = document.getElementById('editor-positions').clientHeight;
-    this.editorWidth = document.getElementById('editor-positions').clientWidth;
-    this.editorDurationWidth = document.getElementById('editor-duration-menu').clientWidth / 24 * 23 - 6;
+    this.editorHeight = document.getElementById('editor-positions').offsetHeight;
+    this.editorWidth = document.getElementById('editor-positions').offsetWidth;
+    this.editorDurationWidth = document.getElementById('editor-duration-menu').offsetWidth / 24 * 22 - 7;
   }
 
   mediaDeleted = [];
@@ -142,7 +142,7 @@ export default class SceneEditorContainer extends Component {
   haveDrag = [];
 
   dropEvent = (event, ui) => {
-    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration / 1000 : 0;
+    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 0;
     this.setState({
       mediaInScene: this.state.mediaInScene.concat([{
         id: ui.draggable.attr("id"),
@@ -201,7 +201,14 @@ export default class SceneEditorContainer extends Component {
 
   handleFormChange = (changedFields) => {
     var newMedias = this.state.mediaInScene.slice();
-    newMedias[this.state.mediaSelected] = {...this.state.mediaInScene[this.state.mediaSelected], ...changedFields};
+    newMedias[this.state.mediaSelected] = {
+      ...this.state.mediaInScene[this.state.mediaSelected],
+      ...changedFields,
+    };
+    if (changedFields.duration)
+      newMedias[this.state.mediaSelected].duration = {value: changedFields.duration.value * 1000};
+    if (changedFields.startTimeOffset)
+      newMedias[this.state.mediaSelected].startTimeOffset = {value: changedFields.startTimeOffset.value * 1000};
     this.setState({
       mediaInScene: newMedias,
     });
@@ -234,8 +241,6 @@ export default class SceneEditorContainer extends Component {
     newMediasWithMS = newMediasWithMS.map((m) =>
       ({
         ...m,
-        startTimeOffset: {value: m.startTimeOffset.value * 1000},
-        duration: {value: m.duration.value * 1000},
       })
     );
 
@@ -344,13 +349,13 @@ export default class SceneEditorContainer extends Component {
             <div>
               <ul>
                 <li>{media.name}</li>
-                <li>{this.state.mediaInScene[idTemp].startTimeOffset.value} : Décalage (s)</li>
-                <li>{this.state.mediaInScene[idTemp].duration.value == 0 ? <span>&infin;</span> : this.state.mediaInScene[idTemp].duration.value}: Durée (s)</li>
+                <li>{this.state.mediaInScene[idTemp].startTimeOffset.value / 1000} : Décalage (s)</li>
+                <li>{this.state.mediaInScene[idTemp].duration.value == 0 ? <span>&infin;</span> : this.state.mediaInScene[idTemp].duration.value / 1000}: Durée (s)</li>
               </ul>
               <Button title="Réinitialiser la durée" size="small" shape="circle" icon="reload"
                 onClick={() => {
                   var newMediaInScene = this.state.mediaInScene;
-                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration / 1000 : 0;
+                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration : 0;
                   this.setState({
                     mediaInScene: newMediaInScene
                   });
@@ -389,9 +394,9 @@ export default class SceneEditorContainer extends Component {
             <Col span="12"><h4>Médias</h4></Col>
             <Col span="12">Échelle en seconde : <InputNumber onChange={(val) => {
               this.setState({
-                scaling: val
+                scaling: val * 1000
               });
-            }} size="small" min={1} value={this.state.scaling} /></Col>
+            }} size="small" min={1} step={0.001} value={this.state.scaling / 1000} /></Col>
           </Row>
           {durationElements}
         </Layout.Content>

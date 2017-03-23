@@ -57,8 +57,8 @@ export default class SceneEditorDuration extends Component {
             width: this.props.width,
             height: 44,
           }}
-          resizeGrid={[this.props.editorDurationWidth / this.props.scaling, 1]}
-          moveGrid={[this.props.editorDurationWidth / this.props.scaling, 1]}
+          resizeGrid={[this.props.editorDurationWidth / (this.props.scaling / scale), 1]}
+          moveGrid={[this.props.editorDurationWidth / (this.props.scaling / scale), 1]}
           style={{backgroundColor: this.props.backgroundColor}}
           className="editor-separation-element"
           minWidth={1}
@@ -78,12 +78,12 @@ export default class SceneEditorDuration extends Component {
           }}
           onClick={this.props.onClick}
           onDragStop={(event, ui) => {
-            const newStart = Math.round(ui.position.left / this.props.editorDurationWidth * this.props.scaling);
+            const newStart = Math.round((ui.position.left / this.props.editorDurationWidth * this.props.scaling) / scale) * scale;
 
             this.props.onDragStop(newStart);
           }}
           onResizeStop={(direction, styleSize, clientSize) => {
-            const newDuration = Math.round(clientSize.width / this.props.editorDurationWidth * this.props.scaling);
+            const newDuration = Math.round((clientSize.width / this.props.editorDurationWidth * this.props.scaling) / scale) * scale;
 
             this.props.onResizeStop(newDuration);
           }}
