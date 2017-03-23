@@ -16,6 +16,7 @@ export default class SceneEditorViewPort extends Component {
     width: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
+    zIndex: PropTypes.number.isRequired,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -27,6 +28,7 @@ export default class SceneEditorViewPort extends Component {
       width: nextProps.width,
       height: nextProps.height
     });
+    this.rnd.updateZIndex(nextProps.zIndex);
   }
 
   rnd;
@@ -61,6 +63,7 @@ export default class SceneEditorViewPort extends Component {
           bottomLeft: false,
           topLeft: false
         }}
+        zIndex={this.props.zIndex}
         onClick={this.props.onClick}
         onResize={(direction, styleSize, clientSize) => {
           const newHeight = Math.round(clientSize.height / this.props.editorHeight * 100);

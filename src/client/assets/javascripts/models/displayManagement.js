@@ -12,6 +12,7 @@ interface Relation {
   guestHeight: number;
   startTimeOffset: number;
   duration: number;
+  zIndex: number;
 }
 
 interface Media {

@@ -115,6 +115,7 @@ export default class SceneEditorContainer extends Component {
             guestHeight: {value: relation.guestHeight},
             startTimeOffset: {value: startTimeOffset},
             duration: {value: duration},
+            zIndex: {value: relation.zIndex},
             idRelation: relation.id, // Id le relation déjà existante
           });
         }
@@ -155,6 +156,7 @@ export default class SceneEditorContainer extends Component {
         guestHeight: {value: 100},
         startTimeOffset: {value: 0},
         duration: {value: duration},
+        zIndex: {value: this.state.mediaInScene.length > 0 ? this.state.mediaInScene[this.state.mediaInScene.length - 1].zIndex.value + 1 : 0},
         idRelation: -1, // Id le relation déjà existante (-1 si aucune)
       }]),
       scaling: duration > this.state.scaling ? duration : this.state.scaling
@@ -255,10 +257,11 @@ export default class SceneEditorContainer extends Component {
       const media = this.props.mediaById[this.state.mediaInScene[idTemp].id];
 
       // Séparation de l'écran
-      const shade = (idTemp + 3) * 8 % 100;
+      const shade = (this.state.mediaInScene[idTemp].zIndex.value  + 3) * 8 % 100;
       screenSparationsDivs.push(
         <SceneEditorViewPort
           key={idTemp}
+          zIndex={this.state.mediaInScene[idTemp].zIndex.value + 10}
           backgroundColor={'#' + shade + shade + shade}
           editorHeight={this.editorHeight}
           editorWidth={this.editorWidth}
@@ -302,9 +305,9 @@ export default class SceneEditorContainer extends Component {
           mediaInSceneLength={this.state.mediaInScene.length}
           moveMediaInScene={(id, deplacement) => {
             var newMedias = this.state.mediaInScene.slice();
-
-            newMedias[id] = this.state.mediaInScene[id + deplacement];
-            newMedias[id + deplacement] = this.state.mediaInScene[id];
+            const temp = newMedias[id].zIndex.value;
+            newMedias[id].zIndex.value = newMedias[id + deplacement].zIndex.value;
+            newMedias[id + deplacement].zIndex.value = temp;
 
             this.setState({
               mediaInScene: newMedias,

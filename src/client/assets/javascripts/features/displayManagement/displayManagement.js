@@ -344,6 +344,7 @@ function normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, agendaId)
       normalizedRelations[key]['guestTop'] = 0;
       normalizedRelations[key]['guestWidth'] = 100;
       normalizedRelations[key]['guestHeight'] = 100;
+      normalizedRelations[key]['zIndex'] = 0;
     }
   }
 
@@ -398,8 +399,6 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
       reject();
     })
   );
-
-
 }
 
 function patchMediaRequest(id) {
@@ -504,7 +503,8 @@ const normalize = {
     guestWidth: relation.guest_width,
     guestHeight: relation.guest_height,
     startTimeOffset: relation.start_time_offset,
-    duration: relation.duration
+    duration: relation.duration,
+    zIndex: relation.z_index
   })
 };
 
