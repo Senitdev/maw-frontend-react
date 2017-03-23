@@ -95,3 +95,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 #scene-list-container .ant-tabs-content {
   height: 100%;
 }
+
+#scene-editor-form .ant-form-item {
+  margin-bottom: 12px;
+}

@@ -53,7 +53,7 @@ class SceneEditorForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <Form onSubmit={this.handleSubmit}>
+      <Form id="scene-editor-form" onSubmit={this.handleSubmit}>
         <Collapse defaultActiveKey={['1', '2', '3']} bordered={false}>
           <Collapse.Panel header={<h3>Positions</h3>} key="1">
             <Form.Item
