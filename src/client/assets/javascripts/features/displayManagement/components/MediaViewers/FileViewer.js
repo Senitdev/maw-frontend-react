@@ -40,7 +40,7 @@ export class FileViewer extends Component {
         else
           this.setState({
             mod: 'video',
-            viewer: <video {...sizes} ref={(r) => this.videoPlayer = r} src={fileUrl} />,
+            viewer: <video {...sizes} ref={(r) => this.videoPlayer = r} src={fileUrl} loop muted preload />,
           });
       }
     }
@@ -48,12 +48,14 @@ export class FileViewer extends Component {
 
   componentDidUpdate() {
     if (this.state.mod == 'video')
-      if (this.props.videoControls == 'play')
+      if (this.props.videoControls == 'play' && this.videoPlayer.paused) {
         this.videoPlayer.play();
-      else if (this.props.videoControls == 'pause')
+      }
+      else if (this.props.videoControls == 'pause' && !this.videoPlayer.paused)
         this.videoPlayer.pause();
-      else if (!isNaN(this.props.videoControls))
-        this.videoPlayer.currentTime = (parseInt(this.props.videoControls));
+      else if (!isNaN(this.props.videoControls)) { //si controls est un nombre
+        this.videoPlayer.currentTime = parseInt(this.props.videoControls) / 1000;
+      }
   }
 
   render() {
