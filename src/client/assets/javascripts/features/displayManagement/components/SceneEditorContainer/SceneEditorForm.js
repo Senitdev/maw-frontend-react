@@ -4,6 +4,9 @@ import { Form, Collapse, InputNumber, Radio } from 'antd';
 const SceneEditorForm = Form.create({
 
   onFieldsChange(props, changedFields) {
+    for (const key of Object.keys(changedFields)) {
+    //  changedFields[key].value = parseInt(changedFields[key].value);
+    }
     props.onChange(changedFields);
   },
 
@@ -52,6 +55,18 @@ class SceneEditorForm extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+
+    const numberValidation = {
+      rules: [{
+        transform: (value) => parseInt(value),
+        min: 0,
+        max: 100,
+        type: 'number', message: 'Veuillez rentrer un nombre valide!',
+      }, {
+        required: true, message: 'Veuillez rentrer un nombre!',
+      }]
+    };
+
     return (
       <Form id="scene-editor-form" onSubmit={this.handleSubmit}>
         <Collapse defaultActiveKey={['1', '2', '3']} bordered={false}>
@@ -60,28 +75,16 @@ class SceneEditorForm extends Component {
               label="x"
               hasFeedback
             >
-              {getFieldDecorator('boxLeft', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
+              {getFieldDecorator('boxLeft', numberValidation)(
+                <input type="number" min={0} max={100} />
               )} %
             </Form.Item>
             <Form.Item
               label="y"
               hasFeedback
             >
-              {getFieldDecorator('boxTop', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
+              {getFieldDecorator('boxTop', numberValidation)(
+                <input type="number" min={0} max={100} />
               )} %
             </Form.Item>
           </Collapse.Panel>
@@ -90,28 +93,16 @@ class SceneEditorForm extends Component {
               label="largeur"
               hasFeedback
             >
-              {getFieldDecorator('boxWidth', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
+              {getFieldDecorator('boxWidth', numberValidation)(
+                <input type="number" min={0} max={100} />
               )} %
             </Form.Item>
             <Form.Item
               label="hauteur"
               hasFeedback
             >
-              {getFieldDecorator('boxHeight', {
-                rules: [{
-                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                }, {
-                  required: true, message: 'Veuillez rentrer un nombre!',
-                }]
-              })(
-                <InputNumber min={0} max={100} />
+              {getFieldDecorator('boxHeight', numberValidation)(
+                <input type="number" min={0} max={100} />
               )} %
             </Form.Item>
           </Collapse.Panel>
@@ -122,12 +113,13 @@ class SceneEditorForm extends Component {
             >
               {getFieldDecorator('startTimeOffset', {
                 rules: [{
+                  transform: (value) => parseFloat(value),
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <InputNumber step={0.001}/>
+                <input type="number" min={0} step={0.001} />
               )} s
             </Form.Item>
             <Form.Item
@@ -140,12 +132,13 @@ class SceneEditorForm extends Component {
 
                 {getFieldDecorator('duration', {
                   rules: [{
+                    transform: (value) => parseFloat(value),
                     type: 'number', message: 'Veuillez rentrer un nombre valide!',
                   }, {
                     required: true, message: 'Veuillez rentrer un nombre!',
                   }]
                 })(
-                   <InputNumber min={0.001} style={{marginLeft: '3px'}} disabled={this.props.mediaData.duration.value <= 0} step={0.001} />
+                  <input type="number" min={0.001} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration.value <= 0} step={0.001} />
                 )}
                 s</Radio>
             </Radio.Group>
