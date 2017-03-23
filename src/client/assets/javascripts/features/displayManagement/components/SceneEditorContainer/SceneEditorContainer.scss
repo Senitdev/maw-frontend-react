@@ -76,7 +76,8 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   background-color: rgb(random(256)-1,random(256)-1,random(256)-1);
   color: white;
   user-select: none !important;
-  padding-left: 1px;
+  padding-left: 2px;
+  padding-top: 1px;
 }
 
 .editor-separation-element button {
