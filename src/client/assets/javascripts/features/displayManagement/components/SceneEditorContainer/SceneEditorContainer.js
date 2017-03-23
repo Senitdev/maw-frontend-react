@@ -396,7 +396,7 @@ export default class SceneEditorContainer extends Component {
           {durationElements}
         </Layout.Content>
         <Layout.Sider width={250}>
-          <div style={{padding: '5px', backgroundColor: '#eeeeee'}}>
+          <div style={{padding: '0 5px 5px 5px'}}>
             <Input
               value={this.state.mediaEdit.name}
               onChange={this.changeName}
