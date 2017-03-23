@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { actionCreators as displayManagementActions, NAME as displayManagementName } from '../../';
 
 import { Input, Row, Col, Icon, Tooltip, Collapse } from 'antd';
+import { Config } from 'app/config';
 
 import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -52,6 +53,26 @@ export default class MediaListContainer extends Component {
     this.setState({ searchText: e.target.value });
   }
 
+  getThumbnailForMedia = (media) => {
+    const url = Config.API + '/modules-static-files/Screens/tenants/1/64/' + media.id;
+    switch (media.type) {
+      case 'agenda':
+        return <Icon type="calendar" />;
+
+      case 'scene':
+        return <Icon type="appstore-o" />;
+
+      case 'file':
+        if (media.mimetype.search('image') === 0)
+          return <img src={url} className='thumbnail' height='auto' width='auto' />;
+        else
+          return <Icon type="video-camera" />;
+
+      default:
+        return <Icon type="file" />;
+    }
+  }
+
   render() {
     $(document).ready(function() {
       $('#media-list-container .media-gutter-box').each(function() {
@@ -91,7 +112,7 @@ export default class MediaListContainer extends Component {
                   id={id}
                   data-event={dataEvent}
                   >
-                  <Icon type="user" />
+                  {this.getThumbnailForMedia(this.props.mediaById[id])}
                   <br />
                   {this.props.mediaById[id].name}
                 </div>
