@@ -46,9 +46,13 @@ interface Screen extends Media {
 }
 
 export const MediaTypes = {
-  FILE: {
-    key: 'file',
-    name: 'Fichiers',
+  IMAGE: {
+    key: 'image',
+    name: 'Images',
+  },
+  VIDEO: {
+    key: 'video',
+    name: 'Vidéos',
   },
   AGENDA: {
     key: 'agenda',

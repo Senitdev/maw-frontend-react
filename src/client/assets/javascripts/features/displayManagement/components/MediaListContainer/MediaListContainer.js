@@ -91,9 +91,27 @@ export default class MediaListContainer extends Component {
     const groupsMedia = [];
     var defaultActiveKey = [];
     var count = 0;
+    
+    const images = {
+      fetchError: this.props.mediaByType['file']['fetchError'],
+      isFetching: this.props.mediaByType['file']['isFetching'],
+      items: this.props.mediaByType['file'].items.filter((id) => (this.props.mediaById[id].mimetype.search('image') === 0))
+    };
+    const videos = {
+      fetchError: this.props.mediaByType['file']['fetchError'],
+      isFetching: this.props.mediaByType['file']['isFetching'],
+      items: this.props.mediaByType['file'].items.filter((id) => (this.props.mediaById[id].mimetype.search('video') === 0))
+    };
+
+    const mediaByType = {
+      image: images,
+      video: videos,
+      scene: this.props.mediaByType.scene,
+      agenda: this.props.mediaByType.agenda,
+    };
 
     for (let key of Object.keys(MediaTypes)) {
-      medias[MediaTypes[key].key] = this.props.mediaByType[MediaTypes[key].key].items.map((id) => {
+      medias[MediaTypes[key].key] = mediaByType[MediaTypes[key].key].items.map((id) => {
 
         const tooltipPlacement = count % 3 == 0 ? 'left' : (count % 3 == 2 ? 'right' : 'top');
         count++;
