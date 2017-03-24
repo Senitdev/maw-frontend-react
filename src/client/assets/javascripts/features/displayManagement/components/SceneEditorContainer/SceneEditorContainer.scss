@@ -115,3 +115,11 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 .editor-cursor-element{
   cursor: e-resize;
 }
+
+.timerDisplayer{
+  margin-left: 10px;
+  background-color: rgb(71, 71, 71);
+  color: white;
+  padding: 3px;
+  border-radius: 2px;
+}

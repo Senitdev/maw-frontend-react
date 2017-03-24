@@ -54,7 +54,8 @@ export default class SceneEditorContainer extends Component {
       mediaEdit: {
         id: -1,
         name: '',
-        type: 'scene'
+        type: 'scene',
+        duration: 0,
       },
       isFetching: true,
       scaling: 60,
@@ -89,7 +90,8 @@ export default class SceneEditorContainer extends Component {
         this.setState({
           mediaEdit: {
             ...this.state.mediaEdit,
-            name: nextProps.mediaById[this.state.mediaEdit.id].name
+            name: nextProps.mediaById[this.state.mediaEdit.id].name,
+            duration: nextProps.mediaById[this.state.mediaEdit.id].duration,
           }
         });
       }
@@ -131,11 +133,21 @@ export default class SceneEditorContainer extends Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.listDrop();
     this.editorHeight = document.getElementById('editor-positions').offsetHeight;
     this.editorWidth = document.getElementById('editor-positions').offsetWidth;
     this.editorDurationWidth = document.getElementById('editor-duration-menu').offsetWidth / 24 * 22 - 7;
+
+    const currentDuration = this.calculateCurrentDuration();
+    if (prevState.mediaEdit.duration != currentDuration) {
+      this.setState({
+        mediaEdit: {
+          ...this.state.mediaEdit,
+          duration: currentDuration,
+        }
+      });
+    }
   }
 
   mediaDeleted = [];
@@ -146,6 +158,17 @@ export default class SceneEditorContainer extends Component {
 
   timer;
   startTime = 0;
+
+  calculateCurrentDuration() {
+    var duration = 0;
+    for (var i = 0; i < this.state.mediaInScene.length; i++) {
+      const relation = this.state.mediaInScene[i];
+      if ((relation.duration.value + relation.startTimeOffset.value) > duration) {
+        duration = relation.duration.value + relation.startTimeOffset.value;
+      }
+    }
+    return duration;
+  }
 
   dropEvent = (event, ui) => {
     const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 0;
@@ -393,6 +416,8 @@ export default class SceneEditorContainer extends Component {
       );
     }
 
+    const currentDuration = require('millisec')(this.state.interval).format('hh [h] : mm [m] : ss [s]');
+
     return (
       <Layout className="display-management-content-layout">
         <Layout.Sider width="auto"><MediaListContainer /></Layout.Sider>
@@ -418,7 +443,7 @@ export default class SceneEditorContainer extends Component {
           </Row>
           <Row id="editor-duration-menu">
             <Col span="4"><h4>Médias</h4></Col>
-            <Col offset='6' span="5">
+            <Col offset='6' span="7">
               <Button onClick={() => {
                   clearInterval(this.timer);
                   this.setState({
@@ -430,7 +455,6 @@ export default class SceneEditorContainer extends Component {
                   clearInterval(this.timer);
                   this.setState({
                     mediaControls: 'pause',
-                  }, () => {
                   });
                 }} icon='pause' />
               <Button onClick={() => {
@@ -442,15 +466,23 @@ export default class SceneEditorContainer extends Component {
                     this.timer = setInterval(this.tick, 50);
                   });
                 }} icon='caret-right' />
+                <span className='timerDisplayer'>{currentDuration}</span>
             </Col>
-            <Col offset='5' span="4">Échelle en seconde : <InputNumber onChange={(val) => {
+            <Col offset='1' span="6">Échelle en seconde : <InputNumber onChange={(val) => {
               this.setState({
                 scaling: val * 1000
               });
             }} size="small" min={1} step={0.001} value={this.state.scaling / 1000} /></Col>
           </Row>
           <Row>
-            <Col offset='2' span='22' className="editor-cursor-container">
+            <Col offset='2' span='22' className="editor-cursor-container" onMouseDown={(e) => {
+                var newPosition = Math.round(e.nativeEvent.offsetX / this.editorDurationWidth * this.state.scaling);
+                clearInterval(this.timer);
+                this.setState({
+                  interval: newPosition,
+                  mediaControls: 'pause',
+                }, () => this.setState({mediaControls: String(newPosition)}));
+              }}>
               <SceneEditorCursor
                 backgroundColor='green'
                 cursorWidth={5}
