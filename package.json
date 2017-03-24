@@ -20,6 +20,7 @@
     "postbuild": "npm run build:html",
     "build:serve": "http-server build/client -p 3003 --cors -o",
     "deploy:test": "npm run build && scp -r build/client/* maw@abcore.fr:test/static-front/",
+    "deploy:demo": "npm run build && scp -r build/client/* maw@abcore.fr:demo/static-front/",
     "lint": "eslint config/ src/client/scripts/ src/client/assets/javascripts/ --ext .js",
     "jscs": "jscs src/js/",
     "typecheck": "flow",
