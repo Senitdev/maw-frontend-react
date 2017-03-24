@@ -6,14 +6,13 @@ import NotFoundView from 'components/NotFound';
 import ManagementLayout from 'features/core/components/ManagementLayout';
 
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
-import AgendaListContainer from 'features/displayManagement/components/AgendaListContainer';
-import ScreenListContainer from 'features/displayManagement/components/ScreenListContainer';
-import SceneListContainer from 'features/displayManagement/components/SceneListContainer';
-import FileListContainer from 'features/displayManagement/components/FileListContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
 import AgendaEditorContainer from 'features/displayManagement/components/AgendaEditorContainer';
 import SceneEditorContainer from 'features/displayManagement/components/SceneEditorContainer';
+
+import { AgendaTableContainer, FileTableContainer, SceneTableContainer, ScreenTableContainer } from 'features/displayManagement/containers';
+import { inTablePage } from 'features/displayManagement/pages/TablePage';
 
 export default function getRoutes(store) {
 
@@ -48,16 +47,20 @@ export default function getRoutes(store) {
         <Route path="display-management" component={DisplayManagementContainer}>
           <IndexRedirect to="agenda" />
 
-          <Route path="file" component={FileListContainer} />
+          <Route path="file" component={inTablePage(FileTableContainer)} />
+
           <Route path="scene">
-            <IndexRoute component={SceneListContainer} />
+            <IndexRoute component={inTablePage(SceneTableContainer)} />
             <Route path=":idScene" component={SceneEditorContainer} />
           </Route>
-          <Route path="screen" component={ScreenListContainer} />
+
+          <Route path="screen" component={inTablePage(ScreenTableContainer)} />
+
           <Route path="agenda">
-            <IndexRoute component={AgendaListContainer} />
+            <IndexRoute component={inTablePage(AgendaTableContainer)} />
             <Route path=":idAgenda" component={AgendaEditorContainer} />
           </Route>
+
         </Route>
       </Route>
 

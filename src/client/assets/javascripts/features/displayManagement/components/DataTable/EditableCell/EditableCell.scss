@@ -1,0 +1,28 @@
+.maw-editable-cell {
+
+  display: flex;
+	align-items: center;
+
+  .button-box {
+
+    button {
+      margin-right: 3px;
+    }
+  }
+
+  .content {
+    flex: auto;
+  }
+
+  .edit-icon {
+    vertical-align: middle;
+    margin-right: 8px;
+    font-size: 1.3em;
+    opacity: 0.55;
+    cursor: pointer;
+  }
+  .edit-icon:hover {
+    color: black;
+    opacity: 0.8;
+  }
+}

@@ -1,2 +1,3 @@
 export { default } from './DataTable';
-export { EditableCell } from './EditableCell';
+export ActionsCell from './ActionsCell';
+export EditableCell from './EditableCell';

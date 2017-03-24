@@ -1,97 +1,142 @@
 import React, { Component, PropTypes } from 'react';
 
-import DataTable from '../DataTable';
-import { EditableCell } from '../DataTable/EditableCell';
+import DataTable, { EditableCell } from '../DataTable';
 
 export default class MediaTable extends Component {
 
   static propTypes = {
-    columns: PropTypes.array,
-    dataSource: PropTypes.array.isRequired,
-    loading: PropTypes.bool,
-    onAdd: PropTypes.func,
-    onDelete: PropTypes.func,
-    onDeleteSelection: PropTypes.func,
-    onEdit: PropTypes.func,
+    columns: PropTypes.arrayOf(PropTypes.object).isRequired,
+    dataSource: PropTypes.arrayOf(PropTypes.object).isRequired,
     onNameEdit: PropTypes.func,
-    onRefresh: PropTypes.func,
     onSearch: PropTypes.func,
-    rowSelection: PropTypes.object,
   };
 
-  generateColumns() {
-    let columns = {
-      id: {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        sorter: (a, b) => b.id - a.id
-      },
-      name: {
+  /**
+   * Collection de modèle de colonne représentant les champs des media.
+   * Un modèle peu être un objet définissant la colonne ou une fonction factory
+   * qui construit l'objet en fonction de certains paramètres.
+   */
+  static ColumnModel = {
+    // Modèle pour le champ "id"
+    id: {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      sorter: (a, b) => b.id - a.id
+    },
+    // Modèle pour le champ "name". La factory prend en paramètre un callback si
+    // l'on souhaite que le champ soit modifiable.
+    name: (onEdit = null) => {
+      const render = onEdit ?
+        (text, media) => <EditableCell record={media} field="name" onEdit={onEdit} />
+        :
+        (text, media) => media.name
+      ;
+      return {
         title: 'Nom',
         dataIndex: 'name',
         key: 'name',
         width: 350,
+        searchable: true,
         sorter: (a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: 'accent' }),
-        render: (text, media) => (this.props.onNameEdit ? <EditableCell media={media} field={'name'} editMedia={this.props.onNameEdit} /> : media.name)
-      },
-      ratio: {
-        title: 'Ratio',
-        key: 'ratio',
-        render: (text, media) => `${media.ratioNumerator} / ${media.ratioDenominator}`
-      },
-      createdAt: {
-        title: 'Date de création',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        sorter: (a, b) => b.createdAt - a.createdAt,
-      },
-      updatedAt: {
-        title: 'Dernière mise à jour',
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        sorter: (a, b) => b.updatedAt - a.updatedAt,
-      },
-    };
+        render
+      };
+    },
+    // Modèle pour le champ "ratio"
+    ratio: {
+      title: 'Ratio',
+      key: 'ratio',
+      render: (text, media) => `${media.ratioNumerator} / ${media.ratioDenominator}`
+    },
+    // Modèle pour le champ "createdAt"
+    createdAt: {
+      title: 'Date de création',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      sorter: (a, b) => b.createdAt - a.createdAt,
+      render: (text, media) => new Date(media.createdAt).toLocaleString('fr')
+    },
+    // Modèle pour le champ "updatedAt"
+    updatedAt: {
+      title: 'Dernière mise à jour',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      sorter: (a, b) => b.updatedAt - a.updatedAt,
+      render: (text, media) => new Date(media.updatedAt).toLocaleString('fr')
+    },
+  };
 
-    const propColumns = this.props.columns ? this.props.columns : [];
-    let includedPropsColumns = [];
-
-    for (let i = 0; i < propColumns.length; i++) {
-      if (columns[propColumns[i].key]) {
-        columns[propColumns[i].key] = {
-          ...columns[propColumns[i].key],
-          ...propColumns[i]
-        };
-      } else {
-        includedPropsColumns.push(propColumns[i]);
+  /**
+   * Retourne les champs dont la valeur peut être recherchée.
+   */
+  static getSearchableFields(columns) {
+    return columns.map((column) => {
+      if(column.searchable) {
+        return column.dataIndex;
       }
+      return false;
+    })
+    .filter((val) => !!val);
+  }
+
+  /**
+   * Constructeur.
+   */
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchText: '',
+      searchableFields: MediaTable.getSearchableFields(props.columns)
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+    // Si les collonnes changent, cherche à nouveau les champs "searchable"
+    if (nextProps.columns != this.props.columns) {
+      this.setState({
+        searchableFields: MediaTable.getSearchableFields(nextProps.columns)
+      });
+    }
+  }
+
+  onSearch = (text) => {
+    this.setState({ searchText: text });
+  }
+
+  /**
+   * Recherche dans les données passées en paramètre les enregistrements dont les champs
+   * "searchable" correspondent au texte de recherche.
+   */
+  searchData(data) {
+    if (! this.state.searchText) {
+      return data;
     }
 
-    columns = Object.keys(columns).map((key) => columns[key]);
-    if (includedPropsColumns.length > 0) {
-      columns.splice(2, 0, ...includedPropsColumns);
-    }
-    return columns;
+    const reg = new RegExp(this.state.searchText.replace(/ /g, '|'), 'gi');
+
+    return data.map((media) => {
+      let match = false;
+      for (let field of this.state.searchableFields) {
+        match |= !!media[field].match(reg);
+        if (match) {
+          return media;
+        }
+      }
+      return false;
+    }).filter((record) => !!record);
   }
 
   render() {
 
-    const columns = this.generateColumns();
+    const { dataSource, onSearch, ...otherProps } = this.props;
 
     return (
       <DataTable
-        columns={columns}
-        dataSource={this.props.dataSource}
-        loading={this.props.loading}
-        onAdd={this.props.onAdd}
-        onDelete={this.props.onDelete}
-        onDeleteSelection={this.props.onDeleteSelection}
-        onEdit={this.props.onEdit}
-        onRefresh={this.props.onRefresh}
-        onSearch={this.props.onSearch}
-        rowSelection={this.props.rowSelection}
-      />
+        {...otherProps}
+        dataSource={this.searchData(dataSource)}
+        onSearch={onSearch || this.onSearch} />
     );
   }
 }

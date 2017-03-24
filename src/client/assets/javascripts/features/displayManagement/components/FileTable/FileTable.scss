@@ -1,0 +1,11 @@
+.ant-modal-body {
+  text-align: center;
+  padding: 0px;
+
+  img, video {
+    width: auto;
+    height: auto;
+    max-width: 768px;
+    max-height: 432px;
+  }
+}
