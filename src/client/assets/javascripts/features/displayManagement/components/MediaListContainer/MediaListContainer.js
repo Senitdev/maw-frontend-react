@@ -54,7 +54,7 @@ export default class MediaListContainer extends Component {
   }
 
   getThumbnailForMedia = (media) => {
-    const url = Config.API + '/modules-static-files/Screens/tenants/1/64/' + media.id;
+    const url = Config.API + Config.thumbnailURL + '1/64/' + media.id;
     switch (media.type) {
       case 'agenda':
         return <Icon type="calendar" />;
@@ -91,7 +91,7 @@ export default class MediaListContainer extends Component {
     const groupsMedia = [];
     var defaultActiveKey = [];
     var count = 0;
-    
+
     const images = {
       fetchError: this.props.mediaByType['file']['fetchError'],
       isFetching: this.props.mediaByType['file']['isFetching'],

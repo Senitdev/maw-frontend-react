@@ -16,4 +16,5 @@ export function logException(ex, context) {
 // TODO: config différente selon l'environnement (dev/prod)
 export const Config = {
   API: 'http://srv.test.maw.abcore.fr/',
+  thumbnailURL: '/modules-static-files/Screens/tenants/'
 };
