@@ -319,7 +319,7 @@ export default class SceneEditorContainer extends Component {
               });
             }}
             media={media}
-            mediaControls={!isNaN(this.state.mediaControls) ? String(this.state.mediaControls - relation.startTimeOffset.value) : this.state.mediaControls}
+            mediaControls={!isNaN(this.state.mediaControls) ? String((this.state.mediaControls - relation.startTimeOffset.value) % media.duration) : this.state.mediaControls}
             offset={relation.startTimeOffset.value}
            />
          );
