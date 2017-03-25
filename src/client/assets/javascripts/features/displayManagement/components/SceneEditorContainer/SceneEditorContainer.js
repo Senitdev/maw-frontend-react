@@ -55,10 +55,10 @@ export default class SceneEditorContainer extends Component {
         id: -1,
         name: '',
         type: 'scene',
-        duration: 0,
+        duration: 60000,
       },
       isFetching: true,
-      scaling: 60,
+      scaling: 90000,
       interval: 0,
       mediaControls: 'pause',
     };
@@ -139,6 +139,7 @@ export default class SceneEditorContainer extends Component {
     this.editorWidth = document.getElementById('editor-positions').offsetWidth;
     this.editorDurationWidth = document.getElementById('editor-duration-menu').offsetWidth / 24 * 22 - 7;
 
+    //Met à jour la durée de la scène
     const currentDuration = this.calculateCurrentDuration();
     if (prevState.mediaEdit.duration != currentDuration) {
       this.setState({
@@ -171,7 +172,7 @@ export default class SceneEditorContainer extends Component {
   }
 
   dropEvent = (event, ui) => {
-    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 0;
+    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 60000;
     this.setState({
       mediaInScene: this.state.mediaInScene.concat([{
         id: ui.draggable.attr("id"),
@@ -404,7 +405,7 @@ export default class SceneEditorContainer extends Component {
               <Button title="Réinitialiser la durée" size="small" shape="circle" icon="reload"
                 onClick={() => {
                   var newMediaInScene = this.state.mediaInScene;
-                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration : 0;
+                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration : 60000;
                   this.setState({
                     mediaInScene: newMediaInScene
                   });

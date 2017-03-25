@@ -358,12 +358,20 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
     name: media.name,
     ratioNumerator: 16,
     ratioDenominator: 9,
-    duration: 0,
+    duration: media.duration,
     type: media.type,
   };
 
   return (dispatch) => new Promise((resolve, reject) =>
-    dispatch(createMedia(mediaForServer))
+    new Promise((resolve, reject) => {
+      if (media.id >= 0) {
+        dispatch(patchMedia(mediaForServer))
+        .then((mediaBis) => resolve(mediaBis));
+      } else {
+        dispatch(createMedia(mediaForServer))
+        .then((mediaBis) => reject(mediaBis));
+      }
+    })
     .then((mediaBis) => {
       var allPromise = [];
       var normalizedRelationsFromEditor;
