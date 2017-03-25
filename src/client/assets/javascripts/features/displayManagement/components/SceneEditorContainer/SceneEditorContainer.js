@@ -14,6 +14,7 @@ import SceneEditorForm from './SceneEditorForm';
 import SceneEditorViewPort from './SceneEditorViewPort';
 import SceneEditorDuration from './SceneEditorDuration';
 import SceneEditorCursor from './SceneEditorCursor';
+import SceneEditorDurationMarque from './SceneEditorDurationMarque';
 
 import './SceneEditorContainer.scss';
 
@@ -484,6 +485,7 @@ export default class SceneEditorContainer extends Component {
                   mediaControls: 'pause',
                 }, () => this.setState({mediaControls: String(newPosition)}));
               }}>
+              <SceneEditorDurationMarque x={2+Math.round((this.state.mediaEdit.duration) / this.state.scaling * this.editorDurationWidth)} />
               <SceneEditorCursor
                 backgroundColor='green'
                 cursorWidth={5}
