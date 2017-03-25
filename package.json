@@ -90,6 +90,7 @@
     "jquery-ui": "1.12.1",
     "json-server": "0.9.4",
     "lodash": "4.15.0",
+    "millisec": "0.2.0",
     "raven-js": "3.6.1",
     "react": "15.3.1",
     "react-dom": "15.3.1",
