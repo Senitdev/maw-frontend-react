@@ -298,6 +298,40 @@ export default class SceneEditorContainer extends Component {
     }
   }
 
+  playScene = () => {
+    this.setState({
+      mediaControls: 'play',
+    }, () => {
+      this.startTime = Date.now() - this.state.interval;
+      clearInterval(this.timer);
+      this.timer = setInterval(this.tick, 50);
+    });
+  }
+
+  pauseScene = (mouse, callback) => {
+    clearInterval(this.timer);
+    this.setState({
+      mediaControls: 'pause'
+    }, callback);
+  }
+
+  rewindScene = () => {
+    clearInterval(this.timer);
+    this.setState({
+      interval: 0,
+      mediaControls: 'pause',
+    }, () => this.setState({mediaControls: '0'}));
+  }
+
+  setSceneInterval = (x) => {
+    const computedX = Math.round(x / this.editorDurationWidth * this.state.scaling);
+    this.pauseScene(undefined, () =>
+      this.setState({
+        interval: computedX,
+        mediaControls: String(computedX),
+      }));
+  };
+
   render() {
     var screenSparationsDivs = [];
     var durationElements = [];
@@ -446,29 +480,10 @@ export default class SceneEditorContainer extends Component {
           <Row id="editor-duration-menu">
             <Col span="4"><h4>Médias</h4></Col>
             <Col offset='6' span="7">
-              <Button onClick={() => {
-                  clearInterval(this.timer);
-                  this.setState({
-                    interval: 0,
-                    mediaControls: 'pause',
-                  }, () => this.setState({mediaControls: '0'}));
-                }} icon='step-backward' />
-              <Button onClick={() => {
-                  clearInterval(this.timer);
-                  this.setState({
-                    mediaControls: 'pause',
-                  });
-                }} icon='pause' />
-              <Button onClick={() => {
-                  this.setState({
-                    mediaControls: 'play',
-                  }, () => {
-                    this.startTime = Date.now() - this.state.interval;
-                    clearInterval(this.timer);
-                    this.timer = setInterval(this.tick, 50);
-                  });
-                }} icon='caret-right' />
-                <span className='timerDisplayer'>{currentDuration}</span>
+              <Button onClick={this.rewindScene} icon='step-backward' />
+              <Button onClick={this.pauseScene} icon='pause' />
+              <Button onClick={this.playScene} icon='caret-right' />
+              <span className='timerDisplayer'>{currentDuration}</span>
             </Col>
             <Col offset='1' span="6">Échelle en seconde : <InputNumber onChange={(val) => {
               this.setState({
@@ -477,14 +492,10 @@ export default class SceneEditorContainer extends Component {
             }} size="small" min={1} step={0.001} value={this.state.scaling / 1000} /></Col>
           </Row>
           <Row>
-            <Col offset='2' span='22' className="editor-cursor-container" onMouseDown={(e) => {
-                var newPosition = Math.round(e.nativeEvent.offsetX / this.editorDurationWidth * this.state.scaling);
-                clearInterval(this.timer);
-                this.setState({
-                  interval: newPosition,
-                  mediaControls: 'pause',
-                }, () => this.setState({mediaControls: String(newPosition)}));
-              }}>
+            <Col offset='2' span='22' className="editor-cursor-container" onClick={(e) => {
+              if (e.nativeEvent.target.className != 'editor-cursor-element')
+                this.setSceneInterval(e.nativeEvent.offsetX);
+            }}>
               <SceneEditorDurationMarque x={2+Math.round((this.state.mediaEdit.duration) / this.state.scaling * this.editorDurationWidth)} />
               <SceneEditorCursor
                 backgroundColor='green'
@@ -493,17 +504,7 @@ export default class SceneEditorContainer extends Component {
                 editorDurationWidth={this.editorDurationWidth}
                 height={7 + this.state.mediaInScene.length * 53}
                 x={Math.round((this.state.interval) / this.state.scaling * this.editorDurationWidth)}
-                onDragStop={(newStart) =>
-                  this.setState({
-                    interval: newStart,
-                    mediaControls: newStart.toString(),
-                  })
-                }
-                onDragStart={() =>
-                  this.setState({
-                    mediaControls: 'pause'
-                  })
-                }
+                onDrag={(offsetX) => this.setSceneInterval(offsetX)}
               />
             </Col>
           </Row>

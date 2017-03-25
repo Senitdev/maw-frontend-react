@@ -9,7 +9,7 @@ export default class SceneEditorCursor extends Component {
     cursorWidth: PropTypes.number.isRequired,
     editorDurationWidth: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    onDragStop: PropTypes.func.isRequired,
+    onDrag: PropTypes.func.isRequired,
     scaling: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
   }
@@ -48,11 +48,7 @@ export default class SceneEditorCursor extends Component {
         }}
         bounds={'parent'}
         moveAxis="x"
-        onDrag={(event, ui) => {
-          const newStart = Math.round(ui.position.left / this.props.editorDurationWidth * this.props.scaling);
-
-          this.props.onDragStop(newStart);
-        }}
+        onDrag={(event, ui) => this.props.onDrag(ui.position.left)}
       />
     );
   }
