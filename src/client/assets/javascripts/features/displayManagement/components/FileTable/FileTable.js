@@ -24,7 +24,18 @@ export default class FileTable extends Component {
       title: 'Poid',
       key: 'weight',
       sorter: (a, b) => b.weight - a.weight,
-      render: (text, file) => `${file.weight} (Ko)`
+      render: (text, file) => {
+        if (file.weight < 1000) {
+          return file.weight + ' o';
+        }
+        if (file.weight < 1000000) {
+          return Number(file.weight / 1000).toFixed(2) + ' Ko';
+        }
+        if (file.weight < 1000000000) {
+          return Number(file.weight / 1000000).toFixed(2) + ' Mo';
+        }
+        return Number(file.weight / 1000000000).toFixed(2) + ' Go';
+      }
     },
     mimetype: {
       title: 'mimetype',
