@@ -10,14 +10,14 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import 'fullcalendar/dist/locale/fr.js';
 
-import { Row, Col, Badge, TimePicker, Input, Button, Icon, InputNumber, Spin } from 'antd';
+import { Row, Col, Badge, TimePicker, Input, Button, Icon, Spin } from 'antd';
 import moment from 'moment';
 import Datetime from 'react-datetime';
 
 import './CalendarContainer.scss';
 
 const format = 'HH:mm';
-var defaultDuration = (allDay) => {return allDay ? 86400 : 7200;};
+var defaultDuration = (allDay) => {allDay ? 86400 : 7200;};
 
 @connect((state) => {
   const { mediaById, file, scene, agenda, relationsById, isFetchingDetails } = state[displayManagementName];
