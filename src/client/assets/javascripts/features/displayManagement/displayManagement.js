@@ -980,19 +980,28 @@ export default function reducer(state: State = initialState, action: any = {}): 
         }
       };
 
-    case MEDIA_LIST_SUCCESS:
+    case MEDIA_LIST_SUCCESS: {
+      const mediaById = {
+        ...state.mediaById,
+        ...Object.keys(action.payload.mediaById).reduce((acc, id) => ({
+          ...acc,
+          [id]: {
+            ...action.payload.mediaById[id],
+            relationsWithHosts: state.mediaById[id] ? state.mediaById[id].relationsWithHosts : [],
+            relationsWithGuests: state.mediaById[id] ? state.mediaById[id].relationsWithGuests : [],
+          }
+        }), {})
+      };
       return {
         ...state,
-        mediaById: {
-          ...state.mediaById,
-          ...action.payload.mediaById
-        },
+        mediaById,
         [action.payload.type]: {
           ...state[action.payload.type],
           isFetching: false,
           items: Object.keys(action.payload.mediaById).map((id) => Number(id))
         }
       };
+    }
 
     case MEDIA_LIST_FAILURE:
       return {
