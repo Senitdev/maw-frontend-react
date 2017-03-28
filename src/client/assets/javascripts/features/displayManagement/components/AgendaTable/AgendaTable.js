@@ -11,7 +11,6 @@ export default class AgendaTable extends Component {
   render() {
 
     const columns = [
-      MediaTable.ColumnModel.id,
       MediaTable.ColumnModel.name(this.props.onNameEdit),
       MediaTable.ColumnModel.ratio,
       MediaTable.ColumnModel.createdAt,

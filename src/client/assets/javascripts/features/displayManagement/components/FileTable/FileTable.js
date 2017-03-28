@@ -91,7 +91,6 @@ export default class FileTable extends Component {
   render() {
 
     const columns = [
-      MediaTable.ColumnModel.id,
       MediaTable.ColumnModel.name(this.props.onNameEdit),
       FileTable.ColumnModel.resolution,
       FileTable.ColumnModel.weight,

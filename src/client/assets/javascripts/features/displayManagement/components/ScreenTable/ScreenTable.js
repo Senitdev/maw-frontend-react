@@ -64,7 +64,6 @@ export default class ScreenTable extends Component {
   render() {
     const { onNameEdit } = this.props;
     const columns = [
-      MediaTable.ColumnModel.id,
       MediaTable.ColumnModel.name(onNameEdit),
       //ScreenTable.ColumnModel.status,
       ScreenTable.ColumnModel.agenda,
