@@ -52,6 +52,7 @@ export default class MediaTable extends Component {
     duration: {
       title: 'Durée',
       key: 'duration',
+      sorter: (a, b) => b.duration - a.duration,
       render: (text, media) => {
         if (!media.duration) {
           return '-';
