@@ -17,7 +17,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   border: 1px solid black;
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */ /* 177.7777% for 9/16 */
   overflow: hidden;
 }
 

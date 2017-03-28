@@ -354,8 +354,8 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
   const mediaForServer = {
     id: media.id,
     name: media.name,
-    ratioNumerator: 16,
-    ratioDenominator: 9,
+    ratioNumerator: media.ratioNumerator,
+    ratioDenominator: media.ratioDenominator,
     duration: media.duration,
     type: media.type,
   };

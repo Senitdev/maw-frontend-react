@@ -57,6 +57,8 @@ export default class SceneEditorContainer extends Component {
         name: '',
         type: 'scene',
         duration: 60000,
+        ratioNumerator: 16,
+        ratioDenominator: 9,
       },
       isFetching: true,
       scaling: 90000,

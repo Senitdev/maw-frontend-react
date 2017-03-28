@@ -59,6 +59,8 @@ export default class CalendarContainer extends Component {
       calendarEdit: {
         id: -1,
         name: '',
+        ratioNumerator: 16,
+        ratioDenominator: 9,
         type: 'agenda',
         duration: 0
       }
