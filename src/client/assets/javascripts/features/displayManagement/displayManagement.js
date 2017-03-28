@@ -125,16 +125,14 @@ function createMedia(media) {
             }
             return response.json();
           }
-        ).then(
-          (json) => {
-            dispatch(createMediaSuccess(json.data));
+        ).then((json) => {
+            //dispatch(createMediaSuccess(json.data));
             resolve(json.data);
-          },
-          (error) => {
-            dispatch(createMediaFailure(error));
-            reject(error);
           }
-        );
+        ).catch((error) => {
+          //dispatch(createMediaFailure(error));
+          reject(error);
+        });
       } else {
         resolve(media);
       }
@@ -369,7 +367,7 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
         .then((mediaBis) => resolve(mediaBis));
       } else {
         dispatch(createMedia(mediaForServer))
-        .then((mediaBis) => reject(mediaBis));
+        .then((mediaBis) => resolve(mediaBis));
       }
     })
     .then((mediaBis) => {
@@ -404,7 +402,7 @@ function featPatchOrCreateFromEditor(deletedRelations, patchedOrCreatedRelations
     })
     .catch(() => {
       NotificationGenerator.raise('Erreur', 'Un problème à été rencontré durant la sauvegarde. Vérifiez votre connection internet et réessayer.', 'error');
-      reject();
+      reject(error);
     })
   );
 }
