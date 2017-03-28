@@ -48,6 +48,27 @@ export default class MediaTable extends Component {
       key: 'ratio',
       render: (text, media) => `${media.ratioNumerator} / ${media.ratioDenominator}`
     },
+    // Modèle pour le champ "duration"
+    duration: {
+      title: 'Durée',
+      key: 'duration',
+      render: (text, media) => {
+        if (!media.duration) {
+          return '-';
+        }
+        const durationinSec = Math.floor(media.duration / 1000);
+        const durationInMin = Math.floor(durationinSec / 60);
+        const durationInHour = Math.floor(durationInMin / 60);
+        const segments = {
+          h: durationInHour,
+          m: durationInMin % 60,
+          s: durationinSec % 60
+        };
+        return (segments.h ? segments.h + 'h ' : '')
+          + (segments.m || segments.h ? segments.m + 'm ' : '')
+          + segments.s + 's';
+      }
+    },
     // Modèle pour le champ "createdAt"
     createdAt: {
       title: 'Date de création',

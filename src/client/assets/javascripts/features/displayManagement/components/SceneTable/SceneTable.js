@@ -14,6 +14,7 @@ export default class SceneTable extends Component {
       MediaTable.ColumnModel.id,
       MediaTable.ColumnModel.name(this.props.onNameEdit),
       MediaTable.ColumnModel.ratio,
+      MediaTable.ColumnModel.duration,
       MediaTable.ColumnModel.createdAt,
       MediaTable.ColumnModel.updatedAt,
     ];
