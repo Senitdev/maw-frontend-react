@@ -533,6 +533,7 @@ export default class SceneEditorContainer extends Component {
             <Input
               value={this.state.mediaEdit.name}
               onChange={this.changeName}
+              onPressEnter={this.submitChange}
               placeholder="Indiquez un nom de scène" />
             <Button
               loading={this.state.isFetching}

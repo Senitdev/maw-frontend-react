@@ -299,6 +299,7 @@ export default class CalendarContainer extends Component {
                 <Input
                   style={{marginRight: '20px'}}
                   value={this.state.calendarEdit.name}
+                  onPressEnter={this.submitChange}
                   onChange={(e) => {
                     this.setState({
                       calendarEdit: {
