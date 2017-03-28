@@ -12,6 +12,7 @@ import 'fullcalendar/dist/locale/fr.js';
 
 import { Row, Col, Badge, TimePicker, Input, Button, Icon, InputNumber, Spin } from 'antd';
 import moment from 'moment';
+import Datetime from 'react-datetime';
 
 import './CalendarContainer.scss';
 
@@ -58,7 +59,8 @@ export default class CalendarContainer extends Component {
       calendarEdit: {
         id: -1,
         name: '',
-        type: 'agenda'
+        type: 'agenda',
+        duration: 0
       }
     };
   }
@@ -88,14 +90,16 @@ export default class CalendarContainer extends Component {
       $('#calendar').fullCalendar({
         locale: 'fr',
         header: {
-          left:   'title',
+          left:   '',
           center: 'month agendaWeek agendaDay',
-          right:  'today prev,next'
+          right:  'today prev title next'
         },
         height: 'auto',
         defaultTimedEventDuration: moment.duration(defaultDuration(false), 'seconds'),
+        allDaySlot: false,
         editable: true,
         droppable: true,
+        timezone: 'UTC',
         businessHours: {
             dow: [ 1, 2, 3, 4, 5, 6 ],
             start: '7:00',
@@ -105,12 +109,24 @@ export default class CalendarContainer extends Component {
         maxTime: '20:00:00',
         eventOverlap: false,
         eventReceive: (event) => {
+          if (event.allDay) {
+            event.allDay = false;
+            var minTime = $('#calendar').fullCalendar('option', 'minTime');
+            var maxTime = $('#calendar').fullCalendar('option', 'maxTime');
+            const start = event.start.unix();
+            event.start = moment.unix(event.start.unix()).add(moment.duration(minTime));
+            $('#calendar').fullCalendar('updateEvent', event);
+            event.end = moment.unix(start).add(moment.duration(maxTime));
+            $('#calendar').fullCalendar('updateEvent', event);
+
+          }
           this.setState({
             mediaInCalendar: this.state.mediaInCalendar.concat([{
               idFull: event._id,
               id: event.idMedia,
-              startTimeOffset: event.start.unix() - 3600,
-              duration: defaultDuration(event.allDay),
+              startTimeOffset: event.start.unix(),
+              //duration: defaultDuration(event.allDay),
+              duration: event.end == null ? defaultDuration(event.allDay) : event.end.unix() - event.start.unix(),
               idRelation: -1,
             }]),
             mediaSelected: event._id,
@@ -141,7 +157,7 @@ export default class CalendarContainer extends Component {
           const idEventSelected = thisReact.getIndexByIdFull(event._id);
 
           var newMedia = thisReact.state.mediaInCalendar;
-          newMedia[idEventSelected].startTimeOffset = event.start.unix() - 3600;
+          newMedia[idEventSelected].startTimeOffset = event.start.unix();
           newMedia[idEventSelected].duration = event.end == null ? defaultDuration(event.allDay) : event.end.unix() - event.start.unix();
 
           thisReact.setState({
@@ -263,9 +279,10 @@ export default class CalendarContainer extends Component {
       var newMediasWithMS = this.state.mediaInCalendar.slice();
       newMediasWithMS = newMediasWithMS.map((m) =>
         ({
-          ...m,
-          startTimeOffset: m.startTimeOffset * 1000,
-          duration: m.duration * 1000,
+          id: m.id,
+          idRelation: m.idRelation,
+          startTimeOffset: (m.startTimeOffset) * 1000,
+          duration: (m.duration) * 1000,
         })
       );
 
@@ -282,20 +299,28 @@ export default class CalendarContainer extends Component {
     if (idEventSelected >= 0)
       var eventFull = $('#calendar').fullCalendar('clientEvents', eventSelected.idFull)[0];
     return (
-      <div id="calendar-container">
-        <Row className="calendar-details">
-          <Col span="11">
+      <Row className="calendar-container">
+        <Col span='19'>
+          <Row>
             <Row>
-              <Col span="6">
-                Heure de début :
-              </Col>
-              <Col span="6">
+              <Col span="6" offset="1">
+                <span>Heure de début: </span>
                 <TimePicker
                   defaultValue={moment('07:00', format)}
                   format={format}
                   onChange={(moment) => this.onChangeHour(moment, 'minTime')} />
               </Col>
-              <Col span="12">
+              <Col span="4">
+                <span>Heure de fin: </span>
+                <TimePicker
+                  defaultValue={moment('20:00', format)}
+                  format={format}
+                  onChange={(m) => {
+                    var minTime = $('#calendar').fullCalendar('option', 'minTime');
+                    this.onChangeHour(moment(minTime, 'HH:mm:ss').isBefore(m) ? m : moment.duration(minTime).add(1, 'H'), 'maxTime');
+                  }} />
+              </Col>
+              <Col span="9">
                 <Input
                   style={{marginRight: '20px'}}
                   value={this.state.calendarEdit.name}
@@ -310,21 +335,7 @@ export default class CalendarContainer extends Component {
                   }}
                   placeholder="Indiquez un nom d'agenda" />
               </Col>
-            </Row>
-            <Row>
-              <Col span="6">
-                Heure de fin :
-              </Col>
-              <Col span="6">
-                <TimePicker
-                  defaultValue={moment('20:00', format)}
-                  format={format}
-                  onChange={(m) => {
-                    var minTime = $('#calendar').fullCalendar('option', 'minTime');
-                    this.onChangeHour(moment(minTime, 'HH:mm:ss').isBefore(m) ? m : moment.duration(minTime).add(1, 'H'), 'maxTime');
-                  }} />
-              </Col>
-              <Col span="12">
+              <Col span="4">
                 <Button
                   disabled={this.state.calendarEdit.name == ''}
                   onClick={this.submitChange}
@@ -332,93 +343,78 @@ export default class CalendarContainer extends Component {
                   type="primary" size="large">Sauvegarder</Button>
               </Col>
             </Row>
-            <Badge status="default" text="Propriétés de l'agenda" />
-          </Col>
-          <Col span="12" offset="1">
-            {this.state.mediaSelected == -1 &&
-              <div>Cliquez sur une entrée dans l'agenda pour modifier ces informations.</div>
+          </Row>
+          <Row>
+            {this.state.mediaInCalendar.length == 0 &&
+              <div id="drop-empty-calendar">
+                <span>
+                  <Icon type="arrow-down" />
+                </span>
+                <br />
+                <span>
+                  Déplacez des médias dans l'agenda !
+                </span>
+                <br />
+                <Spin style={{margin: '5px'}} spinning={this.state.isFetching} />
+              </div>
             }
-            {eventSelected &&
-            <div>
-              <Row>
-                <Col span="14">
-                  <h3>{this.props.mediaById[eventSelected.id].name}</h3>
-                </Col>
-                <Col span="10">
-                  <Button
-                    onClick={() => {
-                      this.removeMediaInCalendar(idEventSelected);
-                      $('#calendar').fullCalendar('removeEvents', eventSelected.idFull);
-                    }}
-                    style={{float: 'right'}} type="danger">
-                      Supprimer ce média
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col span="3">
-                  Heures :
-                </Col>
-                <Col span="6">
-                  <InputNumber disabled={eventFull.allDay} size="small" min={0} value={Math.floor((eventSelected.duration) / 3600)}
-                    onChange={(val) => {
-                      var newDuration = val * 3600 + eventSelected.duration % 3600;
-                      eventFull.end = moment.unix(eventFull.start.unix() + newDuration - 3600);
-                      $('#calendar').fullCalendar('updateEvent', eventFull);
+            <div id="calendar" />
+          </Row>
+        </Col>
 
-                      var newMedia = this.state.mediaInCalendar;
-                      newMedia[idEventSelected].duration = newDuration;
-                      this.setState({
-                        mediaInCalendar: newMedia
-                      });
-                    }}
-                  />
-                </Col>
-                <Col span="3">
-                  Minutes :
-                </Col>
-                <Col span="6">
-                  <InputNumber disabled={eventFull.allDay} size="small" min={0} max={59} value={Math.floor((eventSelected.duration) % 3600 / 60)}
-                    onChange={(val) => {
-                      const newDuration = val * 60 + Math.floor(eventSelected.duration / 3600) * 3600;
-                      eventFull.end = moment.unix(eventFull.start.unix() + newDuration - 3600);
-                      $('#calendar').fullCalendar('updateEvent', eventFull);
+        <Col span="4" offset="1" className="calendar-details">
+          {this.state.mediaSelected == -1 &&
+            <div>Cliquez sur une entrée dans l'agenda pour modifier ces informations.</div>
+          }
+          {eventSelected &&
+          <div>
+            <Row>
+              <h3>{this.props.mediaById[eventSelected.id].name}</h3>
+            </Row>
+            <Row>
+              Début: <Datetime utc value={moment((eventSelected.startTimeOffset) * 1000)} onChange={(val) => {
 
-                      var newMedia = this.state.mediaInCalendar;
-                      newMedia[idEventSelected].duration = newDuration;
-                      this.setState({
-                        mediaInCalendar: newMedia
-                      });
-                    }}
-                  />
-                </Col>
-                <Col span="3">
-                  Décalage :
-                </Col>
-                <Col span="3">
-                  {eventSelected.startTimeOffset}
-                </Col>
-              </Row>
-            </div>
-            }
+                        eventFull.start = val;
+                        eventFull.allDay = false;
+
+                        $('#calendar').fullCalendar('updateEvent', eventFull);
+
+                        var newMedia = this.state.mediaInCalendar.slice();
+                        newMedia[idEventSelected].startTimeOffset = (val.unix());
+                        this.setState({
+                          mediaInCalendar: newMedia
+                        });
+                      }} />
+            </Row>
+            <Row>
+              Fin: <Datetime utc value={moment((eventSelected.startTimeOffset + eventSelected.duration) * 1000)} onChange={(val) => {
+
+                        eventFull.end = val;
+                        eventFull.allDay = false;
+                        $('#calendar').fullCalendar('updateEvent', eventFull);
+
+                        var newMedia = this.state.mediaInCalendar.slice();
+                        newMedia[idEventSelected].duration = val.unix() - newMedia[idEventSelected].startTimeOffset;
+                        this.setState({
+                          mediaInCalendar: newMedia
+                        });
+                      }} />
+            </Row>
+            <Row>
+              <Button
+                onClick={() => {
+                  this.removeMediaInCalendar(idEventSelected);
+                  $('#calendar').fullCalendar('removeEvents', eventSelected.idFull);
+                }}
+                type="danger">
+                  Supprimer ce média
+              </Button>
+            </Row>
             <Badge status="default" text="Planification du média" />
-          </Col>
-        </Row>
-        {this.state.mediaInCalendar.length == 0 &&
-          <div id="drop-empty-calendar">
-            <span>
-              <Icon type="arrow-down" />
-            </span>
-            <br />
-            <span>
-              Déplacez des médias dans l'agenda !
-            </span>
-            <br />
-            <Spin style={{margin: '5px'}} spinning={this.state.isFetching} />
           </div>
-        }
-        <div id="calendar" />
-      </div>
+          }
+        </Col>
+      </Row>
     );
   }
 }

@@ -4,6 +4,7 @@ import Helmet from "react-helmet";
 
 import './App.scss';
 import logo from 'images/LogoMAW.png';
+import 'styles/TimePicker.scss';
 
 const App = (props) => (
   <div id="App">

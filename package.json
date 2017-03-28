@@ -93,6 +93,7 @@
     "millisec": "0.2.0",
     "raven-js": "3.6.1",
     "react": "15.3.1",
+    "react-datetime": "2.8.8",
     "react-dom": "15.3.1",
     "react-helmet": "4.0.0",
     "react-hot-loader": "3.0.0-beta.2",
