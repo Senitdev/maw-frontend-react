@@ -221,7 +221,7 @@ export default class CalendarContainer extends Component {
 
   mediaDeleted = [];
 
-  onChangeHour = (time, dateString, calendarOption) => {
+  onChangeHour = (time, calendarOption) => {
     if (time) {
       var newTime = "24:00";
       if (time.hours() < 23) {
@@ -270,7 +270,7 @@ export default class CalendarContainer extends Component {
       );
 
       this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, newMediasWithMS, this.state.calendarEdit)
-      .then((mediaId) => {
+      .then(() => {
         this.context.router.push('/display-management/agenda/');
       });
     });
@@ -293,7 +293,7 @@ export default class CalendarContainer extends Component {
                 <TimePicker
                   defaultValue={moment('07:00', format)}
                   format={format}
-                  onChange={(moment, timeString) => this.onChangeHour(moment, timeString, 'minTime')} />
+                  onChange={(moment) => this.onChangeHour(moment, 'minTime')} />
               </Col>
               <Col span="12">
                 <Input
@@ -319,7 +319,10 @@ export default class CalendarContainer extends Component {
                 <TimePicker
                   defaultValue={moment('20:00', format)}
                   format={format}
-                  onChange={(moment, timeString) => this.onChangeHour(moment, timeString, 'maxTime')} />
+                  onChange={(m) => {
+                    var minTime = $('#calendar').fullCalendar('option', 'minTime');
+                    this.onChangeHour(moment(minTime, 'HH:mm:ss').isBefore(m) ? m : moment.duration(minTime).add(1, 'H'), 'maxTime');
+                  }} />
               </Col>
               <Col span="12">
                 <Button
