@@ -432,9 +432,9 @@ export default class SceneEditorContainer extends Component {
           }}
           onDragStop={(newStart) => {
             var newMediaInScene = this.state.mediaInScene.slice();
-            newMediaInScene[idTemp].startTimeOffset.value = newStart;
-            if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
-              newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
+            newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value = newStart;
+            if (newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value + newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value > this.state.scaling)
+              newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = this.state.scaling - newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value;
 
             this.setState({
               mediaInScene: newMediaInScene
@@ -442,9 +442,9 @@ export default class SceneEditorContainer extends Component {
           }}
           onResizeStop={(newDuration) => {
             var newMediaInScene = this.state.mediaInScene.slice();
-            newMediaInScene[idTemp].duration.value = newDuration;
-            if (newMediaInScene[idTemp].startTimeOffset.value + newMediaInScene[idTemp].duration.value > this.state.scaling)
-              newMediaInScene[idTemp].duration.value = this.state.scaling - newMediaInScene[idTemp].startTimeOffset.value;
+            newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = newDuration;
+            if (newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value + newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value > this.state.scaling)
+              newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = this.state.scaling - newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value;
 
             this.setState({
               mediaInScene: newMediaInScene
@@ -460,7 +460,7 @@ export default class SceneEditorContainer extends Component {
               <Button title="Réinitialiser la durée" size="small" shape="circle" icon="reload"
                 onClick={() => {
                   var newMediaInScene = this.state.mediaInScene.slice();
-                  newMediaInScene[idTemp].duration.value = media.duration ? media.duration : 60000;
+                  newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = media.duration ? media.duration : 60000;
                   this.setState({
                     mediaInScene: newMediaInScene
                   });
