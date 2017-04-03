@@ -162,18 +162,6 @@ export default class SceneEditorContainer extends Component {
   timer;
   startTime = 0;
 
-  /* fonction d'aide. Permet de supprimer un clé dans un object de façon immutable
-   * TODO: mettre ça dans une classe OUTIL commune à toute l'app.
-   */
-  removeByKey (myObj, deleteKey) {
-    return Object.keys(myObj)
-      .filter((key) => key !== deleteKey)
-      .reduce((result, current) => {
-        result[current] = myObj[current];
-        return result;
-    }, {});
-  }
-
   calculateCurrentDuration() {
     var duration = 0;
     Object.keys(this.state.mediaInScene).forEach((key) => {
@@ -226,6 +214,18 @@ export default class SceneEditorContainer extends Component {
     }
   }
 
+  /* fonction d'aide. Permet de supprimer un clé dans un object de façon immutable
+   * TODO: mettre ça dans une classe OUTIL commune à toute l'app.
+   */
+  removeByKey (myObj, deleteKey) {
+    return Object.keys(myObj)
+      .filter((key) => key !== deleteKey)
+      .reduce((result, current) => {
+        result[current] = myObj[current];
+        return result;
+    }, {});
+  }
+
   removeMediaInScene = (idRelation) => {
     // Liste des relations supprimées
     if (idRelation >= 0)
@@ -262,7 +262,7 @@ export default class SceneEditorContainer extends Component {
 
   submitChange = () => {
     // this.mediaDeleted : contient les id des relations à supprimer
-    // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
+    // this.state.mediaInScene contient les relations indexé par idRelation
     // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
     var relationsToSave = {};
     Object.keys(this.state.mediaInScene).forEach((key) => {
@@ -294,7 +294,6 @@ export default class SceneEditorContainer extends Component {
   }
 
   handleFormChange = (changedFields) => {
-    //if (Object.keys(changedFields)[0] =)
     this.updateRelation(this.state.mediaSelected, changedFields);
   }
 
@@ -362,7 +361,7 @@ export default class SceneEditorContainer extends Component {
 
   render() {
     var screenSparationsDivs = [];
-//  var durationElements = [];
+
     Object.keys(this.state.mediaInScene).forEach((key) => {
       const media = this.props.mediaById[this.state.mediaInScene[key].id];
       const relation = this.state.mediaInScene[key];
@@ -420,91 +419,6 @@ export default class SceneEditorContainer extends Component {
          );
        }
      });
-
-    /*
-    var mediaInSceneByZIndex = this.state.mediaInScene.slice();
-    for (i = 0; i < mediaInSceneByZIndex.length; i++)
-      mediaInSceneByZIndex[i].indexTemp = i;
-
-    mediaInSceneByZIndex.sort((a, b) => {
-      if (a.zIndex.value < b.zIndex.value)
-        return 1;
-        if (a.zIndex.value > b.zIndex.value)
-        return -1;
-      return 0;
-    });
-    for (i = 0; i < mediaInSceneByZIndex.length; i++) {
-      let idTemp = i;
-      const media = this.props.mediaById[mediaInSceneByZIndex[idTemp].id];
-      const shade = (mediaInSceneByZIndex[idTemp].zIndex.value  + 3) * 8 % 100;
-      // Editeur des durées et z-index
-      const duree = (mediaInSceneByZIndex[idTemp].duration.value == 0 ? this.state.scaling - mediaInSceneByZIndex[idTemp].startTimeOffset.value : mediaInSceneByZIndex[idTemp].duration.value);
-      durationElements.push(
-        <SceneEditorDuration
-          key={idTemp}
-          id={idTemp}
-          backgroundColor={'#' + shade + shade + shade}
-          editorDurationWidth={this.editorDurationWidth}
-          mediaInSceneLength={this.state.mediaInScene.length}
-          moveMediaInScene={(id, deplacement) => {
-            var newMediaInScene = this.state.mediaInScene.slice();
-
-            const temp = mediaInSceneByZIndex[id].zIndex.value;
-            newMediaInScene[mediaInSceneByZIndex[id].indexTemp].zIndex.value = mediaInSceneByZIndex[id + deplacement].zIndex.value;
-            newMediaInScene[mediaInSceneByZIndex[id + deplacement].indexTemp].zIndex.value = temp;
-
-            this.setState({
-              mediaInScene: newMediaInScene,
-            });
-          }}
-          x={Math.round(mediaInSceneByZIndex[idTemp].startTimeOffset.value / this.state.scaling * this.editorDurationWidth)}
-          width={Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 30)}
-          scaling={this.state.scaling}
-          onClick={() => {
-            if (this.state.mediaSelected != mediaInSceneByZIndex[idTemp].indexTemp)
-              this.setState({mediaSelected: mediaInSceneByZIndex[idTemp].indexTemp});
-          }}
-          onDragStop={(newStart) => {
-            var newMediaInScene = this.state.mediaInScene.slice();
-            newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value = newStart;
-            if (newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value + newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value > this.state.scaling)
-              newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = this.state.scaling - newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value;
-
-            this.setState({
-              mediaInScene: newMediaInScene
-            });
-          }}
-          onResizeStop={(newDuration) => {
-            var newMediaInScene = this.state.mediaInScene.slice();
-            newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = newDuration;
-            if (newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value + newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value > this.state.scaling)
-              newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = this.state.scaling - newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].startTimeOffset.value;
-
-            this.setState({
-              mediaInScene: newMediaInScene
-            });
-          }}
-          content={
-            <div>
-              <ul>
-                <li>{media.name}</li>
-                <li>{mediaInSceneByZIndex[idTemp].startTimeOffset.value / 1000} : Décalage (s)</li>
-                <li>{mediaInSceneByZIndex[idTemp].duration.value == 0 ? <span>&infin;</span> : mediaInSceneByZIndex[idTemp].duration.value / 1000}: Durée (s)</li>
-              </ul>
-              <Button title="Réinitialiser la durée" size="small" shape="circle" icon="reload"
-                onClick={() => {
-                  var newMediaInScene = this.state.mediaInScene.slice();
-                  newMediaInScene[mediaInSceneByZIndex[idTemp].indexTemp].duration.value = media.duration ? media.duration : 60000;
-                  this.setState({
-                    mediaInScene: newMediaInScene
-                  });
-                }}
-              />
-            </div>
-          }
-        />
-      );
-    }*/
 
     return (
       <Layout className="display-management-content-layout">
