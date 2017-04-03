@@ -60,10 +60,9 @@ export default class SceneEditorTimelineItem extends Component {
             topLeft: false
           }}
           onClick={() => this.props.onClick(relation.idRelation)}
-          onDragStop={(event, ui, a) => {
+          onDragStop={(event, ui) => {
             const newStart = Math.round((ui.position.left / editorDurationWidth * scaling) / scale) * scale;
             const newZindex = Math.round((ui.position.top / 150 * 150) / 50);
-            console.log(newZindex);
             this.props.updateRelation(relation.idRelation, {startTimeOffset: newStart, zIndex: newZindex});
           }}
           onResizeStop={(direction, styleSize, clientSize) => {
