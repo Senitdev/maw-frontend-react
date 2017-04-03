@@ -295,27 +295,12 @@ function patchRelation(relation) {
 //Prend des relations provenant d'un formulaire de scene pour le mettre en forme, prêt à être transmit au action.
 function normalizeRelationsFromSceneEditor(patchedOrCreatedRelations, sceneId) {
   var normalizedRelations = {};
-
-  for (let key in patchedOrCreatedRelations) { //Pour chaque relation à MàJ ou crée...
-    normalizedRelations[key] = {};
-
-    if (patchedOrCreatedRelations.hasOwnProperty(key)) {
-      let relation = patchedOrCreatedRelations[key]; //Etrait la relation
-      normalizedRelations[key]['id'] = relation['idRelation'];
-      if (normalizedRelations[key]['id'] < 0) { //Si on a affaire à une création, on doit renseigner hostMedia et guestMedia
-        normalizedRelations[key]['hostMediaId'] = sceneId;
-        normalizedRelations[key]['guestMediaId'] = parseInt(relation['id']);
-      }
-      for (let subKey in relation) {
-        if (subKey in relation)
-          if (relation[subKey].value != null)
-            if (relation[subKey].value > -1)
-              normalizedRelations[key][subKey] = relation[subKey].value;
-            else if (subKey == 'duration')
-              normalizedRelations[key][subKey] = relation[subKey].value/1000;
-      }
-    }
-  }
+  Object.keys(patchedOrCreatedRelations).forEach((key) => {
+    normalizedRelations[key] = {
+      ...patchedOrCreatedRelations[key],
+      hostMediaId: sceneId
+    };
+  });
   return normalizedRelations;
 }
 //Prend des relations provenant d'un formulaire d'agenda pour le mettre en forme, prêt à être transmit au action.

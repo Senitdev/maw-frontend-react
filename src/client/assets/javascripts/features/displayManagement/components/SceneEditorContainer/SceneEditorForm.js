@@ -1,49 +1,27 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Collapse, InputNumber, Radio } from 'antd';
+import { Form, Collapse, Radio } from 'antd';
 
 const SceneEditorForm = Form.create({
 
   onFieldsChange(props, changedFields) {
-    for (const key of Object.keys(changedFields)) {
-    //  changedFields[key].value = parseInt(changedFields[key].value);
-    }
-    props.onChange(changedFields);
+    const key = Object.keys(changedFields)[0];
+    props.onChange({
+      [key]: Number(changedFields[key].value),
+    });
   },
 
   mapPropsToFields(props) {
     return {
-      boxHeight: {
-        ...props.mediaData.boxHeight
-      },
-      boxLeft: {
-        ...props.mediaData.boxLeft
-      },
-      boxTop: {
-        ...props.mediaData.boxTop
-      },
-      boxWidth: {
-        ...props.mediaData.boxWidth
-      },
-      duration: {
-        ...props.mediaData.duration,
-        value: props.mediaData.duration.value / 1000
-      },
-      guestHeight: {
-        ...props.mediaData.guestHeight
-      },
-      guestLeft: {
-        ...props.mediaData.guestLeft
-      },
-      guestTop: {
-        ...props.mediaData.guestTop
-      },
-      guestWidth: {
-        ...props.mediaData.guestWidth
-      },
-      startTimeOffset: {
-        ...props.mediaData.startTimeOffset,
-        value: props.mediaData.startTimeOffset.value / 1000
-      },
+      boxHeight: {value: props.mediaData.boxHeight},
+      boxLeft: {value: props.mediaData.boxLeft},
+      boxTop: {value: props.mediaData.boxTop},
+      boxWidth: {value: props.mediaData.boxWidth},
+      duration: {value: props.mediaData.duration / 1000},
+      guestHeight: {value: props.mediaData.guestHeight},
+      guestLeft: {value: props.mediaData.guestLeft},
+      guestTop: {value: props.mediaData.guestTop},
+      guestWidth: {value: props.mediaData.guestWidth},
+      startTimeOffset: {value: props.mediaData.startTimeOffset / 1000},
     };
   },
 })(
@@ -115,7 +93,6 @@ class SceneEditorForm extends Component {
             >
               {getFieldDecorator('startTimeOffset', {
                 rules: [{
-                  transform: (value) => parseFloat(value),
                   type: 'number', message: 'Veuillez rentrer un nombre valide!',
                 }, {
                   required: true, message: 'Veuillez rentrer un nombre!',
@@ -126,19 +103,18 @@ class SceneEditorForm extends Component {
             </Form.Item>
             <Form.Item
               hasFeedback >
-            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration.value >= 0 ? 1 : 2}>
+            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration >= 0 ? 1 : 2}>
               <Radio value={1}>
                 Pendant :
 
                 {getFieldDecorator('duration', {
                   rules: [{
-                    transform: (value) => parseFloat(value),
                     type: 'number', message: 'Veuillez rentrer un nombre valide!',
                   }, {
                     required: true, message: 'Veuillez rentrer un nombre!',
                   }]
                 })(
-                  <input type="number" min={0.001} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration.value <= 0} step={0.001} />
+                  <input type="number" min={0.001} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration <= 0} step={0.001} />
                 )}
                 s</Radio>
             </Radio.Group>

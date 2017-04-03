@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import Rnd from 'react-rnd';
-import { Row, Col } from 'antd';
 
 export default class SceneEditorCursor extends Component {
 

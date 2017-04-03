@@ -8,13 +8,11 @@ import $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/droppable';
 
-import { Layout, Button, Input, Icon, Row, Col, InputNumber } from 'antd';
+import { Layout, Button, Input, Icon, Row, Col } from 'antd';
 
 import SceneEditorForm from './SceneEditorForm';
 import SceneEditorViewPort from './SceneEditorViewPort';
-import SceneEditorDuration from './SceneEditorDuration';
-import SceneEditorCursor from './SceneEditorCursor';
-import SceneEditorDurationMarque from './SceneEditorDurationMarque';
+import SceneEditorTimeline from './SceneEditorTimeline';
 
 import './SceneEditorContainer.scss';
 
@@ -50,8 +48,8 @@ export default class SceneEditorContainer extends Component {
     super(props);
 
     this.state = {
-      mediaInScene: [],
-      mediaSelected: -1,
+      mediaInScene: {},
+      mediaSelected: undefined,
       mediaEdit: {
         id: -1,
         name: '',
@@ -100,7 +98,7 @@ export default class SceneEditorContainer extends Component {
       }
     }
     if (nextProps.relationsById) {
-      var mediaInScene = [];
+      var mediaInScene = {};
       var maxScale = this.state.scaling;
       for (var index in nextProps.relationsById) {
         const relation = nextProps.relationsById[index];
@@ -111,21 +109,21 @@ export default class SceneEditorContainer extends Component {
           if (end > maxScale)
             maxScale = end;
 
-          mediaInScene.push({
+          mediaInScene[relation.id] = {
             id: relation.guestMediaId,
-            boxLeft: {value: relation.boxLeft},
-            boxTop: {value: relation.boxTop},
-            boxWidth: {value: relation.boxWidth},
-            boxHeight: {value: relation.boxHeight},
-            guestLeft: {value: relation.guestLeft},
-            guestTop: {value: relation.guestTop},
-            guestWidth: {value: relation.guestWidth},
-            guestHeight: {value: relation.guestHeight},
-            startTimeOffset: {value: startTimeOffset},
-            duration: {value: duration},
-            zIndex: {value: relation.zIndex},
+            boxLeft: relation.boxLeft,
+            boxTop: relation.boxTop,
+            boxWidth: relation.boxWidth,
+            boxHeight: relation.boxHeight,
+            guestLeft: relation.guestLeft,
+            guestTop: relation.guestTop,
+            guestWidth: relation.guestWidth,
+            guestHeight: relation.guestHeight,
+            startTimeOffset: startTimeOffset,
+            duration: duration,
+            zIndex: relation.zIndex,
             idRelation: relation.id, // Id le relation déjà existante
-          });
+          };
         }
       }
       this.setState({
@@ -159,42 +157,58 @@ export default class SceneEditorContainer extends Component {
   editorWidth = 0;
   editorDurationWidth = 0;
   haveDrag = [];
+  tmpIdForNewRelation = -1;
 
   timer;
   startTime = 0;
 
+  /* fonction d'aide. Permet de supprimer un clé dans un object de façon immutable
+   * TODO: mettre ça dans une classe OUTIL commune à toute l'app.
+   */
+  removeByKey (myObj, deleteKey) {
+    return Object.keys(myObj)
+      .filter((key) => key !== deleteKey)
+      .reduce((result, current) => {
+        result[current] = myObj[current];
+        return result;
+    }, {});
+  }
+
   calculateCurrentDuration() {
     var duration = 0;
-    for (var i = 0; i < this.state.mediaInScene.length; i++) {
-      const relation = this.state.mediaInScene[i];
-      if ((relation.duration.value + relation.startTimeOffset.value) > duration) {
-        duration = relation.duration.value + relation.startTimeOffset.value;
+    Object.keys(this.state.mediaInScene).forEach((key) => {
+      const relation = this.state.mediaInScene[key];
+      if ((relation.duration + relation.startTimeOffset) > duration) {
+        duration = relation.duration + relation.startTimeOffset;
       }
-    }
+    });
     return duration;
   }
 
   dropEvent = (event, ui) => {
     const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 60000;
-    const zIndex = this.state.mediaInScene.length > 0 ? Math.max(...this.state.mediaInScene.map((o) => o.zIndex.value)) + 1 : 0;
+    //const zIndex = this.state.mediaInScene.length > 0 ? Math.max(...this.state.mediaInScene.map((o) => o.zIndex.value)) + 1 : 0;
     this.setState({
-      mediaInScene: this.state.mediaInScene.concat([{
-        id: ui.draggable.attr("id"),
-        boxLeft: {value: 0},
-        boxTop: {value: 0},
-        boxWidth: {value: 100},
-        boxHeight: {value: 100},
-        guestLeft: {value: 0},
-        guestTop: {value: 0},
-        guestWidth: {value: 100},
-        guestHeight: {value: 100},
-        startTimeOffset: {value: 0},
-        duration: {value: duration},
-        zIndex: {value: zIndex},
-        idRelation: -1, // Id le relation déjà existante (-1 si aucune)
-      }]),
+      mediaInScene: {
+        ...this.state.mediaInScene,
+        [this.tmpIdForNewRelation]: {
+          id: ui.draggable.attr("id"),
+          boxLeft: 0,
+          boxTop: 0,
+          boxWidth: 100,
+          boxHeight: 100,
+          guestLeft: 0,
+          guestTop: 0,
+          guestWidth: 100,
+          guestHeight: 100,
+          startTimeOffset: 0,
+          duration: duration,
+          zIndex: 0,
+          idRelation: this.tmpIdForNewRelation, // Id le relation déjà existante (négative si aucune)
+        }
+      },
       scaling: duration > this.state.scaling ? duration : this.state.scaling
-    });
+    }, () => this.tmpIdForNewRelation -= 1);
   }
 
   listDrop = () => {
@@ -204,55 +218,35 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
-  selecteMediaInScene = (id) => {
-    if (id != this.state.selecteMedia) {
+  selecteMediaInScene = (idRelation) => {
+    if (idRelation != this.state.mediaSelected) {
       this.setState({
-        mediaSelected: id
+        mediaSelected: idRelation
       });
     }
   }
 
-  removeMediaInScene = (id) => {
+  removeMediaInScene = (idRelation) => {
     // Liste des relations supprimées
-    if (this.state.mediaInScene[id].idRelation >= 0)
-      this.mediaDeleted.push(this.state.mediaInScene[id].idRelation);
-
-    var newMedias = this.state.mediaInScene;
-    newMedias.splice(id, 1);
-
-    var newMediaSelected = this.state.mediaSelected;
-    if (id == this.state.mediaSelected)
-      newMediaSelected = -1;
-    else if (id < this.state.mediaSelected) {
-      newMediaSelected--;
-    }
+    if (idRelation >= 0)
+      this.mediaDeleted.push(idRelation);
 
     this.setState({
-      mediaInScene: newMedias,
-      mediaSelected: newMediaSelected
-    });
-  }
-
-  handleFormChange = (changedFields) => {
-    var newMedias = this.state.mediaInScene.slice();
-    newMedias[this.state.mediaSelected] = {
-      ...this.state.mediaInScene[this.state.mediaSelected],
-      ...changedFields,
-    };
-    if (changedFields.duration)
-      newMedias[this.state.mediaSelected].duration = {value: changedFields.duration.value * 1000};
-    if (changedFields.startTimeOffset)
-      newMedias[this.state.mediaSelected].startTimeOffset = {value: changedFields.startTimeOffset.value * 1000};
-    this.setState({
-      mediaInScene: newMedias,
+      mediaInScene: this.removeByKey(this.state.mediaInScene, String(idRelation)),
+      mediaSelected: undefined,
     });
   }
 
   changeDuration = (e) => {
-    var newMedias = this.state.mediaInScene.slice();
-    newMedias[this.state.mediaSelected].duration.value = e.target.value == 1 ? 1 : 0;
+    const idRelationSelected = this.state.mediaSelected;
     this.setState({
-      mediaInScene: newMedias,
+      mediaInScene: {
+        ...this.state.mediaInScene,
+        [idRelationSelected]: {
+          ...this.state.mediaInScene[idRelationSelected],
+          duration: e.target.value,
+        }
+      }
     });
   }
 
@@ -270,21 +264,52 @@ export default class SceneEditorContainer extends Component {
     // this.mediaDeleted : contient les id des relations à supprimer
     // this.state.mediaInScene contient les relations. l'attribut idRelation contient l'id à modifier. -1 si ajout
     // this.state.mediaEdit: {id: id de la scene. -1 si ajout, name: nom}
-
-    var newMediasWithMS = this.state.mediaInScene.slice();
-    newMediasWithMS = newMediasWithMS.map((m) =>
-      ({
-        ...m,
-      })
-    );
-
-    this.setState({
-      mediaSelected: -1
+    var relationsToSave = {};
+    Object.keys(this.state.mediaInScene).forEach((key) => {
+      const relation = this.state.mediaInScene[key];
+      relationsToSave[key] = {
+        id: key,
+        guestMediaId: relation.id,
+        duration: relation.duration,
+        startTimeOffset: relation.startTimeOffset,
+        boxLeft: relation.boxLeft,
+        boxTop: relation.boxTop,
+        boxWidth: relation.boxWidth,
+        boxHeight: relation.boxHeight,
+        guestLeft: relation.guestLeft,
+        guestTop: relation.guestTop,
+        guestWidth: relation.guestWidth,
+        guestHeight: relation.guestHeight,
+        zIndex: relation.zIndex,
+      };
     });
-
-    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, newMediasWithMS, this.state.mediaEdit)
+    this.setState({
+      mediaSelected: undefined
+    });
+    //return;
+    this.props.actions.featPatchOrCreateFromEditor(this.mediaDeleted, relationsToSave, this.state.mediaEdit)
     .then(() => {
       this.context.router.push('/display-management/scene/');
+    });
+  }
+
+  handleFormChange = (changedFields) => {
+    //if (Object.keys(changedFields)[0] =)
+    this.updateRelation(this.state.mediaSelected, changedFields);
+  }
+
+  updateRelation = (idRelation, keyToChange) => {
+    var updatedRelation = { ...this.state.mediaInScene[idRelation] };
+    Object.keys(keyToChange).forEach((key) => {
+      updatedRelation[key] = keyToChange[key];
+    });
+    this.setState({
+      mediaInScene: {
+        ...this.state.mediaInScene,
+        [idRelation]: {
+          ...updatedRelation
+        }
+      }
     });
   }
 
@@ -337,57 +362,66 @@ export default class SceneEditorContainer extends Component {
 
   render() {
     var screenSparationsDivs = [];
-    var durationElements = [];
-    for (var i = 0; i < this.state.mediaInScene.length; i++) {
-      let idTemp = i;
-      const media = this.props.mediaById[this.state.mediaInScene[idTemp].id];
-      const relation = this.state.mediaInScene[idTemp];
+//  var durationElements = [];
+    Object.keys(this.state.mediaInScene).forEach((key) => {
+      const media = this.props.mediaById[this.state.mediaInScene[key].id];
+      const relation = this.state.mediaInScene[key];
 
       // Séparation de l'écran
-      const shade = (this.state.mediaInScene[idTemp].zIndex.value  + 3) * 8 % 100;
-      if (((relation.startTimeOffset.value <= (this.state.interval)) &&
-          (relation.startTimeOffset.value + relation.duration.value >= (this.state.interval))) ||
-          (relation.duration.value == 0)) {
+      if (((relation.startTimeOffset <= (this.state.interval)) &&
+          (relation.startTimeOffset + relation.duration >= (this.state.interval))) ||
+          (relation.duration == 0)) {
         screenSparationsDivs.push(
           <SceneEditorViewPort
-            key={idTemp}
-            zIndex={this.state.mediaInScene[idTemp].zIndex.value + 10}
-            backgroundColor={'#' + shade + shade + shade}
+            key={key}
+            zIndex={relation.zIndex}
+            backgroundColor='black'
             editorHeight={this.editorHeight}
             editorWidth={this.editorWidth}
-            x={this.state.mediaInScene[idTemp].boxLeft.value / 100 * this.editorWidth}
-            y={this.state.mediaInScene[idTemp].boxTop.value / 100 * this.editorHeight}
-            width={this.state.mediaInScene[idTemp].boxWidth.value / 100 * this.editorWidth}
-            height={this.state.mediaInScene[idTemp].boxHeight.value / 100 * this.editorHeight}
+            x={relation.boxLeft / 100 * this.editorWidth}
+            y={relation.boxTop / 100 * this.editorHeight}
+            width={relation.boxWidth / 100 * this.editorWidth}
+            height={relation.boxHeight / 100 * this.editorHeight}
             onClick={() => {
-              if (this.state.mediaSelected != idTemp)
-                this.setState({mediaSelected: idTemp});
+              if (this.state.mediaSelected != key)
+                this.selecteMediaInScene(key);
             }}
             onResizeStop={(newHeight, newWidth) => {
-              var newMediaInScene = this.state.mediaInScene;
-              newMediaInScene[idTemp].boxHeight.value = newHeight + newMediaInScene[idTemp].boxTop.value > 100 ? 100 - newMediaInScene[idTemp].boxTop.value : newHeight;
-              newMediaInScene[idTemp].boxWidth.value = newWidth + newMediaInScene[idTemp].boxLeft.value > 100 ? 100 - newMediaInScene[idTemp].boxLeft.value : newWidth;
+              const newBoxHeight = newHeight + relation.boxTop > 100 ? 100 - relation.boxTop : newHeight;
+              const newBoxWidth = newWidth + relation.boxLeft > 100 ? 100 - relation.boxLeft : newWidth;
 
               this.setState({
-                mediaInScene: newMediaInScene
+                mediaInScene: {
+                  ...this.state.mediaInScene,
+                  [key]: {
+                    ...relation,
+                    boxHeight: newBoxHeight,
+                    boxWidth: newBoxWidth,
+                  }
+                }
               });
             }}
             onDragStop={(newX, newY) => {
-              var newMediaInScene = this.state.mediaInScene;
-              newMediaInScene[idTemp].boxTop.value = newY;
-              newMediaInScene[idTemp].boxLeft.value = newX;
               this.setState({
-                mediaInScene: newMediaInScene
+                mediaInScene: {
+                  ...this.state.mediaInScene,
+                  [key]: {
+                    ...relation,
+                    boxTop: newY,
+                    boxLeft: newX,
+                  }
+                }
               });
             }}
             media={media}
-            mediaControls={!isNaN(this.state.mediaControls) ? String((this.state.mediaControls - relation.startTimeOffset.value) % media.duration) : this.state.mediaControls}
-            offset={relation.startTimeOffset.value}
+            mediaControls={!isNaN(this.state.mediaControls) ? String((this.state.mediaControls - relation.startTimeOffset) % media.duration) : this.state.mediaControls}
+            offset={relation.startTimeOffset}
            />
          );
        }
-     }
+     });
 
+    /*
     var mediaInSceneByZIndex = this.state.mediaInScene.slice();
     for (i = 0; i < mediaInSceneByZIndex.length; i++)
       mediaInSceneByZIndex[i].indexTemp = i;
@@ -427,8 +461,8 @@ export default class SceneEditorContainer extends Component {
           width={Math.max(Math.round(duree / this.state.scaling * this.editorDurationWidth), 30)}
           scaling={this.state.scaling}
           onClick={() => {
-            if (this.state.mediaSelected != idTemp)
-              this.setState({mediaSelected: idTemp});
+            if (this.state.mediaSelected != mediaInSceneByZIndex[idTemp].indexTemp)
+              this.setState({mediaSelected: mediaInSceneByZIndex[idTemp].indexTemp});
           }}
           onDragStop={(newStart) => {
             var newMediaInScene = this.state.mediaInScene.slice();
@@ -470,9 +504,7 @@ export default class SceneEditorContainer extends Component {
           }
         />
       );
-    }
-
-    const currentDuration = require('millisec')(this.state.interval).format('hh [h] : mm [m] : ss [s]');
+    }*/
 
     return (
       <Layout className="display-management-content-layout">
@@ -480,7 +512,7 @@ export default class SceneEditorContainer extends Component {
         <Layout.Content id="scene-list-container">
           <Row>
             <Col id="editor-positions" span="24">
-              { this.state.mediaInScene.length == 0 ?
+              { Object.keys(this.state.mediaInScene).length == 0 ?
                   <div id="drop-empty-container">
                     <span>
                       <Icon type="arrow-down" />
@@ -497,38 +529,26 @@ export default class SceneEditorContainer extends Component {
               }
             </Col>
           </Row>
-          <Row id="editor-duration-menu">
-            <Col span="4"><h4>Médias</h4></Col>
-            <Col offset='6' span="7">
-              <Button onClick={this.rewindScene} icon='step-backward' />
-              <Button onClick={this.pauseScene} icon='pause' />
-              <Button onClick={this.playScene} icon='caret-right' />
-              <span className='timerDisplayer'>{currentDuration}</span>
-            </Col>
-            <Col offset='1' span="6">Échelle en seconde : <InputNumber onChange={(val) => {
-              this.setState({
-                scaling: val * 1000
-              });
-            }} size="small" min={1} step={0.001} value={this.state.scaling / 1000} /></Col>
-          </Row>
-          <Row>
-            <Col offset='2' span='22' className="editor-cursor-container" onClick={(e) => {
-              if (e.nativeEvent.target.className != 'editor-cursor-element')
-                this.setSceneInterval(e.nativeEvent.offsetX);
-            }}>
-              <SceneEditorDurationMarque x={2+Math.round((this.state.mediaEdit.duration) / this.state.scaling * this.editorDurationWidth)} />
-              <SceneEditorCursor
-                backgroundColor='green'
-                cursorWidth={5}
-                scaling={this.state.scaling}
-                editorDurationWidth={this.editorDurationWidth}
-                height={7 + this.state.mediaInScene.length * 53}
-                x={Math.round((this.state.interval) / this.state.scaling * this.editorDurationWidth)}
-                onDrag={(offsetX) => this.setSceneInterval(offsetX)}
-              />
-            </Col>
-          </Row>
-          {durationElements}
+          <SceneEditorTimeline
+            scene={this.state.mediaEdit}
+            relations={this.state.mediaInScene}
+            medias={this.props.mediaById}
+            scaling={this.state.scaling}
+            editorDurationWidth={this.editorDurationWidth}
+            interval={this.state.interval}
+            setSceneInterval={this.setSceneInterval}
+            playScene={this.playScene}
+            pauseScene={this.pauseScene}
+            rewindScene={this.rewindScene}
+            onClick={(idRelation) => {
+              if (this.state.mediaSelected != idRelation) {
+                this.selecteMediaInScene(idRelation);
+              }
+            }}
+            updateRelation={this.updateRelation}
+
+          />
+
         </Layout.Content>
         <Layout.Sider width={250}>
           <div style={{padding: '0 5px 5px 5px'}}>
@@ -545,7 +565,7 @@ export default class SceneEditorContainer extends Component {
               type="primary" size="large" title="Il faut un nom avant de pouvoir sauvegarder">Sauvegarder</Button>
           </div>
           <hr />
-          { this.state.mediaSelected == -1 ?
+          { this.state.mediaSelected == undefined ?
             <div>Cliquez sur un média pour modifier ces informations.</div>
           :
             <div>
