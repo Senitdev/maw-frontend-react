@@ -8,7 +8,7 @@ import ManagementLayout from 'features/core/components/ManagementLayout';
 import DisplayManagementContainer from 'features/displayManagement/components/DisplayManagementContainer';
 import LoginContainer from 'features/auth/components/login/LoginContainer';
 import RegisterContainer from 'features/auth/components/register/RegisterContainer';
-import AgendaEditorContainer from 'features/displayManagement/components/AgendaEditorContainer';
+import CalendarEditorContainer from 'features/displayManagement/components/CalendarEditorContainer';
 import SceneEditorContainer from 'features/displayManagement/components/SceneEditorContainer';
 
 import { AgendaTableContainer, FileTableContainer, SceneTableContainer, ScreenTableContainer } from 'features/displayManagement/containers';
@@ -58,7 +58,7 @@ export default function getRoutes(store) {
 
           <Route path="agenda">
             <IndexRoute component={inTablePage(AgendaTableContainer)} />
-            <Route path=":idAgenda" component={AgendaEditorContainer} />
+            <Route path=":idAgenda" component={CalendarEditorContainer} />
           </Route>
 
         </Route>
