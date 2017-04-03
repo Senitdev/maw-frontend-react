@@ -3,8 +3,8 @@ import React, { Component, PropTypes } from 'react';
 import { Button, Row, Col, InputNumber } from 'antd';
 import millisec from 'millisec';
 
-import SceneEditorCursor from './SceneEditorCursor';
-import SceneEditorDurationMarque from './SceneEditorDurationMarque';
+import SceneEditorTimelineCursor from './SceneEditorTimelineCursor';
+import SceneEditorTimelineDurationMarque from './SceneEditorTimelineDurationMarque';
 import SceneEditorTimelineItem from './SceneEditorTimelineItem';
 
 export default class SceneEditorTimeline extends Component {
@@ -91,12 +91,12 @@ export default class SceneEditorTimeline extends Component {
           </Col>
         </Row>
         <Row>
-          <SceneEditorDurationMarque
+          <SceneEditorTimelineDurationMarque
             sceneDuration={sceneDuration}
             scaling={scaling}
             editorDurationWidth={editorDurationWidth}
           />
-          <SceneEditorCursor
+          <SceneEditorTimelineCursor
             backgroundColor='green'
             cursorWidth={5}
             scaling={scaling}

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Rnd from 'react-rnd';
 
-export default class SceneEditorCursor extends Component {
+export default class SceneEditorTimelineCursor extends Component {
 
   static propTypes = {
     backgroundColor: PropTypes.string.isRequired,

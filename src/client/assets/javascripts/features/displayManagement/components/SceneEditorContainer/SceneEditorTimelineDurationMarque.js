@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-export default class SceneEditorDurationMarque extends Component {
+export default class SceneEditorTimelineDurationMarque extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
