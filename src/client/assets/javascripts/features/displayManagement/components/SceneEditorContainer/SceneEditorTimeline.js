@@ -61,16 +61,43 @@ export default class SceneEditorTimeline extends Component {
 
     Object.keys(relations).forEach((key) => {
 
+      var previousRelation = null;
+      var nextRelation = null;
+      var maxPrevious = -1;
+      var maxNext = Number.MAX_VALUE;
+      Object.keys(relations).forEach((keySearch) => {
+        if (key != keySearch)
+          if (relations[key].zIndex == relations[keySearch].zIndex) {
+            const previousTemp = relations[keySearch].duration + relations[keySearch].startTimeOffset;
+            if (previousTemp <= relations[key].startTimeOffset) {
+              if (previousTemp > maxPrevious) {
+                maxPrevious = previousTemp;
+                previousRelation = relations[keySearch];
+              }
+            } else if (relations[keySearch].startTimeOffset > relations[key].startTimeOffset + relations[key].duration) {
+              if (relations[keySearch].startTimeOffset < maxNext) {
+                maxNext = relations[keySearch].startTimeOffset;
+                nextRelation = relations[keySearch];
+              }
+            }
+          }
+      });
+
+      console.log(relations[key], previousRelation, nextRelation);
+
       items.push(
         <SceneEditorTimelineItem
           key={key}
           media={medias[relations[key].id]}
           editorDurationWidth={editorDurationWidth}
           relation={relations[key]}
+          previousRelation={previousRelation}
+          nextRelation={nextRelation}
           scale={100}
           scaling={scaling}
           onClick={this.props.onClick}
           updateRelation={this.props.updateRelation}
+          rightLastElement={0}
         />
       );
     });
@@ -108,7 +135,10 @@ export default class SceneEditorTimeline extends Component {
           {items}
         </Row>
         <Row>
-          <Button onClick={() => {
+          <Button
+            style={{marginTop: '5px'}}
+            icon="plus"
+            onClick={() => {
               this.setState({
                 newLayer: 1,
               });

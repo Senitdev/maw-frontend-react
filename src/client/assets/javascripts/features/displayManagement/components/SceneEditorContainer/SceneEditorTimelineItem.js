@@ -7,7 +7,9 @@ export default class SceneEditorTimelineItem extends Component {
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
     media: PropTypes.object.isRequired,
+    nextRelation: PropTypes.object,
     onClick: PropTypes.func.isRequired,
+    previousRelation: PropTypes.object,
     relation: PropTypes.object.isRequired,
     scale: PropTypes.number.isRequired,
     scaling: PropTypes.number.isRequired,
@@ -26,6 +28,9 @@ export default class SceneEditorTimelineItem extends Component {
       return true;
   }
 
+  getXFromRelation = (relation) => Math.round(relation.startTimeOffset / this.props.scaling * this.props.editorDurationWidth);
+  getWidthFromRelation = (relation) => Math.max(Math.round(relation.duration / this.props.scaling * this.props.editorDurationWidth), 30);
+
   render() {
 
     const relation            = this.props.relation;
@@ -33,9 +38,11 @@ export default class SceneEditorTimelineItem extends Component {
     const scaling             = this.props.scaling;
     const editorDurationWidth = this.props.editorDurationWidth;
     const scale               = this.props.scale;
-    const x                   = Math.round(relation.startTimeOffset / scaling * editorDurationWidth);
+    const x                   = this.getXFromRelation(relation);
     const y                   = relation.zIndex * 50;
-    const width               = Math.max(Math.round(relation.duration / scaling * editorDurationWidth), 30);
+    const width               = this.getWidthFromRelation(relation);
+    const rightPrevious       = this.props.previousRelation ? this.getWidthFromRelation(this.props.previousRelation) + this.getXFromRelation(this.props.previousRelation) : 0;
+    const leftNext            = (this.props.nextRelation ? this.getXFromRelation(this.props.nextRelation) : editorDurationWidth) - width;
 
     return (
         <Rnd
@@ -48,7 +55,7 @@ export default class SceneEditorTimelineItem extends Component {
           }}
           resizeGrid={[editorDurationWidth / (scaling / scale), 1]}
           moveGrid={[editorDurationWidth / (scaling / scale), 50]}
-          bounds={'parent'}
+          bounds={{left: rightPrevious, right: leftNext, top: 0}}
           isResizable={{
             top: false,
             right: true,
