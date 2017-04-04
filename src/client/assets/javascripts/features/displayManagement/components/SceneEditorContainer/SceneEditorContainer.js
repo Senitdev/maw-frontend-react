@@ -138,7 +138,7 @@ export default class SceneEditorContainer extends Component {
     this.listDrop();
     this.editorHeight = document.getElementById('editor-positions').offsetHeight;
     this.editorWidth = document.getElementById('editor-positions').offsetWidth;
-    this.editorDurationWidth = document.getElementById('editor-duration-menu').offsetWidth / 24 * 22 - 7;
+    this.editorDurationWidth = document.getElementById('editor-duration-menu').offsetWidth;
 
     //Met à jour la durée de la scène
     const currentDuration = this.calculateCurrentDuration();
