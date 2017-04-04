@@ -317,22 +317,33 @@ export default class CalendarEditorContainer extends Component {
                 <h3>{this.props.mediaById[eventSelected.id].name}</h3>
               </Row>
               <Row>
-                Début: <Datetime utc value={moment((eventSelected.startTimeOffset) * 1000)} onChange={(val) => {
-                          var newMedia = this.state.mediaInCalendar.slice();
-                          newMedia[idEventSelected].startTimeOffset = (val.unix());
-                          this.setState({
-                            mediaInCalendar: newMedia
-                          });
-                        }} />
+                Début:
+                <Datetime
+                  utc
+                  value={moment.unix(eventSelected.startTimeOffset)}
+                  onChange={(val) => {
+                    var newMedia = this.state.mediaInCalendar.slice();
+                    newMedia[idEventSelected].startTimeOffset = (val.unix());
+                    this.setState({
+                      mediaInCalendar: newMedia
+                    });
+                  }} />
               </Row>
               <Row>
-                Fin: <Datetime utc value={moment((eventSelected.startTimeOffset + eventSelected.duration) * 1000)} onChange={(val) => {
-                          var newMedia = this.state.mediaInCalendar.slice();
-                          newMedia[idEventSelected].duration = val.unix() - newMedia[idEventSelected].startTimeOffset;
-                          this.setState({
-                            mediaInCalendar: newMedia
-                          });
-                        }} />
+                Fin:
+                <Datetime
+                  utc
+                  value={moment.unix(eventSelected.startTimeOffset + eventSelected.duration)}
+                  isValidDate={(current) => current.isAfter(moment.unix(eventSelected.startTimeOffset).subtract(1, 'day'))}
+                  onChange={(val) => {
+                    if (val.isAfter(moment.unix(eventSelected.startTimeOffset))) {
+                      var newMedia = this.state.mediaInCalendar.slice();
+                      newMedia[idEventSelected].duration = val.unix() - newMedia[idEventSelected].startTimeOffset;
+                      this.setState({
+                        mediaInCalendar: newMedia
+                      });
+                    }
+                  }} />
               </Row>
               <Row>
                 <Button
