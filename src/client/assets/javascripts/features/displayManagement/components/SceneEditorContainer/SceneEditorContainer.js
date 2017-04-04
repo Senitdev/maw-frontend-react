@@ -448,6 +448,11 @@ export default class SceneEditorContainer extends Component {
             relations={this.state.mediaInScene}
             medias={this.props.mediaById}
             scaling={this.state.scaling}
+            onChangeScaling={(val) => {
+              this.setState({
+                scaling: val
+              });
+            }}
             editorDurationWidth={this.editorDurationWidth}
             interval={this.state.interval}
             setSceneInterval={this.setSceneInterval}

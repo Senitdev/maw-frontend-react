@@ -13,6 +13,7 @@ export default class SceneEditorTimeline extends Component {
     editorDurationWidth: PropTypes.number.isRequired,
     interval: PropTypes.number.isRequired,
     medias: PropTypes.object.isRequired,
+    onChangeScaling: PropTypes.func.isRequired,
     onClick: PropTypes.func.isRequired,
     pauseScene: PropTypes.func.isRequired,
     playScene: PropTypes.func.isRequired,
@@ -83,11 +84,8 @@ export default class SceneEditorTimeline extends Component {
             <Button onClick={this.props.playScene} icon='caret-right' />
             <span className='timerDisplayer'>{this.getCurrentFormatedTick()}</span>
           </Col>
-          <Col offset='1' span="6">Échelle en seconde : <InputNumber onChange={(val) => {
-              this.setState({
-                scaling: val * 1000
-              });
-            }} size="small" min={1} step={0.001} value={scaling / 1000} />
+          <Col offset='1' span="6">
+            Échelle en milliseconde : <InputNumber onChange={this.props.onChangeScaling} size="small" min={1} value={scaling} />
           </Col>
         </Row>
         <Row>
