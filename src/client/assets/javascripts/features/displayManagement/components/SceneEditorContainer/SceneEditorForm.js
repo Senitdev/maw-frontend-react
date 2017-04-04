@@ -16,12 +16,12 @@ const SceneEditorForm = Form.create({
       boxLeft: {value: props.mediaData.boxLeft},
       boxTop: {value: props.mediaData.boxTop},
       boxWidth: {value: props.mediaData.boxWidth},
-      duration: {value: props.mediaData.duration / 1000},
+      duration: {value: props.mediaData.duration},
       guestHeight: {value: props.mediaData.guestHeight},
       guestLeft: {value: props.mediaData.guestLeft},
       guestTop: {value: props.mediaData.guestTop},
       guestWidth: {value: props.mediaData.guestWidth},
-      startTimeOffset: {value: props.mediaData.startTimeOffset / 1000},
+      startTimeOffset: {value: props.mediaData.startTimeOffset},
     };
   },
 })(
@@ -98,8 +98,8 @@ class SceneEditorForm extends Component {
                   required: true, message: 'Veuillez rentrer un nombre!',
                 }]
               })(
-                <input type="number" min={0} step={0.001} />
-              )} s
+                <input type="number" min={0} />
+              )} ms
             </Form.Item>
             <Form.Item
               hasFeedback >
@@ -114,9 +114,9 @@ class SceneEditorForm extends Component {
                     required: true, message: 'Veuillez rentrer un nombre!',
                   }]
                 })(
-                  <input type="number" min={0.001} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration <= 0} step={0.001} />
+                  <input type="number" min={1} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration <= 0} />
                 )}
-                s</Radio>
+                ms</Radio>
             </Radio.Group>
            </Form.Item>
           </Collapse.Panel>
