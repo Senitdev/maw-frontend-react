@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-import { Button, Row, Col, InputNumber } from 'antd';
+import { Button, Row, Col, Icon } from 'antd';
 import millisec from 'millisec';
 
 import SceneEditorTimelineCursor from './SceneEditorTimelineCursor';
@@ -10,6 +10,7 @@ import SceneEditorTimelineItem from './SceneEditorTimelineItem';
 export default class SceneEditorTimeline extends Component {
 
   static propTypes = {
+    changeScaling: PropTypes.func.isRequired,
     editorDurationWidth: PropTypes.number.isRequired,
     interval: PropTypes.number.isRequired,
     medias: PropTypes.object.isRequired,
@@ -111,8 +112,10 @@ export default class SceneEditorTimeline extends Component {
             <Button onClick={this.props.playScene} icon='caret-right' />
             <span className='timerDisplayer'>{this.getCurrentFormatedTick()}</span>
           </Col>
-          <Col offset='1' span="6">
-            Échelle en milliseconde : <InputNumber onChange={this.props.onChangeScaling} size="small" min={1} value={scaling} />
+          <Col offset='2' span="5">
+            <Button icon='minus-circle-o' onClick={() => this.props.changeScaling(0.9)}/>
+            <span> <Icon type="search" /> {scaling / 1000}[s] </span>
+            <Button icon='plus-circle-o' onClick={() => this.props.changeScaling(1.1)}/>
           </Col>
         </Row>
         <Row>

@@ -59,7 +59,7 @@ export default class SceneEditorContainer extends Component {
         ratioDenominator: 9,
       },
       isFetching: true,
-      scaling: 90000,
+      scaling: 100000,
       interval: 0,
       mediaControls: 'pause',
     };
@@ -299,6 +299,12 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
+  changeScaling = (pourcent) => {
+    this.setState({
+      scaling: Math.round((this.state.scaling * pourcent)/1000)*1000,
+    });
+  }
+
   tick = () => {
     if (this.state.interval >= this.state.mediaEdit.duration) {
       clearInterval(this.timer);
@@ -446,6 +452,7 @@ export default class SceneEditorContainer extends Component {
             playScene={this.playScene}
             pauseScene={this.pauseScene}
             rewindScene={this.rewindScene}
+            changeScaling={this.changeScaling}
             onClick={(idRelation) => {
               if (this.state.mediaSelected != idRelation) {
                 this.selecteMediaInScene(idRelation);
