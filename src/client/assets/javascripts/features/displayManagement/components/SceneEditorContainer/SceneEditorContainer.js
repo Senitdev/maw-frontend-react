@@ -237,19 +237,6 @@ export default class SceneEditorContainer extends Component {
     });
   }
 
-  changeDuration = (e) => {
-    const idRelationSelected = this.state.mediaSelected;
-    this.setState({
-      mediaInScene: {
-        ...this.state.mediaInScene,
-        [idRelationSelected]: {
-          ...this.state.mediaInScene[idRelationSelected],
-          duration: e.target.value,
-        }
-      }
-    });
-  }
-
   changeName = (e) => {
     const { value } = e.target;
     this.setState({
@@ -498,7 +485,6 @@ export default class SceneEditorContainer extends Component {
               <SceneEditorForm
                 onChange={this.handleFormChange}
                 mediaData={this.state.mediaInScene[this.state.mediaSelected]}
-                changeDuration={this.changeDuration}
               />
             </div>
           }

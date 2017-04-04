@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Collapse, Radio } from 'antd';
+import { Form, Collapse } from 'antd';
 
 const SceneEditorForm = Form.create({
 
@@ -28,7 +28,6 @@ const SceneEditorForm = Form.create({
 class SceneEditorForm extends Component {
 
   static propTypes = {
-    changeDuration: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
     mediaData: PropTypes.object.isRequired,
   }
@@ -102,22 +101,18 @@ class SceneEditorForm extends Component {
               )} ms
             </Form.Item>
             <Form.Item
+              label="Pendant "
               hasFeedback >
-            <Radio.Group onChange={this.props.changeDuration} value={this.props.mediaData.duration >= 0 ? 1 : 2}>
-              <Radio value={1}>
-                Pendant :
-
-                {getFieldDecorator('duration', {
-                  rules: [{
-                    type: 'number', message: 'Veuillez rentrer un nombre valide!',
-                  }, {
-                    required: true, message: 'Veuillez rentrer un nombre!',
-                  }]
-                })(
-                  <input type="number" min={1} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration <= 0} />
-                )}
-                ms</Radio>
-            </Radio.Group>
+              {getFieldDecorator('duration', {
+                rules: [{
+                  type: 'number', message: 'Veuillez rentrer un nombre valide!',
+                }, {
+                  required: true, message: 'Veuillez rentrer un nombre!',
+                }]
+              })(
+                <input type="number" min={1} style={{margin: '0 3px 0 3px'}} disabled={this.props.mediaData.duration <= 0} />
+              )}
+              ms
            </Form.Item>
           </Collapse.Panel>
         </Collapse>
