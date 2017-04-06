@@ -28,7 +28,6 @@ export default class SceneEditorTimeline extends Component {
 
   state = {
     DOMitemsDimensions: {},
-    newLayer: 0,
     maxZindex: 0,
   }
 
@@ -42,7 +41,6 @@ export default class SceneEditorTimeline extends Component {
 
       this.setState({
         maxZindex: maxZindex,
-        newLayer: 0,
       });
     }
   }
@@ -57,7 +55,7 @@ export default class SceneEditorTimeline extends Component {
     const relations           = this.props.relations;
     const medias              = this.props.medias;
     const timeInterval        = this.props.interval;
-    const maxZindex           = this.state.maxZindex + this.state.newLayer;
+    const maxZindex           = this.state.maxZindex + 2;
     var items                 = [];
 
     Object.keys(relations).forEach((key) => {
@@ -84,8 +82,6 @@ export default class SceneEditorTimeline extends Component {
           }
       });
 
-      console.log(relations[key], previousRelation, nextRelation);
-
       items.push(
         <SceneEditorTimelineItem
           key={key}
@@ -99,6 +95,7 @@ export default class SceneEditorTimeline extends Component {
           onClick={this.props.onClick}
           updateRelation={this.props.updateRelation}
           rightLastElement={0}
+          maxZindex={maxZindex}
         />
       );
     });
@@ -129,25 +126,13 @@ export default class SceneEditorTimeline extends Component {
             cursorWidth={5}
             scaling={scaling}
             editorDurationWidth={editorDurationWidth}
-            height={7 + 50*(maxZindex+1)}
+            height={7 + 50*(maxZindex)}
             x={Math.round((timeInterval) / scaling * editorDurationWidth)}
             onDrag={(offsetX) => this.props.setSceneInterval(offsetX)}
           />
         </Row>
-        <Row className='timeline' style={{height: 50*(maxZindex+1) + 'px', backgroundSize: editorDurationWidth + 'px 50px'}}>
+        <Row className='timeline' style={{height: 50*(maxZindex) + 'px', backgroundSize: editorDurationWidth + 'px 50px'}}>
           {items}
-        </Row>
-        <Row>
-          <Button
-            style={{marginTop: '5px'}}
-            icon="plus"
-            onClick={() => {
-              this.setState({
-                newLayer: 1,
-              });
-            }}>
-            ajoute une couche
-          </Button>
         </Row>
       </div>
     );

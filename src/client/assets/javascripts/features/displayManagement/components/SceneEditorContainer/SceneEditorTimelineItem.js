@@ -6,6 +6,7 @@ export default class SceneEditorTimelineItem extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
+    maxZindex: PropTypes.number.isRequired,
     media: PropTypes.object.isRequired,
     nextRelation: PropTypes.object,
     onClick: PropTypes.func.isRequired,
@@ -22,7 +23,8 @@ export default class SceneEditorTimelineItem extends Component {
   shouldComponentUpdate(nextProps) {
     if (this.props.relation === nextProps.relation
         && this.props.editorDurationWidth === nextProps.editorDurationWidth
-        && this.props.scaling === nextProps.scaling)
+        && this.props.scaling === nextProps.scaling
+        && this.props.maxZindex === nextProps.maxZindex)
       return false;
     else
       return true;
@@ -43,6 +45,7 @@ export default class SceneEditorTimelineItem extends Component {
     const width               = this.getWidthFromRelation(relation);
     const rightPrevious       = this.props.previousRelation ? this.getWidthFromRelation(this.props.previousRelation) + this.getXFromRelation(this.props.previousRelation) : 0;
     const leftNext            = (this.props.nextRelation ? this.getXFromRelation(this.props.nextRelation) : editorDurationWidth) - width;
+    const maxZindex           = this.props.maxZindex;
 
     return (
         <Rnd
@@ -55,7 +58,7 @@ export default class SceneEditorTimelineItem extends Component {
           }}
           resizeGrid={[editorDurationWidth / (scaling / scale), 1]}
           moveGrid={[editorDurationWidth / (scaling / scale), 50]}
-          bounds={{left: rightPrevious, right: leftNext, top: 0}}
+          bounds={{left: rightPrevious, right: leftNext, top: 0, bottom: (maxZindex-1)*50}}
           isResizable={{
             top: false,
             right: true,
