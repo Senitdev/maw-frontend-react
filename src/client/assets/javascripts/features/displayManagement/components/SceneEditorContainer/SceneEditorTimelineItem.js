@@ -30,6 +30,10 @@ export default class SceneEditorTimelineItem extends Component {
       return true;
   }
 
+  componentDidUpdate(nextProps) {
+    this.rnd.updatePosition({x: this.getXFromRelation(nextProps.relation), y: nextProps.relation.zIndex * 50});
+  }
+
   getXFromRelation = (relation) => Math.round(relation.startTimeOffset / this.props.scaling * this.props.editorDurationWidth);
   getWidthFromRelation = (relation) => Math.max(Math.round(relation.duration / this.props.scaling * this.props.editorDurationWidth), 30);
 
@@ -50,6 +54,7 @@ export default class SceneEditorTimelineItem extends Component {
     return (
         <Rnd
           className="editor-separation-element"
+          ref={(ref) => this.rnd = ref}
           initial={{
             x: x,
             y: y,
