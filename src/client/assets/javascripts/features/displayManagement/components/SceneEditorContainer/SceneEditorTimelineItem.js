@@ -30,8 +30,9 @@ export default class SceneEditorTimelineItem extends Component {
       return true;
   }
 
-  componentDidUpdate(nextProps) {
-    this.rnd.updatePosition({x: this.getXFromRelation(nextProps.relation), y: nextProps.relation.zIndex * 50});
+  componentWillUpdate(nextProps) {
+    this.rnd.updatePosition({x: Math.round(nextProps.relation.startTimeOffset / nextProps.scaling * nextProps.editorDurationWidth),
+                             y: nextProps.relation.zIndex * 50});
   }
 
   getXFromRelation = (relation) => Math.round(relation.startTimeOffset / this.props.scaling * this.props.editorDurationWidth);
