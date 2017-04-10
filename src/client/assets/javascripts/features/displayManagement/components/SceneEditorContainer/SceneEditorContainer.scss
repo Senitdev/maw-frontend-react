@@ -127,5 +127,10 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   border-bottom: 1px black solid;
   border-left: 1px black solid;
   border-right: 1px black solid;
+}
 
+.magnet {
+  width: 2px;
+  border-left: 1px red solid;
+  border-right: 1px green solid;
 }

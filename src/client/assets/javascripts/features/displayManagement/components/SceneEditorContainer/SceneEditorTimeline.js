@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-import { Button, Row, Col, Icon } from 'antd';
+import { Button, Row, Col, Icon, Switch, Tooltip } from 'antd';
 import millisec from 'millisec';
 
 import SceneEditorTimelineCursor from './SceneEditorTimelineCursor';
@@ -29,6 +29,8 @@ export default class SceneEditorTimeline extends Component {
   state = {
     DOMitemsDimensions: {},
     maxZindex: 0,
+    magnetIsActive: false,
+    magnetX: -1,
   }
 
   componentDidUpdate(prevProps) {
@@ -47,6 +49,8 @@ export default class SceneEditorTimeline extends Component {
 
   getCurrentFormatedTick = () => millisec(this.props.interval).format('hh [h] : mm [m] : ss [s]');
 
+  updateCurrentMagnetX = (magnetX) => this.setState({magnetX: magnetX});
+
   render() {
 
     const sceneDuration       = this.props.scene.duration;
@@ -57,45 +61,25 @@ export default class SceneEditorTimeline extends Component {
     const timeInterval        = this.props.interval;
     const maxZindex           = this.state.maxZindex + 2;
     var items                 = [];
+    var rnd                   = {};
 
     Object.keys(relations).forEach((key) => {
 
-      var previousRelation = null;
-      var nextRelation = null;
-      var maxPrevious = -1;
-      var maxNext = Number.MAX_VALUE;
-      Object.keys(relations).forEach((keySearch) => {
-        if (key != keySearch)
-          if (relations[key].zIndex == relations[keySearch].zIndex) {
-            const previousTemp = relations[keySearch].duration + relations[keySearch].startTimeOffset;
-            if (previousTemp <= relations[key].startTimeOffset) {
-              if (previousTemp > maxPrevious) {
-                maxPrevious = previousTemp;
-                previousRelation = relations[keySearch];
-              }
-            } else if (relations[keySearch].startTimeOffset > relations[key].startTimeOffset + relations[key].duration) {
-              if (relations[keySearch].startTimeOffset < maxNext) {
-                maxNext = relations[keySearch].startTimeOffset;
-                nextRelation = relations[keySearch];
-              }
-            }
-          }
-      });
-
       items.push(
         <SceneEditorTimelineItem
+          ref={(ref) => rnd[relations[key].idRelation] = ref}
           key={key}
           media={medias[relations[key].id]}
           editorDurationWidth={editorDurationWidth}
           relation={relations[key]}
-          previousRelation={previousRelation}
-          nextRelation={nextRelation}
           scale={100}
           scaling={scaling}
           onClick={this.props.onClick}
           updateRelation={this.props.updateRelation}
-          rightLastElement={0}
           maxZindex={maxZindex}
+          itemsRef={rnd}
+          magnetIsActive={this.state.magnetIsActive}
+          getCurrentMagnetX={this.updateCurrentMagnetX}
         />
       );
     });
@@ -103,7 +87,15 @@ export default class SceneEditorTimeline extends Component {
     return (
       <div id="editor-duration-menu">
         <Row>
-          <Col offset='8' span="9">
+          <Col span='2'>
+            <Tooltip title="Active/désactive le magnetisme lors des déplacements des éléments dans la timeline.">
+              <Switch onChange={(checked) => this.setState({magnetIsActive: checked})}
+                      defaultChecked={false}
+                      checkedChildren={<Icon type="lock" />}
+                      unCheckedChildren={<Icon type="unlock" />} />
+            </Tooltip>
+          </Col>
+          <Col offset='6' span="9">
             <Button onClick={this.props.rewindScene} icon='step-backward' />
             <Button onClick={this.props.pauseScene} icon='pause' />
             <Button onClick={this.props.playScene} icon='caret-right' />
@@ -133,6 +125,7 @@ export default class SceneEditorTimeline extends Component {
         </Row>
         <Row className='timeline' style={{height: 50*(maxZindex) + 'px', backgroundSize: editorDurationWidth + 'px 50px'}}>
           {items}
+          {this.state.magnetX > -1 ? <div className='magnet' style={{height: 50*maxZindex + 'px', marginLeft: this.state.magnetX-1 + 'px'}} /> : null}
         </Row>
       </div>
     );

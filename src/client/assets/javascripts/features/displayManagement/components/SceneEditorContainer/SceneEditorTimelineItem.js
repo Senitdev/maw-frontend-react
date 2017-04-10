@@ -6,11 +6,12 @@ export default class SceneEditorTimelineItem extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
+    getCurrentMagnetX: PropTypes.func.isRequired,
+    itemsRef: PropTypes.object.isRequired,
+    magnetIsActive: PropTypes.bool.isRequired,
     maxZindex: PropTypes.number.isRequired,
     media: PropTypes.object.isRequired,
-    nextRelation: PropTypes.object,
     onClick: PropTypes.func.isRequired,
-    previousRelation: PropTypes.object,
     relation: PropTypes.object.isRequired,
     scale: PropTypes.number.isRequired,
     scaling: PropTypes.number.isRequired,
@@ -24,22 +25,72 @@ export default class SceneEditorTimelineItem extends Component {
     if (this.props.relation === nextProps.relation
         && this.props.editorDurationWidth === nextProps.editorDurationWidth
         && this.props.scaling === nextProps.scaling
-        && this.props.maxZindex === nextProps.maxZindex)
+        && this.props.maxZindex === nextProps.maxZindex
+        && this.props.itemsRef === nextProps.itemsRef
+        && this.props.magnetIsActive === nextProps.magnetIsActive)
       return false;
     else
       return true;
   }
 
   componentWillUpdate(nextProps) {
-    this.rnd.updatePosition({x: Math.round(nextProps.relation.startTimeOffset / nextProps.scaling * nextProps.editorDurationWidth),
-                             y: nextProps.relation.zIndex * 50});
+  this.rnd.updatePosition({x:(nextProps.relation.startTimeOffset / nextProps.scaling * nextProps.editorDurationWidth),
+                           y: nextProps.relation.zIndex * 50});
+  }
+
+  magneticPositionsX = {};
+  magnetX = -1;
+
+  /**
+   * Pendant qu'on drag, si magnet est activé, garde en mémoire la dernière position magnetique.
+   */
+  draging = () => {
+    if (this.props.magnetIsActive) {
+      Object.keys(this.magneticPositionsX).forEach((key) => {
+        let gapInPos = this.rnd.state.x - key;
+        if (gapInPos > -5 && gapInPos < 5 ) {
+          this.magnetX = key;
+        }
+      });
+    }
+    else {
+      this.magnetX = -1;
+    }
+    this.props.getCurrentMagnetX(this.magnetX);
+  }
+
+  /**
+   * Récupère les positions de début et fin des élément dans la timeline.
+   * les mets dans un object, les positions sont les clé, les valeurs sont les id des items à ces positions.
+   */
+  calculateMagneticPosition = () => {
+    var newMagneticPositionsX = {};
+
+    Object.keys(this.props.itemsRef).forEach((key) => {
+      const relation = this.props.itemsRef[key].props.relation;
+      if (relation.idRelation == this.props.relation.idRelation)
+        return;
+
+      let rndStartPosX = Math.round(relation.startTimeOffset / this.props.scaling * this.props.editorDurationWidth);
+      let rndStopPosX = rndStartPosX + (Math.max(Math.round(relation.duration / this.props.scaling * this.props.editorDurationWidth), 30));
+
+      if (newMagneticPositionsX[rndStartPosX])
+        newMagneticPositionsX[rndStartPosX].push(relation.idRelation);
+      else
+        newMagneticPositionsX[rndStartPosX] = [relation.idRelation];
+      if (newMagneticPositionsX[rndStopPosX])
+        newMagneticPositionsX[rndStopPosX].push(relation.idRelation);
+      else
+        newMagneticPositionsX[rndStopPosX] = [relation.idRelation];
+    });
+
+    this.magneticPositionsX = newMagneticPositionsX;
   }
 
   getXFromRelation = (relation) => Math.round(relation.startTimeOffset / this.props.scaling * this.props.editorDurationWidth);
   getWidthFromRelation = (relation) => Math.max(Math.round(relation.duration / this.props.scaling * this.props.editorDurationWidth), 30);
 
   render() {
-
     const relation            = this.props.relation;
     const media               = this.props.media;
     const scaling             = this.props.scaling;
@@ -48,9 +99,8 @@ export default class SceneEditorTimelineItem extends Component {
     const x                   = this.getXFromRelation(relation);
     const y                   = relation.zIndex * 50;
     const width               = this.getWidthFromRelation(relation);
-    const rightPrevious       = this.props.previousRelation ? this.getWidthFromRelation(this.props.previousRelation) + this.getXFromRelation(this.props.previousRelation) : 0;
-    const leftNext            = (this.props.nextRelation ? this.getXFromRelation(this.props.nextRelation) : editorDurationWidth) - width;
     const maxZindex           = this.props.maxZindex;
+    const magnetIsActive      = this.props.magnetIsActive;
 
     return (
         <Rnd
@@ -64,7 +114,7 @@ export default class SceneEditorTimelineItem extends Component {
           }}
           resizeGrid={[editorDurationWidth / (scaling / scale), 1]}
           moveGrid={[editorDurationWidth / (scaling / scale), 50]}
-          bounds={{left: rightPrevious, right: leftNext, top: 0, bottom: (maxZindex-1)*50}}
+          bounds={{left: 0, right: 10000, top: 0, bottom: (maxZindex-1)*50}}
           isResizable={{
             top: false,
             right: true,
@@ -76,10 +126,19 @@ export default class SceneEditorTimelineItem extends Component {
             topLeft: false
           }}
           onClick={() => this.props.onClick(relation.idRelation)}
+          onDragStart={() => this.calculateMagneticPosition()}
+          onDrag={(event, ui) => this.draging(event, ui)}
           onDragStop={(event, ui) => {
-            const newStart = Math.round((ui.position.left / editorDurationWidth * scaling) / scale) * scale;
             const newZindex = Math.round((ui.position.top / 150 * 150) / 50);
+            let newStart;
+            if (magnetIsActive && this.magnetX > -1) {
+              newStart = Math.round((this.magnetX / editorDurationWidth * scaling) / scale) * scale;
+              this.rnd.updatePosition({x: this.magnetX, y: newZindex});
+            } else {
+              newStart = Math.round((ui.position.left / editorDurationWidth * scaling) / scale) * scale;
+            }
             this.props.updateRelation(relation.idRelation, {startTimeOffset: newStart, zIndex: newZindex});
+            this.props.getCurrentMagnetX(-1);
           }}
           onResizeStop={(direction, styleSize, clientSize) => {
             const newDuration = Math.round((clientSize.width / editorDurationWidth * scaling) / scale) * scale;
