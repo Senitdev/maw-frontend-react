@@ -6,7 +6,7 @@ export default class SceneEditorTimelineItem extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
-    getCurrentMagnetX: PropTypes.func.isRequired,
+    setCurrentMagnetX: PropTypes.func.isRequired,
     itemsRef: PropTypes.object.isRequired,
     magnetIsActive: PropTypes.bool.isRequired,
     maxZindex: PropTypes.number.isRequired,
@@ -56,7 +56,23 @@ export default class SceneEditorTimelineItem extends Component {
     else {
       this.magnetX = -1;
     }
-    this.props.getCurrentMagnetX(this.magnetX);
+    this.props.setCurrentMagnetX(this.magnetX);
+  }
+
+  resizing = (direction, styleSize, clientSize) => {
+    if (this.props.magnetIsActive) {
+      Object.keys(this.magneticPositionsX).forEach((key) => {
+        let gapInPos = this.rnd.state.x + clientSize.width  - key;
+        if (gapInPos > -5 && gapInPos < 5 ) {
+          this.magnetX = key;
+        }
+      });
+    }
+    else {
+      this.magnetX = -1;
+    }
+
+    this.props.setCurrentMagnetX(this.magnetX);
   }
 
   /**
@@ -138,11 +154,20 @@ export default class SceneEditorTimelineItem extends Component {
               newStart = Math.round((ui.position.left / editorDurationWidth * scaling) / scale) * scale;
             }
             this.props.updateRelation(relation.idRelation, {startTimeOffset: newStart, zIndex: newZindex});
-            this.props.getCurrentMagnetX(-1);
+            this.props.setCurrentMagnetX(-1);
           }}
+          onResizeStart={() => this.calculateMagneticPosition()}
+          onResize={(direction, styleSize, clientSize) => this.resizing(direction, styleSize, clientSize)}
           onResizeStop={(direction, styleSize, clientSize) => {
-            const newDuration = Math.round((clientSize.width / editorDurationWidth * scaling) / scale) * scale;
+            var newDuration;
+            if (magnetIsActive) {
+              newDuration = Math.round(((this.magnetX - x) / editorDurationWidth * scaling) / scale) * scale;
+              this.rnd.updateSize({width: this.getWidthFromRelation(relation), height: 43});
+            } else {
+              newDuration = Math.round((clientSize.width / editorDurationWidth * scaling) / scale) * scale;
+            }
             this.props.updateRelation(relation.idRelation, {duration: newDuration});
+            this.props.setCurrentMagnetX(-1);
           }}
           >
           <div>

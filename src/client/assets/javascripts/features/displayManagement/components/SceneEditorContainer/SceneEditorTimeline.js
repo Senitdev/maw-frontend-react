@@ -79,7 +79,7 @@ export default class SceneEditorTimeline extends Component {
           maxZindex={maxZindex}
           itemsRef={rnd}
           magnetIsActive={this.state.magnetIsActive}
-          getCurrentMagnetX={this.updateCurrentMagnetX}
+          setCurrentMagnetX={this.updateCurrentMagnetX}
         />
       );
     });
