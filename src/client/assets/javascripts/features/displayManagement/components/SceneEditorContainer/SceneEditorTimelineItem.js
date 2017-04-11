@@ -126,7 +126,7 @@ export default class SceneEditorTimelineItem extends Component {
             x: x,
             y: y,
             width: width,
-            height: 43,
+            height: 44,
           }}
           resizeGrid={[editorDurationWidth / (scaling / scale), 1]}
           moveGrid={[editorDurationWidth / (scaling / scale), 50]}

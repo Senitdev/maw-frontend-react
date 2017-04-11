@@ -71,6 +71,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 }
 
 .editor-separation-element {
+  height: 44px !important;
   width: 100px;
   background-color: rgb(random(256)-1,random(256)-1,random(256)-1);
   color: white;
