@@ -5,7 +5,6 @@ import { FileViewer } from '../MediaViewers/FileViewer';
 export default class SceneEditorViewPort extends Component {
 
   static propTypes = {
-    backgroundColor: PropTypes.string.isRequired,
     editorHeight: PropTypes.number.isRequired,
     editorWidth: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -40,7 +39,6 @@ export default class SceneEditorViewPort extends Component {
 
     return (
       <Rnd
-        style={{backgroundColor: this.props.backgroundColor}}
         ref={(c) => { this.rnd = c; }}
         initial={{
           x: this.props.x,

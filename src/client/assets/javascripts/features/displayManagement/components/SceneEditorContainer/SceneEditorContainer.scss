@@ -32,14 +32,14 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 .editor-position {
   border: 1px solid #989898;
   color: white;
-  user-select: none;
+  user-select: none !important;
   overflow: hidden;
   text-align: center;
 }
 
 .editor-position img {
-  pointer-events: none;
-  user-select: none;
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 .editor-duration-container {

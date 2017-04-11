@@ -369,7 +369,6 @@ export default class SceneEditorContainer extends Component {
           <SceneEditorViewPort
             key={key}
             zIndex={relation.zIndex}
-            backgroundColor='black'
             editorHeight={this.editorHeight}
             editorWidth={this.editorWidth}
             ratio={relation.ratio}
