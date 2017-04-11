@@ -123,6 +123,7 @@ export default class SceneEditorContainer extends Component {
             duration: duration,
             zIndex: relation.zIndex,
             idRelation: relation.id, // Id le relation déjà existante
+            ratio: true,
           };
         }
       }
@@ -193,6 +194,7 @@ export default class SceneEditorContainer extends Component {
           duration: duration,
           zIndex: 0,
           idRelation: this.tmpIdForNewRelation, // Id le relation déjà existante (négative si aucune)
+          ratio: true,
         }
       },
       scaling: duration > this.state.scaling ? duration : this.state.scaling
@@ -370,6 +372,7 @@ export default class SceneEditorContainer extends Component {
             backgroundColor='black'
             editorHeight={this.editorHeight}
             editorWidth={this.editorWidth}
+            ratio={relation.ratio}
             x={relation.boxLeft / 100 * this.editorWidth}
             y={relation.boxTop / 100 * this.editorHeight}
             width={relation.boxWidth / 100 * this.editorWidth}

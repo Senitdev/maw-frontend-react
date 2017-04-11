@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
-import { Form, Collapse } from 'antd';
+import { Form, Collapse, Switch } from 'antd';
 
 const SceneEditorForm = Form.create({
 
   onFieldsChange(props, changedFields) {
     const key = Object.keys(changedFields)[0];
     props.onChange({
-      [key]: Number(changedFields[key].value),
+      [key]: typeof(changedFields[key].value) === "boolean" ? changedFields[key].value : Number(changedFields[key].value),
     });
   },
 
@@ -22,6 +22,7 @@ const SceneEditorForm = Form.create({
       guestTop: {value: props.mediaData.guestTop},
       guestWidth: {value: props.mediaData.guestWidth},
       startTimeOffset: {value: props.mediaData.startTimeOffset},
+      ratio: {value: props.mediaData.ratio},
     };
   },
 })(
@@ -77,6 +78,13 @@ class SceneEditorForm extends Component {
             </Form.Item>
           </Collapse.Panel>
           <Collapse.Panel header={<h3>Dimensions</h3>} key="2">
+            <Form.Item
+              label="conserver le ratio"
+            >
+              {getFieldDecorator('ratio', {valuePropName: 'checked'})(
+                <Switch />
+              )}
+            </Form.Item>
             <Form.Item
               label="largeur"
               hasFeedback
