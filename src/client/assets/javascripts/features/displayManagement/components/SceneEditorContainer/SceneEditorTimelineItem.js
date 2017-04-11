@@ -6,7 +6,6 @@ export default class SceneEditorTimelineItem extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
-    setCurrentMagnetX: PropTypes.func.isRequired,
     itemsRef: PropTypes.object.isRequired,
     magnetIsActive: PropTypes.bool.isRequired,
     maxZindex: PropTypes.number.isRequired,
@@ -15,6 +14,7 @@ export default class SceneEditorTimelineItem extends Component {
     relation: PropTypes.object.isRequired,
     scale: PropTypes.number.isRequired,
     scaling: PropTypes.number.isRequired,
+    setCurrentMagnetX: PropTypes.func.isRequired,
     updateRelation: PropTypes.func.isRequired,
   }
 
@@ -44,34 +44,35 @@ export default class SceneEditorTimelineItem extends Component {
   /**
    * Pendant qu'on drag, si magnet est activé, garde en mémoire la dernière position magnetique.
    */
-  draging = () => {
+  draging = (event, ui) => {
     if (this.props.magnetIsActive) {
-      Object.keys(this.magneticPositionsX).forEach((key) => {
-        let gapInPos = this.rnd.state.x - key;
-        if (gapInPos > -5 && gapInPos < 5 ) {
-          this.magnetX = key;
+      const keys = Object.keys(this.magneticPositionsX);
+      for (var i = 0; i < keys.length; i++) {
+        let gapInPos = ui.position.left - keys[i];
+        if (gapInPos > -15 && gapInPos < 15 ) {
+          this.magnetX = keys[i];
+          break;
+        } else {
+          this.magnetX = -1;
         }
-      });
-    }
-    else {
-      this.magnetX = -1;
+      }
     }
     this.props.setCurrentMagnetX(this.magnetX);
   }
 
   resizing = (direction, styleSize, clientSize) => {
     if (this.props.magnetIsActive) {
-      Object.keys(this.magneticPositionsX).forEach((key) => {
-        let gapInPos = this.rnd.state.x + clientSize.width  - key;
-        if (gapInPos > -5 && gapInPos < 5 ) {
-          this.magnetX = key;
+      const keys = Object.keys(this.magneticPositionsX);
+      for (var i = 0; i < keys.length; i++) {
+        let gapInPos = this.rnd.state.x + clientSize.width  - keys[i];
+        if (gapInPos > -15 && gapInPos < 15 ) {
+          this.magnetX = keys[i];
+          break;
+        } else {
+          this.magnetX = -1;
         }
-      });
+      }
     }
-    else {
-      this.magnetX = -1;
-    }
-
     this.props.setCurrentMagnetX(this.magnetX);
   }
 
@@ -154,20 +155,22 @@ export default class SceneEditorTimelineItem extends Component {
               newStart = Math.round((ui.position.left / editorDurationWidth * scaling) / scale) * scale;
             }
             this.props.updateRelation(relation.idRelation, {startTimeOffset: newStart, zIndex: newZindex});
-            this.props.setCurrentMagnetX(-1);
+            this.magnetX = -1;
+            this.props.setCurrentMagnetX(this.magnetX);
           }}
           onResizeStart={() => this.calculateMagneticPosition()}
           onResize={(direction, styleSize, clientSize) => this.resizing(direction, styleSize, clientSize)}
           onResizeStop={(direction, styleSize, clientSize) => {
             var newDuration;
-            if (magnetIsActive) {
+            if (magnetIsActive && this.magnetX > -1) {
               newDuration = Math.round(((this.magnetX - x) / editorDurationWidth * scaling) / scale) * scale;
               this.rnd.updateSize({width: this.getWidthFromRelation(relation), height: 43});
             } else {
               newDuration = Math.round((clientSize.width / editorDurationWidth * scaling) / scale) * scale;
             }
             this.props.updateRelation(relation.idRelation, {duration: newDuration});
-            this.props.setCurrentMagnetX(-1);
+            this.magnetX = -1;
+            this.props.setCurrentMagnetX(this.magnetX);
           }}
           >
           <div>

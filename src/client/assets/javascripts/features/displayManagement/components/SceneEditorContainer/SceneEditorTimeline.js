@@ -29,7 +29,7 @@ export default class SceneEditorTimeline extends Component {
   state = {
     DOMitemsDimensions: {},
     maxZindex: 0,
-    magnetIsActive: false,
+    magnetIsActive: true,
     magnetX: -1,
   }
 
@@ -90,7 +90,7 @@ export default class SceneEditorTimeline extends Component {
           <Col span='2'>
             <Tooltip title="Active/désactive le magnetisme lors des déplacements des éléments dans la timeline.">
               <Switch onChange={(checked) => this.setState({magnetIsActive: checked})}
-                      defaultChecked={false}
+                      defaultChecked
                       checkedChildren={<Icon type="lock" />}
                       unCheckedChildren={<Icon type="unlock" />} />
             </Tooltip>
