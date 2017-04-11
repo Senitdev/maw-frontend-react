@@ -20,6 +20,11 @@ import { MediaTypes } from 'models/displayManagement';
 
   const mediaByType = { file, scene, agenda };
 
+  // TODO : Supprimer dès que màj du serveur
+  mediaByType.clock = {...mediaByType.agenda};
+  if (mediaByType.agenda.items.length > 0)
+    mediaByType.clock.items = [5];
+
   return {
     mediaByType,
     mediaById
@@ -47,6 +52,7 @@ export default class MediaListContainer extends Component {
     this.props.actions.fetchMediaList('file');
     this.props.actions.fetchMediaList('scene');
     this.props.actions.fetchMediaList('agenda');
+    //this.props.actions.fetchMediaList('clock');
   }
 
   onInputChange = (e) => {
@@ -108,6 +114,7 @@ export default class MediaListContainer extends Component {
       video: videos,
       scene: this.props.mediaByType.scene,
       agenda: this.props.mediaByType.agenda,
+      clock: this.props.mediaByType.clock,
     };
 
     for (let key of Object.keys(MediaTypes)) {
@@ -142,11 +149,11 @@ export default class MediaListContainer extends Component {
       });
 
       groupsMedia.push(
-          <Collapse.Panel header={<h3>{MediaTypes[key].name}</h3>} key={MediaTypes[key].key}>
-            <Row className="group-media-list" gutter={16}>
-              {medias[MediaTypes[key].key]}
-            </Row>
-          </Collapse.Panel>
+        <Collapse.Panel header={<h3>{MediaTypes[key].name}</h3>} key={MediaTypes[key].key}>
+          <Row className="group-media-list" gutter={16}>
+            {medias[MediaTypes[key].key]}
+          </Row>
+        </Collapse.Panel>
       );
 
       defaultActiveKey.push(MediaTypes[key].key);

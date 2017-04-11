@@ -13,7 +13,7 @@ export class FileViewer extends Component {
 
   state = {
     mod: 'null',
-    viewer: <div>viewer n'est pas displonible pour ce type de fichier.</div>,
+    viewer: <div style={{backgroundColor: 'black', width: '100%', height: '100%'}}>viewer n'est pas displonible pour ce type de fichier.</div>,
   }
 
   componentDidMount() {
@@ -30,6 +30,12 @@ export class FileViewer extends Component {
         this.setState({
           mod: `image`,
           viewer: <img {...sizes} src={fileUrl} />,
+        });
+      } else if (mimetype.search('clock') === 0) {
+        // TODO
+        this.setState({
+          mod: `clock`,
+          viewer: <img {...sizes} src="http://www.clipartkid.com/images/278/to-help-improve-the-quality-of-the-lyrics-visit-lloyd-banks-4C1gB9-clipart.gif" />,
         });
       } else if (mimetype.search('video') === 0) {
         if (this.props.displayControls)

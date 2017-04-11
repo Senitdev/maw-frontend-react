@@ -62,6 +62,10 @@ export const MediaTypes = {
     key: 'scene',
     name: 'Scènes',
   },
+  CLOCK: {
+    key: 'clock',
+    name: 'Horloges',
+  },
 };
 
 export type State = {

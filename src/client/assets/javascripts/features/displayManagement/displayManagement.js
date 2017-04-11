@@ -691,6 +691,25 @@ function fetchMediaList(type) {
           }
         }
 
+        // TODO
+        mediaById = {
+          ...mediaById,
+          5: {
+            id: 5,
+            name: "Horloge",
+            ratioNumerator: 16,
+            ratioDenominator: 9,
+            type: "clock",
+            version: 0,
+            createdAt: "2017-03-24 20:19:00",
+            updatedAt: "2017-03-28 13:03:05",
+            relationsWithHosts: [],
+            relationsWithGuests: [],
+            duration: 0,
+            mimetype: 'clock'
+          }
+        };
+
         dispatch(mediaListSuccess(type, mediaById));
       })
       .catch((error) => dispatch(mediaListFailure(type, error)));
