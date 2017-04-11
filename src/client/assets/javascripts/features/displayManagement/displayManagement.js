@@ -319,6 +319,8 @@ function normalizeRelationsFromAgendaEditor(patchedOrCreatedRelations, agendaId)
       }
       normalizedRelations[key]['duration'] = relation['duration'];
       normalizedRelations[key]['startTimeOffset'] = relation['startTimeOffset'];
+      normalizedRelations[key]['repetitionDelay'] = relation['repetitionDelay'];
+      normalizedRelations[key]['endTimeOffset'] = relation['endTimeOffset'];
       normalizedRelations[key]['boxLeft'] = 0;
       normalizedRelations[key]['boxTop'] = 0;
       normalizedRelations[key]['boxWidth'] = 100;
@@ -495,6 +497,8 @@ const normalize = {
     guestHeight: relation.guest_height,
     startTimeOffset: relation.start_time_offset,
     duration: relation.duration,
+    endTimeOffset: relation.end_time_offset,
+    repetitionDelay: relation.repetition_delay,
     zIndex: relation.z_index
   })
 };
