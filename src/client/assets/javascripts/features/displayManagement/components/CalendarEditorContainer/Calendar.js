@@ -74,6 +74,8 @@ export default class Calendar extends Component {
         eventRender: (event, element) => {
           if (event._id == this.props.mediaSelected)
             element.addClass('selected');
+          if (event.editable == false)
+            element.addClass('reccuring');
         },
         eventResize: (event) => {
           this.props.eventResize(event._id, event.end.unix() - event.start.unix());
@@ -82,28 +84,67 @@ export default class Calendar extends Component {
           this.props.eventDrop(event._id, event.start.unix(), event.end == null ? this.props.defaultDuration(event.allDay) : event.end.unix() - event.start.unix());
         },
         eventAfterRender: this.props.eventAfterRender,
+        viewRender: () => this.updateView(this.props),
       });
     });
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.maxTime != nextProps.maxTime)
+      $('#calendar').fullCalendar('option', 'maxTime', nextProps.maxTime);
+    if (this.props.minTime != nextProps.minTime)
+      $('#calendar').fullCalendar('option', 'minTime', nextProps.minTime);
+  }
+
+  componentDidUpdate() {
+    this.updateView(this.props);
+  }
+
+  updateView = (p) => {
     // Je récupère tous les events déjà présent pour le mettre à jour => updateEvents
     // S'il y a des nouveaux events, je dois les créer => renderEvents
-    var eventsTemp = $('#calendar').fullCalendar('clientEvents');
+    var eventsTemp = $('#calendar').fullCalendar('clientEvents', (e) => typeof e.editable === "undefined" || e.editable == true); // On sélectionne que ceux éditable (ceux de basses, pas ceux créer pour la répétition)
     var eventsRemoveTemp = eventsTemp.map((e) => e._id);
     var eventsRenderTemp = [];
+    var eventsRenderReccuringTemp = [];
 
-    for (var i = 0; i < nextProps.mediaInCalendar.length; i++) {
-      const media = nextProps.mediaInCalendar[i];
+    var view = $('#calendar').fullCalendar('getView');
+    var viewStart;
+    var viewEnd;
+    if (view.start) {
+      viewStart = view.start.unix();
+      viewEnd = view.end.unix();
+    }
+
+    for (var i = 0; i < p.mediaInCalendar.length; i++) {
+      const media = p.mediaInCalendar[i];
       var added = false;
 
       var start = moment.unix(media.startTimeOffset);
       var end = moment.unix(media.startTimeOffset + media.duration);
       var allDay = (media.duration % this.props.defaultDuration(true) == 0 && start.format(format) === '00:00');
 
+      // If Reccuring
+      if (view.start && media.repetitionDelay > 0) {
+        const s = viewStart >= media.startTimeOffset ? viewStart - (viewStart - media.startTimeOffset) % media.repetitionDelay : media.startTimeOffset + media.repetitionDelay;
+        const e = media.endTimeOffset > 0 && media.endTimeOffset < viewEnd ? media.endTimeOffset : viewEnd;
+
+        for (var startTimeOffsetReccuring = s; startTimeOffsetReccuring < e; startTimeOffsetReccuring += media.repetitionDelay) {
+          eventsRenderReccuringTemp.push({
+            id: media.idFull,
+            editable: false,
+            title: p.mediaById[media.id].name,
+            start: moment.unix(startTimeOffsetReccuring),
+            end: moment.unix(startTimeOffsetReccuring + media.duration),
+            allDay: allDay,
+            idRelation: media.idRelation
+          });
+        }
+      }
+
       for (var j = 0; j < eventsTemp.length; j++) {
         if (eventsTemp[j]._id == media.idFull) {
-          eventsTemp[j].title = nextProps.mediaById[media.id].name;
+          eventsTemp[j].title = p.mediaById[media.id].name;
           eventsTemp[j].start = start;
           eventsTemp[j].end = end;
           eventsTemp[j].allDay = allDay;
@@ -118,11 +159,11 @@ export default class Calendar extends Component {
 
       if (!added) {
         eventsRenderTemp.push({
-          title: nextProps.mediaById[media.id].name,
+          title: p.mediaById[media.id].name,
           start: start,
           end: end,
           allDay: allDay,
-          idRelation: media.idRelation
+          idRelation: media.idRelation,
         });
       }
     }
@@ -130,11 +171,8 @@ export default class Calendar extends Component {
     $('#calendar').fullCalendar('renderEvents', eventsRenderTemp, true);
     $('#calendar').fullCalendar('updateEvents', eventsTemp);
     $('#calendar').fullCalendar('removeEvents', (e) => eventsRemoveTemp.indexOf(e._id) > -1);
-
-    if (this.props.maxTime != nextProps.maxTime)
-      $('#calendar').fullCalendar('option', 'maxTime', nextProps.maxTime);
-    if (this.props.minTime != nextProps.minTime)
-      $('#calendar').fullCalendar('option', 'minTime', nextProps.minTime);
+    $('#calendar').fullCalendar('removeEvents', (e) => e.editable == false);
+    $('#calendar').fullCalendar('renderEvents', eventsRenderReccuringTemp, true);
   }
 
   render() {

@@ -10,9 +10,10 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.min.css';
 import 'fullcalendar/dist/locale/fr.js';
 
-import { Row, Col, TimePicker, Input, Button, Layout } from 'antd';
+import { Row, Col, TimePicker, Input, Button, Layout, Checkbox, Radio } from 'antd';
 import moment from 'moment';
 import Datetime from 'react-datetime';
+import TimeWithoutMaxPicker from '../../../../utils/TimePicker';
 
 import MediaListContainer from '../MediaListContainer';
 import Calendar from './Calendar';
@@ -113,6 +114,8 @@ export default class CalendarEditorContainer extends Component {
             startTimeOffset: relation.startTimeOffset / 1000,
             duration: relation.duration / 1000,
             idRelation: relation.id,
+            endTimeOffset: relation.endTimeOffset / 1000,
+            repetitionDelay: relation.repetitionDelay / 1000,
           });
         }
       }
@@ -173,6 +176,8 @@ export default class CalendarEditorContainer extends Component {
           idRelation: m.idRelation,
           startTimeOffset: (m.startTimeOffset) * 1000,
           duration: (m.duration) * 1000,
+          endTimeOffset: (m.endTimeOffset) * 1000,
+          repetitionDelay: (m.repetitionDelay) * 1000,
         })
       );
 
@@ -206,6 +211,8 @@ export default class CalendarEditorContainer extends Component {
                   startTimeOffset: event.start.unix(),
                   duration: event.end == null ? defaultDuration(event.allDay) : event.end.unix() - event.start.unix(),
                   idRelation: -1,
+                  endTimeOffset: 0,
+                  repetitionDelay: 0,
                 }]),
                 mediaSelected: event._id,
               });
@@ -345,6 +352,61 @@ export default class CalendarEditorContainer extends Component {
                     }
                   }} />
               </Row>
+              <Row>
+                <Checkbox checked={eventSelected.repetitionDelay > 0} onChange={(e) => {
+                  var newMedia = this.state.mediaInCalendar.slice();
+                  newMedia[idEventSelected].repetitionDelay = e.target.checked ? 86400 : -1;
+                  this.setState({
+                    mediaInCalendar: newMedia
+                  });
+                }}>Récurrent</Checkbox>
+              </Row>
+              {eventSelected.repetitionDelay > 0 &&
+                <div>
+                  <Row>
+                    Répéter tous les :
+                  </Row>
+                  <Row>
+                    <TimeWithoutMaxPicker size="small" time={eventSelected.repetitionDelay} onChange={(s) => {
+                      var newMedia = this.state.mediaInCalendar.slice();
+                      newMedia[idEventSelected].repetitionDelay = s;
+                      this.setState({
+                        mediaInCalendar: newMedia
+                      });
+                    }} />
+                  </Row>
+                  <Row>
+                    Fin :
+                  </Row>
+                  <Row>
+                    <Radio.Group
+                      onChange={(e) => {
+                        var newMedia = this.state.mediaInCalendar.slice();
+                        newMedia[idEventSelected].endTimeOffset = e.target.value;
+                        this.setState({
+                          mediaInCalendar: newMedia
+                        });
+                      }}
+                      value={eventSelected.endTimeOffset > 0 ? eventSelected.startTimeOffset : 0} >
+                      <Radio value={0}>Jamais</Radio>
+                      <Radio value={eventSelected.startTimeOffset}>Le :
+                        <Datetime
+                          utc
+                          inputProps={{disabled: eventSelected.endTimeOffset == 0}}
+                          value={moment.unix(eventSelected.endTimeOffset)}
+                          isValidDate={(current) => current.isAfter(moment.unix(eventSelected.startTimeOffset).subtract(1, 'day'))}
+                          onChange={(val) => {
+                            var newMedia = this.state.mediaInCalendar.slice();
+                            newMedia[idEventSelected].endTimeOffset = val.unix();
+                            this.setState({
+                              mediaInCalendar: newMedia
+                            });
+                          }} />
+                      </Radio>
+                    </Radio.Group>
+                  </Row>
+                </div>
+              }
               <Row>
                 <Button
                   onClick={() => {

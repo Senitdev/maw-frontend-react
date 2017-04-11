@@ -36,8 +36,13 @@
 }
 
 .fc-time-grid-event.selected, .fc-day-grid-event.selected {
-  border: 1px #111111 solid;
+  border: 1.5px #111111 solid;
   background-color: #3a99ad;
+}
+
+.fc-time-grid-event.reccuring, .fc-day-grid-event.reccuring {
+  background-color: #115b25;
+  cursor: not-allowed;
 }
 
 #drop-empty-calendar {
