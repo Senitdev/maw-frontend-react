@@ -110,8 +110,12 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   float: right;
 }
 
-.editor-cursor-element{
-  cursor: e-resize;
+.editor-cursor-element {
+  width: 5px;
+  cursor: col-resize;
+  top: -20px;
+  background-color: green;
+  z-index: 130 !important;
 }
 
 .timerDisplayer{
@@ -123,7 +127,6 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
 }
 
 .timeline {
-  margin-top: 7px;
   background-color: rgba(183, 183, 183, 0.5);
   background-image: linear-gradient(to bottom, black 1px, transparent 1px);
   border-bottom: 1px black solid;
@@ -135,4 +138,35 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   width: 2px;
   border-left: 1px red solid;
   border-right: 1px green solid;
+}
+
+#mark-duration {
+  border: 1px solid black;
+  border-bottom: 0px;
+  margin-top: 5px;
+  height: 20px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#mark-duration > span {
+  position: absolute;
+  height: 100%;
+  border-left: 1px solid black;
+  line-height: 20px;
+  font-size: 70%;
+  padding-left: 0.5px;
+  z-index: 132;
+
+  background-size: 20.5% 20px;
+  background-image: linear-gradient(to right, #999 0.5px, transparent 0.5px);
+  box-sizing: content-box;
+
+  user-select: none;
+}
+
+#mark-duration > span > span {
+  position: relative;
+  left: -4px;
+  background-color: #f1f1f1;
 }

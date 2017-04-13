@@ -4,8 +4,6 @@ import Rnd from 'react-rnd';
 export default class SceneEditorTimelineCursor extends Component {
 
   static propTypes = {
-    backgroundColor: PropTypes.string.isRequired,
-    cursorWidth: PropTypes.number.isRequired,
     editorDurationWidth: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     onDrag: PropTypes.func.isRequired,
@@ -26,14 +24,14 @@ export default class SceneEditorTimelineCursor extends Component {
     return (
       <Rnd
         ref={(c) => { this.rnd = c; }}
+        zIndex={130}
         initial={{
           x: 0,
           y: 0,
-          width: this.props.cursorWidth,
+          width: 5,
           height: this.props.height,
         }}
         moveGrid={[this.props.editorDurationWidth / (this.props.scaling/100), 1]}
-        style={{backgroundColor: this.props.backgroundColor}}
         className="editor-cursor-element"
         isResizable={{
           top: false,
@@ -48,6 +46,7 @@ export default class SceneEditorTimelineCursor extends Component {
         bounds={'parent'}
         moveAxis="x"
         onDrag={(event, ui) => this.props.onDrag(ui.position.left)}
+        onDragStop={() => this.rnd.updateZIndex(130)}
       />
     );
   }

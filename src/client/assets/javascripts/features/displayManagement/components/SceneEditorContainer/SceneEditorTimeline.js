@@ -33,6 +33,10 @@ export default class SceneEditorTimeline extends Component {
     magnetX: -1,
   }
 
+  componentDidMount() {
+    document.body.addEventListener('mouseup', () => this.markMouseDown = false);
+  }
+
   componentDidUpdate(prevProps) {
     if (!(prevProps.relations === this.props.relations)) {
       var maxZindex = 0;
@@ -50,6 +54,10 @@ export default class SceneEditorTimeline extends Component {
   getCurrentFormatedTick = () => millisec(this.props.interval).format('hh [h] : mm [m] : ss [s]');
 
   updateCurrentMagnetX = (magnetX) => this.setState({magnetX: magnetX});
+
+  seekCursor = (e) => this.props.setSceneInterval(e.pageX - document.getElementById('mark-duration').getBoundingClientRect().left);
+
+  markMouseDown = false;
 
   render() {
 
@@ -84,6 +92,28 @@ export default class SceneEditorTimeline extends Component {
       );
     });
 
+    const scalingS = scaling / 1000;
+
+    const markTime = Math.floor(scalingS / 15);
+    const numberSeparation = scalingS / markTime;
+
+    var markSeparators = [];
+    for (var i = 0; i < numberSeparation; i++) {
+      const left = i / numberSeparation * 100;
+      var width = (i + 1) / numberSeparation * 100 - left;
+
+      markSeparators.push(
+        <span
+          key={i}
+          style={{
+            left: left + '%',
+            width: width + '%',
+          }} >
+          <span>{i * markTime}</span>
+        </span>
+      );
+    }
+
     return (
       <div id="editor-duration-menu">
         <Row>
@@ -103,8 +133,21 @@ export default class SceneEditorTimeline extends Component {
           </Col>
           <Col offset='2' span="5">
             <Button icon='minus-circle-o' onClick={() => this.props.changeScaling(0.9)}/>
-            <span> <Icon type="search" /> {scaling / 1000}[s] </span>
+            <span> <Icon type="search" /> {scalingS}[s] </span>
             <Button icon='plus-circle-o' onClick={() => this.props.changeScaling(1.1)}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="24" id="mark-duration"
+            onMouseDown={(e) => {
+              this.markMouseDown = true;
+              this.seekCursor(e);
+            }}
+            onMouseMove={(e) => {
+              if (this.markMouseDown)
+                this.seekCursor(e);
+            }}>
+            {markSeparators}
           </Col>
         </Row>
         <Row>
@@ -114,14 +157,12 @@ export default class SceneEditorTimeline extends Component {
             editorDurationWidth={editorDurationWidth}
           />
           <SceneEditorTimelineCursor
-            backgroundColor='green'
-            cursorWidth={5}
             scaling={scaling}
             editorDurationWidth={editorDurationWidth}
-            height={7 + 50*(maxZindex)}
+            height={20 + 50 * (maxZindex)}
             x={Math.round((timeInterval) / scaling * editorDurationWidth)}
-            onDrag={(offsetX) => this.props.setSceneInterval(offsetX)}
-          />
+            onDrag={(offsetX) => this.props.setSceneInterval(offsetX)} />
+
         </Row>
         <Row className='timeline' style={{height: 50*(maxZindex) + 'px', backgroundSize: editorDurationWidth + 'px 50px'}}>
           {items}
