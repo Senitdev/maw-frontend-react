@@ -1,3 +1,13 @@
-.screen-status {
-  text-align: center;
+.screen-status > button.connected {
+  border: 1px solid #30FF30;
+  background-color: #30FF30;
+}
+
+.screen-status > button.warning {
+  border: 1px solid #ffd351;
+  background-color: #ffd351;
+}
+
+.screen-status > button {
+  cursor: auto !important;
 }
