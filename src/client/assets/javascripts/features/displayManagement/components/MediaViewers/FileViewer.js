@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Config } from 'app/config';
 
+import { clockJs } from '../../../../utils/clock-js';
+
 export class FileViewer extends Component {
   static propTypes = {
     displayControls: PropTypes.bool,
@@ -32,10 +34,12 @@ export class FileViewer extends Component {
           viewer: <img {...sizes} src={fileUrl} />,
         });
       } else if (mimetype.search('clock') === 0) {
-        // TODO
+        const idClock = "clock-container-" + new Date().getTime();
         this.setState({
           mod: `clock`,
-          viewer: <img {...sizes} src="http://www.clipartkid.com/images/278/to-help-improve-the-quality-of-the-lyrics-visit-lloyd-banks-4C1gB9-clipart.gif" />,
+          viewer: <div style={{width: '100%', height: '100%'}} id={idClock} />
+        }, () => {
+          clockJs(idClock);
         });
       } else if (mimetype.search('video') === 0) {
         if (this.props.displayControls)
