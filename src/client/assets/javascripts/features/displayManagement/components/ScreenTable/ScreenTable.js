@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Tooltip, Button } from 'antd';
 
 import MediaTable from '../MediaTable';
-import AgendaSelectorContainer from './AgendaSelectorContainer';
+//import AgendaSelectorContainer from './AgendaSelectorContainer';
 import ScreenClaimModal from './ScreenClaimModal';
 
 import './ScreenTable.scss';
@@ -46,11 +46,12 @@ export default class ScreenTable extends Component {
         );
       }
     },
-    agenda: {
+/*    agenda: {
       title: 'Agenda',
       key: 'agenda',
       render: (text, screen) => <AgendaSelectorContainer screen={screen} />
     },
+*/
   };
 
   constructor(props) {
@@ -78,9 +79,8 @@ export default class ScreenTable extends Component {
     const columns = [
       MediaTable.ColumnModel.name(onNameEdit),
       ScreenTable.ColumnModel.status,
-      ScreenTable.ColumnModel.agenda,
+      //ScreenTable.ColumnModel.agenda,
       MediaTable.ColumnModel.ratio,
-      MediaTable.ColumnModel.createdAt,
       MediaTable.ColumnModel.updatedAt,
     ];
 

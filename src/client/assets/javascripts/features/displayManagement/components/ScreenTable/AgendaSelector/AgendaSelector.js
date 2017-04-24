@@ -5,23 +5,23 @@ const { Option } = Select;
 export default class AgendaSelector extends Component {
 
   static propTypes = {
-    agendas: PropTypes.arrayOf(PropTypes.object).isRequired,
-    onChange: PropTypes.func,
+    agendas: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
     value: PropTypes.number,
   };
 
   render() {
-    let { agendas, ...otherProps } = this.props;
-    if (otherProps.value != null) {
-      otherProps.value = String(otherProps.value);
-    }
+    const agendasRender = Object.keys(this.props.agendas).map((agendaId) => (
+              <Option key={String(agendaId)}>{this.props.agendas[agendaId].name}</Option>
+            ));
 
     return (
-      <Select {...otherProps} dropdownMatchSelectWidth={false}>
+      <Select value={String(this.props.value)}
+              defaultValue='-1'
+              dropdownMatchSelectWidth={false}
+              onChange={(value) => this.props.onChange(Number(value))}>
         <Option key="-1">- vide -</Option>
-        { agendas.map((agenda) => (
-        <Option key={String(agenda.id)}>{agenda.name}</Option>
-        ))}
+        {agendasRender}
       </Select>
     );
   }

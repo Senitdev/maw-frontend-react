@@ -1,0 +1,28 @@
+.weekScheduler {
+  display: inline-block;
+  border-collapse: collapse;
+}
+
+.headerWeekScheduler {
+  height: 30px;
+  background-color: #cecece;
+}
+
+.colOneWeekScheduler {
+  width: 100px;
+}
+
+.colWeekScheduler {
+  width: 100px;
+}
+
+.lineWeekScheduler {
+    height: 40px;
+}
+.lineWeekScheduler > th {
+  padding: 5px;
+  background-color: #e2e2e2;
+}
+.lineWeekScheduler > th > span {
+  width: 90px;
+}

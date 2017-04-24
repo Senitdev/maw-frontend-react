@@ -15,6 +15,7 @@ export default class DataTable extends Component {
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
     onEdit: PropTypes.func,
+    onEditSelection: PropTypes.func,
     onPreview: PropTypes.func,
     onRefresh: PropTypes.func,
     onSearch: PropTypes.func,
@@ -23,7 +24,7 @@ export default class DataTable extends Component {
 
   render() {
 
-    const { columns, loading, onAdd, onDelete, onDeleteSelection, onEdit, onPreview, onRefresh, onSearch, title, ...otherProps} = this.props;
+    const { columns, loading, onAdd, onDelete, onDeleteSelection, onEditSelection, onEdit, onPreview, onRefresh, onSearch, title, ...otherProps} = this.props;
 
     const tableColumns = (onDelete || onEdit || onPreview ?
       columns.concat({
@@ -45,13 +46,20 @@ export default class DataTable extends Component {
         }
 
         { /* Ligne avec les boutons d'action */
-        (onRefresh || onDeleteSelection || onAdd || onSearch) && (
+        (onRefresh || onEditSelection || onDeleteSelection || onAdd || onSearch) && (
         <Row style={{marginBottom: '4px'}}>
 
           <Col span={3} className="maw-data-table-tool-bar">
             { /* Bouton de refresh si nécessaire */ onRefresh &&
             <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay={0.6}>
               <Button loading={loading} icon="reload" onClick={onRefresh} />
+            </Tooltip>
+            }
+            { /* Bouton d'édition de la sélection si nécessaire */ onEditSelection &&
+            <Tooltip title="Edition de la sélection" placement="bottom" mouseEnterDelay={0.6}>
+              <Popconfirm title="Editer la sélection ?" onConfirm={onEditSelection} okText="Oui" cancelText="Non">
+                <Button icon="edit" />
+              </Popconfirm>
             </Tooltip>
             }
             { /* Bouton de suppression de la sélection si nécessaire */ onDeleteSelection &&
