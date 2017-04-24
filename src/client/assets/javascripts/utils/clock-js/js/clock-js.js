@@ -1,7 +1,8 @@
-export function clockJs(idContainer) {
+function clockJs(idContainer) {
   var container = document.getElementById(idContainer);
 
   container.style.fontFamily = "alarm clock";
+  container.style.textAnchor = "middle";
 
   function checkTime(t) {
     return t < 10 ? "0" + t : t;
@@ -19,6 +20,6 @@ export function clockJs(idContainer) {
     m = checkTime(m);
     s = checkTime(s);
 
-    container.innerHTML = "<svg width='100%' height='100%' viewBox='0 0 55 15'><text x='0' y='11'>" + h + ":" + m + ":" + s + "</text></svg>";
+    container.innerHTML = "<svg width='100%' height='100%' viewBox='0 0 55 13'><text x='50%' y='60%' alignment-baseline='middle' textLength='100%'>" + h + ":" + m + ":" + s + "</text></svg>";
   }, 200);
 }

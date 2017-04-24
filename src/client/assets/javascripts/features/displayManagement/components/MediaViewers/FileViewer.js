@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Config } from 'app/config';
 
-import { clockJs } from '../../../../utils/clock-js';
+import '../../../../utils/clock-js/css/clock-js.css';
+import { clockJs } from '../../../../utils/clock-js/js/clock-js';
 
 export class FileViewer extends Component {
   static propTypes = {
