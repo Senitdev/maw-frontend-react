@@ -1,4 +1,4 @@
-function clockJs(idContainer) {
+export function clockJs(idContainer) {
   var container = document.getElementById(idContainer);
 
   container.style.fontFamily = "alarm clock";
