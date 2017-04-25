@@ -103,9 +103,7 @@ export default class ScreenTableContainer extends Component {
   }
 
   handleOkEdit = () => {
-    console.log('Heures d\'activité: ', this.screenDetail.activityPlanning.state.days);
-    console.log('Heures de mise é jours: ', this.screenDetail.updatePlanning.state.days);
-    console.log('écran: ', this.screenDetail.state);
+    console.log(this.screenDetail);
   }
 
   render() {

@@ -17,27 +17,11 @@ export default class ScreenDetailsModal extends Component {
     // Localement, ces horaires sont des matrice de 7*96 qui contient un object de type event
     // un event = {event: '******', color: '******'}
     let activityDays = [];
-    for (let i = 0; i < 7; i += 1) {
-      const day = [];
-      for (let j = 0; j < 96; j += 1) {
-        day.push({event: 'innactif'});
-      }
-      activityDays.push(day);
-    }
-    let updateDays = [];
-    for (let k = 0; k < 7; k += 1) {
-      const day = [];
-      for (let l = 0; l < 96; l += 1) {
-        day.push({event: 'noUpdate'});
-      }
-      updateDays.push(day);
-    }
 
     this.state = {
       ids: [-1],
       agendaId: -1,
       activityPlanning: activityDays,
-      updatePlanning: updateDays,
     };
   }
 
@@ -114,10 +98,6 @@ export default class ScreenDetailsModal extends Component {
     */
   }
 
-  onActivitySchedulingChange = (scheduling) => {
-    console.log(scheduling);
-  }
-
   render() {
     return (
       <div>
@@ -125,7 +105,7 @@ export default class ScreenDetailsModal extends Component {
           <b>Agenda:</b> <AgendaSelector agendas={this.props.agendas} value={this.state.agendaId} onChange={this.onChangeAgenda} />
         </div>
         <br/>
-        <WeekScheduler onActivitySchedulingChange={this.onActivitySchedulingChange} />
+        <WeekScheduler ref={(ref) => this.WeekScheduler = ref} />
       </div>
     );
   }

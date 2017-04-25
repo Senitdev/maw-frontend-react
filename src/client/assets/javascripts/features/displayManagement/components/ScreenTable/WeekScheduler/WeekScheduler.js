@@ -8,7 +8,6 @@ export default class WeekScheduler extends Component {
 
   static propTypes = {
     getState: PropTypes.func,
-    onActivitySchedulingChange: PropTypes.func,
   };
 
   constructor(props) {
@@ -28,12 +27,7 @@ export default class WeekScheduler extends Component {
     };
   }
 
-  componentDidUpdate() {
-    this.props.onActivitySchedulingChange(this.state);
-  }
-
   onSwitchDay = (idDay, isActive) => {
-    console.log(idDay, isActive)
     this.setState({
       daysSwitch: {
         ...this.state.daysSwitch,
