@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Table, Input, Button, Row, Col, Tooltip, Popconfirm, Popover } from 'antd';
+import { Table, Input, Button, Row, Col, Tooltip, Popconfirm } from 'antd';
 
 import TitleBar from '../TitleBar';
 import ActionsCell from './ActionsCell';
