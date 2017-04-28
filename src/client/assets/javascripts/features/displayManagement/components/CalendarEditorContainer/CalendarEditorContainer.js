@@ -355,7 +355,7 @@ export default class CalendarEditorContainer extends Component {
               <Row>
                 <Checkbox checked={eventSelected.repetitionDelay > 0} onChange={(e) => {
                   var newMedia = this.state.mediaInCalendar.slice();
-                  newMedia[idEventSelected].repetitionDelay = e.target.checked ? 86400 : -1;
+                  newMedia[idEventSelected].repetitionDelay = e.target.checked ? 86400 : 0;
                   this.setState({
                     mediaInCalendar: newMedia
                   });
