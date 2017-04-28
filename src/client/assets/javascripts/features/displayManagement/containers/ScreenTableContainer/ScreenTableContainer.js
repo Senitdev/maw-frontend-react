@@ -2,10 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 
 import ScreenTable from '../../components/ScreenTable';
-import ScreenDetailsModal from '../../components/ScreenTable/ScreenDetailsModal';
+import AgendaSelector from '../../components/ScreenTable/AgendaSelector';
+import WeekScheduler from '../../components/ScreenTable/WeekScheduler';
 import { actionCreators as displayManagementActions, selector } from 'features/displayManagement';
 
 @connect(selector, (dispatch) => ({
@@ -25,8 +26,12 @@ export default class ScreenTableContainer extends Component {
 
     this.state = {
       selectedRows: [],
-      modalVisible: false,
+      scheduleEdit: false,
+      scheduleActivity: {start: 0, end: 86400000},
+      calendarEdit: false,
       currentEditableScreenId: [],
+      agendaIdSelected: -1,
+      agendaHasChanged: false,
     };
   }
 
@@ -76,34 +81,165 @@ export default class ScreenTableContainer extends Component {
     this.props.actions.fetchMediaList('screen');
   }
 
-  onEdit = (screen) => {
-    this.props.actions.fetchMediaDetails(screen.id, 'screen');
-    this.setState({
-      modalVisible: true,
-      currentEditableScreenId: [screen.id],
+  handleOkEdit = () => {
+    var allPromise = [];
+
+    for (var i = 0; i < this.state.currentEditableScreenId.length; i++) {
+      //Extrait les infos util à la mise a jours de l'écran.
+      var screen = this.props.displayManagement.mediaById[this.state.currentEditableScreenId[i]];
+      var relationId = screen.relationsWithGuests.length > 0 ? screen.relationsWithGuests[0] : -1;
+
+      //Si on doit sauvegarder l'agenda et que l'agenda a bien été modifié...
+      if (this.state.calendarEdit && this.state.agendaHasChanged) {
+
+        //Si l'écran n'avait pas d'agenda, on crée une nouvelle relation écran-agenda
+        if (relationId == -1 && this.state.agendaIdSelected != -1) {
+
+          const relation = {
+            hostMediaId: screen.id,
+            guestMediaId: parseInt(this.state.agendaIdSelected),
+            boxLeft: 0,
+            boxTop: 0,
+            boxWidth: 100,
+            boxHeight: 100,
+            guestLeft: 0,
+            guestTop: 0,
+            guestWidth: 100,
+            guestHeight: 100,
+            startTimeOffset: 0,
+            repetitionDelay: 0,
+            endTimeOffset: 0,
+            duration: 0,
+            zIndex: 0
+          };
+          allPromise.push(this.props.actions.createRelation(relation));
+
+        //Si l'écran avait un agenda et qu'on veut le changer, on patch la relation
+        } else if (relationId != -1 && this.state.agendaIdSelected != -1) {
+          const relation = {
+            id: relationId,
+            guestMediaId: parseInt(this.state.agendaIdSelected),
+          };
+          allPromise.push(this.props.actions.patchRelation(relation));
+
+        //Si l'écran avait un agenda et qu'on en veut plus, on détruit la relation.
+        } else if (relationId > 0 && this.state.agendaIdSelected == -1) {
+          allPromise.push(this.props.actions.deleteRelation(relationId));
+        }
+      }
+
+      //Si on doit sauvegarder de nouveau horraire
+      if (this.state.scheduleEdit) {
+        allPromise.push(this.props.actions.patchScreen({
+          id: screen.id,
+          powerOn: this.state.scheduleActivity.start,
+          powerOff: this.state.scheduleActivity.end,
+        }));
+      }
+    }
+
+    Promise.all(allPromise).then(this.handleCloseEdit).then(() => this.forceUpdate());
+  }
+
+  onScheduleClick = (screen) => {
+    this.props.actions.fetchMediaDetails(screen.id, 'screen').then(() => {
+      const updatedScreen = this.props.displayManagement.mediaById[screen.id];
+      this.setState({
+        scheduleEdit: true,
+        scheduleActivity: {
+          start: updatedScreen.powerOn,
+          end: updatedScreen.powerOff,
+        },
+        currentEditableScreenId: [screen.id],
+      })
     });
   }
 
-  onEditSelection = () => {
-
+  onScheduleSelectionClick = () => {
     for (var i = 0; i < this.state.selectedRows.length; i++) {
       this.props.actions.fetchMediaDetails(this.state.selectedRows[i], 'screen');
     }
 
     this.setState({
-      modalVisible: true,
+      scheduleEdit: true,
+      scheduleActivity: {start: 0, end: 86400000},
       currentEditableScreenId: this.state.selectedRows,
+    });
+  }
+
+  onCalendarClick = (screen) => {
+    this.props.actions.fetchMediaDetails(screen.id, 'screen').then(() => {
+      //Récupère l'agenda courant pour ce calendrier
+      var agendaId;
+      if (this.props.displayManagement.mediaById[screen.id].relationsWithGuests.length > 0) {
+        agendaId = this.props.displayManagement.relationsById[this.props.displayManagement.mediaById[screen.id].relationsWithGuests[0]].guestMediaId;
+      } else {
+        agendaId = -1;
+      }
+      this.setState({
+        calendarEdit: true,
+        agendaIdSelected: agendaId,
+        currentEditableScreenId: [screen.id],
+      });
+    });
+  }
+
+  onCalendarSelectionClick = () => {
+    //Récupère les info de tout les écrans sélectionné
+    var allPromise = [];
+    for (var i = 0; i < this.state.selectedRows.length; i++) {
+      allPromise.push(this.props.actions.fetchMediaDetails(this.state.selectedRows[i], 'screen'));
+    }
+
+    Promise.all(allPromise).then(() => {
+      //Détermine si la sélection a déjà un calendrier commun, et l'enregistre.
+      var agendaId;
+      if (this.props.displayManagement.mediaById[this.state.selectedRows[0]].relationsWithGuests.length > 0) {
+        agendaId = this.props.displayManagement.relationsById[this.props.displayManagement.mediaById[this.state.selectedRows[0]].relationsWithGuests[0]].guestMediaId;
+      } else {
+        agendaId = -1;
+      }
+      for (var i = 0; i < this.state.selectedRows.length; i++) {
+        var agendaIdBis;
+        if (this.props.displayManagement.mediaById[this.state.selectedRows[i]].relationsWithGuests.length > 0) {
+          agendaIdBis = this.props.displayManagement.relationsById[this.props.displayManagement.mediaById[this.state.selectedRows[i]].relationsWithGuests[0]].guestMediaId;
+        } else {
+          agendaIdBis = -1;
+        }
+
+        if (agendaId != agendaIdBis) {
+          agendaId = null;
+          break;
+        }
+      }
+
+      this.setState({
+        calendarEdit: true,
+        agendaIdSelected: agendaId,
+        currentEditableScreenId: this.state.selectedRows,
+      });
+    });
+  }
+
+  onChangeAgenda = (agendaId) => {
+    this.setState({
+      agendaHasChanged: true,
+      agendaIdSelected: agendaId,
+    });
+  }
+
+  onScheduleActivityChange = (value) => {
+    this.setState({
+      scheduleActivity: value[0]
     });
   }
 
   handleCloseEdit = () => {
     this.setState({
-      modalVisible: false,
+      calendarEdit: false,
+      scheduleEdit: false,
+      currentEditableScreenId: [],
     });
-  }
-
-  handleOkEdit = () => {
-    console.log(this.screenDetail);
   }
 
   render() {
@@ -117,19 +253,28 @@ export default class ScreenTableContainer extends Component {
       agendas = {...agendas, [agendaId]: {...this.props.displayManagement.mediaById[agendaId]}};
     });
 
-    // Récupère les ID de tout les écrans séléctionné.
-    // Prépars un titre pour la modal d'édition fait de tout les noms d'écrans séléctionné.
-    var currentScreens;
-    var modalTitle;
-    if (this.state.currentEditableScreenId.length > 0) {
-      if (this.state.currentEditableScreenId.length == 1)
-        modalTitle = 'Edition de l\'écran: ' + this.props.displayManagement.mediaById[this.state.currentEditableScreenId[0]].name;
-      else
-        modalTitle = 'Edition des écrans: ' + this.props.displayManagement.mediaById[this.state.currentEditableScreenId[0]].name;
-      currentScreens = [this.props.displayManagement.mediaById[this.state.currentEditableScreenId[0]]];
-      for (var i = 1; i < (this.state.currentEditableScreenId.length); i++) {
+    //Si une modal d'édition d'horraire ou d'agenda doit s'afficher...
+    if (this.state.calendarEdit || this.state.scheduleEdit) {
+      // Récupère les ID de tout les écrans séléctionné.
+      var currentScreens = [];
+      for (var i = 0; i < (this.state.currentEditableScreenId.length); i++) {
         currentScreens.push(this.props.displayManagement.mediaById[this.state.currentEditableScreenId[i]]);
-        modalTitle = modalTitle + ', ' + currentScreens[i].name;
+      }
+
+      // Prépars un titre pour la modal d'édition (calendar ou horraire).
+      var modalTitle;
+      if (this.state.calendarEdit) {
+        if (this.state.currentEditableScreenId.length > 1) {
+          modalTitle = 'Modifier l\'agenda pour la sélection d\'écrans.';
+        } else {
+          modalTitle = 'Modifier l\'agenda pour l\'écran \"' + currentScreens[0].name + '\".';
+        }
+      } else if (this.state.scheduleEdit) {
+        if (this.state.currentEditableScreenId.length > 1) {
+          modalTitle = 'Modifier les horraires d\'activité de la sélection d\'écrans.';
+        } else {
+          modalTitle = 'Modifier les horraires d\'activité de l\'écran \"' + currentScreens[0].name + '\".';
+        }
       }
     }
 
@@ -143,27 +288,45 @@ export default class ScreenTableContainer extends Component {
         <ScreenTable
           dataSource={data}
           loading={loading}
-          onAgendaEdit={this.onAgendaChange}
+          onCalendar={this.onCalendarClick}
+          onCalendarSelection={this.onCalendarSelectionClick}
           onDelete={this.onDelete}
           onDeleteSelection={this.onDeleteSelection}
-          onEdit={this.onEdit}
-          onEditSelection={this.onEditSelection}
+          onGroupSelection={(groupName) => console.log(groupName)}
           onNameEdit={this.onNameEdit}
           onRefresh={this.onRefresh}
+          onSchedule={this.onScheduleClick}
+          onScheduleSelection={this.onScheduleSelectionClick}
           rowSelection={rowSelection} />
-        {currentScreens ?
-          <Modal key={currentScreens.id}
-                 title={modalTitle}
-                 visible={this.state.modalVisible}
-                 onOk={this.handleOkEdit}
-                 onCancel={this.handleCloseEdit} >
-            <ScreenDetailsModal ref={(screenDetail) => { this.screenDetail = screenDetail; }}
-                                screens={currentScreens}
-                                agendas={agendas}
-                                relationsById={this.props.displayManagement.relationsById} />
-          </Modal>
-        : null}
+          {currentScreens ?
+            <Modal title={modalTitle}
+                   visible={this.state.scheduleEdit || this.state.calendarEdit}
+                   onOk={this.handleOkEdit}
+                   onCancel={this.handleCloseEdit}
+                   footer={[
+                     <Button key="annuler" size="large" onClick={this.handleCloseEdit}>Annuler</Button>,
+                     <Button key="Sauvegarder" type="primary" size="large" onClick={this.handleOkEdit}>
+                       Sauvegarder
+                     </Button>,
+                   ]} >
+              {this.state.calendarEdit ?
+                <AgendaSelector agendas={agendas} value={this.state.agendaIdSelected} onChange={this.onChangeAgenda} />
+              : null}
+              {this.state.scheduleEdit ?
+                <WeekScheduler onChange={this.onScheduleActivityChange}
+                               startTime={this.state.scheduleActivity.start}
+                               endTime={this.state.scheduleActivity.end} />
+              : null}
+            </Modal>
+          : null}
       </span>
     );
   }
 }
+
+/*              <ScreenEditModal ref={(screenEdit) => { this.screenEdit = screenEdit; }}
+                               screens={currentScreens}
+                               agendas={agendas}
+                               relationsById={this.props.displayManagement.relationsById}
+                               this.state.scheduleEdit />
+                      */
