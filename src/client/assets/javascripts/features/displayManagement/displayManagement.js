@@ -46,6 +46,10 @@ const PATCH_RELATION_REQUEST = 'maw/displayManagement/PATCH_RELATION_REQUEST';
 const PATCH_RELATION_SUCCESS = 'maw/displayManagement/PATCH_RELATION_SUCCESS';
 const PATCH_RELATION_FAILURE = 'maw/displayManagement/PATCH_RELATION_FAILURE';
 
+const PATCH_SCREEN_REQUEST = 'maw/displayManagement/PATCH_SCREEN_REQUEST';
+const PATCH_SCREEN_SUCCESS = 'maw/displayManagement/PATCH_SCREEN_SUCCESS';
+const PATCH_SCREEN_FAILURE = 'maw/displayManagement/PATCH_SCREEN_FAILURE';
+
 const DELETE_RELATION_REQUEST = 'maw/displayManagement/DELETE_RELATION_REQUEST';
 const DELETE_RELATION_SUCCESS = 'maw/displayManagement/DELETE_RELATION_SUCCESS';
 const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
@@ -53,20 +57,6 @@ const DELETE_RELATION_FAILURE = 'maw/displayManagement/DELETE_RELATION_FAILURE';
 const ADD_FILE = 'maw/displayManagement/ADD_FILE';
 
 // Action creators
-function attachScreenToAgenda(screen, relation) {
-  return (dispatch) => new Promise(
-    (resolve, reject) => {
-      if (screen.relationsWithGuests[0])
-        dispatch(deleteRelation(screen.relationsWithGuests[0]))
-        .then(() => dispatch(createRelation(relation)))
-        .then(() => resolve())
-        .catch(() => reject());
-      else
-        dispatch(createRelation(relation));
-    }
-  );
-}
-
 function claimScreen(id, name) {
   const url = 'entities/1/modules/3/feats/claim-global-screen';
 
@@ -102,6 +92,52 @@ function createMediaFailure(error) {
   return {
     type: CREATE_MEDIA_FAILURE,
     payload: { error }
+  };
+}
+
+function patchScreenRequest(screenId) {
+  return {
+    type: PATCH_SCREEN_REQUEST,
+    payload: { screenId }
+  };
+}
+function patchScreenSuccess(screen) {
+  return {
+    type: PATCH_SCREEN_SUCCESS,
+    payload: { screen }
+  };
+}
+function patchScreenError(error) {
+  return {
+    type: PATCH_SCREEN_FAILURE,
+    payload: { error }
+  };
+}
+
+function patchScreen(screen) {
+
+  const screenForServer = normalizeObjectForServer(screen);
+  const url = Config.API + 'entities/1/modules/3/screens/' + screen.id;
+
+  return (dispatch) => {
+    dispatch(patchScreenRequest(screen.id));
+    return fetch(url, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({...screenForServer, return: 1})
+    })
+    .then((response) => {
+      if (!response.ok) {
+        let error = new Error('patch fail');
+        error.response = response;
+        throw error;
+      }
+      return response.json();
+    }).then((response) => {
+      dispatch(patchScreenSuccess(normalizeObjectForClient(response.data)));
+      return response.data;
+    })
+    .catch((error) => dispatch(patchScreenError(screen.id, error)));
   };
 }
 
@@ -481,7 +517,9 @@ const normalize = {
   }),
   screen: (screen) => ({
     distantVersion: screen.distant_version,
-    lastPull: new Date(screen.last_pull)
+    lastPull: new Date(screen.last_pull),
+    powerOff: screen.power_off,
+    powerOn: screen.power_on,
   }),
   relation: (relation) => ({
     id: relation.id,
@@ -810,12 +848,14 @@ function addFile(data) {
 }
 
 export const actionCreators = {
-  attachScreenToAgenda,
   deleteMedia,
   deleteRelation,
   fetchMediaList,
   fetchMediaDetails,
   patchMedia,
+  patchRelation,
+  patchScreen,
+  createRelation,
   fetchMediaRelation,
   featPatchOrCreateFromEditor,
   claimScreen,
@@ -969,6 +1009,40 @@ export default function reducer(state: State = initialState, action: any = {}): 
       };
 
     case PATCH_MEDIA_FAILURE:
+      return {
+        ...state,
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.id]: false,
+        },
+      };
+
+    case PATCH_SCREEN_REQUEST:
+      return {
+        ...state,
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.id]: true,
+        },
+      };
+
+    case PATCH_SCREEN_SUCCESS:
+      return {
+        ...state,
+        mediaById: {
+          ...state.mediaById,
+          [action.payload.screen.id]: {
+            ...state.mediaById[action.payload.screen.id],
+            ...action.payload.screen
+          }
+        },
+        isPatching: {
+          ...state.isPatching,
+          [action.payload.screen.id]: false,
+        },
+      };
+
+    case PATCH_SCREEN_FAILURE:
       return {
         ...state,
         isPatching: {
