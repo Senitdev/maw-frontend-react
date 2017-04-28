@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Table, Input, Button, Row, Col, Tooltip, Popconfirm } from 'antd';
+import { Table, Input, Button, Row, Col, Tooltip, Popconfirm, Popover } from 'antd';
 
 import TitleBar from '../TitleBar';
 import ActionsCell from './ActionsCell';
@@ -12,27 +12,60 @@ export default class DataTable extends Component {
     columns: PropTypes.arrayOf(PropTypes.object).isRequired,
     loading: PropTypes.bool,
     onAdd: PropTypes.func,
+    onCalendar: PropTypes.func,
+    onCalendarSelection: PropTypes.func,
     onDelete: PropTypes.func,
     onDeleteSelection: PropTypes.func,
     onEdit: PropTypes.func,
-    onEditSelection: PropTypes.func,
+    onGroupSelection: PropTypes.func,
     onPreview: PropTypes.func,
     onRefresh: PropTypes.func,
+    onSchedule: PropTypes.func,
+    onScheduleSelection: PropTypes.func,
     onSearch: PropTypes.func,
     title: PropTypes.string,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      groupNameInputValue: '',
+    };
+  }
+
   render() {
 
-    const { columns, loading, onAdd, onDelete, onDeleteSelection, onEditSelection, onEdit, onPreview, onRefresh, onSearch, title, ...otherProps} = this.props;
+    const { columns,
+            loading,
+            onAdd,
+            onCalendar,
+            onCalendarSelection,
+            onDelete,
+            onDeleteSelection,
+            onEdit,
+            onGroupSelection,
+            onPreview,
+            onRefresh,
+            onSchedule,
+            onScheduleSelection,
+            onSearch,
+            title,
+            ...otherProps
+          } = this.props;
 
-    const tableColumns = (onDelete || onEdit || onPreview ?
+    const tableColumns = (onCalendar || onDelete || onEdit || onPreview || onSchedule ?
       columns.concat({
         title: 'Actions',
         key: 'actions',
         width: 115,
         className: 'maw-data-table-actions-column',
-        render: (text, record) => <ActionsCell onDelete={onDelete} onEdit={onEdit} onPreview={onPreview} record={record} />
+        render: (text, record) => <ActionsCell onCalendar={onCalendar}
+                                               onDelete={onDelete}
+                                               onEdit={onEdit}
+                                               onPreview={onPreview}
+                                               onSchedule={onSchedule}
+                                               record={record} />
       })
       :
       columns
@@ -46,20 +79,28 @@ export default class DataTable extends Component {
         }
 
         { /* Ligne avec les boutons d'action */
-        (onRefresh || onEditSelection || onDeleteSelection || onAdd || onSearch) && (
+        (onRefresh || onGroupSelection || onDeleteSelection || onAdd || onSearch || onScheduleSelection || onCalendarSelection) && (
         <Row style={{marginBottom: '4px'}}>
 
-          <Col span={3} className="maw-data-table-tool-bar">
+          <Col span={4} className="maw-data-table-tool-bar">
             { /* Bouton de refresh si nécessaire */ onRefresh &&
             <Tooltip title="Rafraichir les données" placement="bottom" mouseEnterDelay={0.6}>
               <Button loading={loading} icon="reload" onClick={onRefresh} />
             </Tooltip>
             }
-            { /* Bouton d'édition de la sélection si nécessaire */ onEditSelection &&
-            <Tooltip title="Edition de la sélection" placement="bottom" mouseEnterDelay={0.6}>
-              <Popconfirm title="Editer la sélection ?" onConfirm={onEditSelection} okText="Oui" cancelText="Non">
-                <Button icon="edit" />
-              </Popconfirm>
+            { /* Bouton d'édition de la sélection si nécessaire */ onGroupSelection &&
+            <Tooltip title="Groupe la sélection" placement="bottom" mouseEnterDelay={0.6}>
+              <Button icon="usergroup-add" onClick={() => this.setState({groupPopoverVisible: true})} />
+            </Tooltip>
+            }
+            { /* Bouton d'édition des horraires de la sélection si nécessaire */ onScheduleSelection &&
+            <Tooltip title="Editer les horraires d'activité" placement="bottom" mouseEnterDelay={0.6}>
+              <Button icon="clock-circle-o" onClick={onScheduleSelection} />
+            </Tooltip>
+            }
+            { /* Bouton d'édition des agendas de la sélection si nécessaire */ onCalendarSelection &&
+            <Tooltip title="Modifier l'agenda de la sélection" placement="bottom" mouseEnterDelay={0.6}>
+              <Button icon="calendar" onClick={onCalendarSelection} />
             </Tooltip>
             }
             { /* Bouton de suppression de la sélection si nécessaire */ onDeleteSelection &&
