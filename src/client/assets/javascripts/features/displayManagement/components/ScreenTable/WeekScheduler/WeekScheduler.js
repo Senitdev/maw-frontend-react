@@ -7,14 +7,16 @@ import './WeekScheduler.scss';
 export default class WeekScheduler extends Component {
 
   static propTypes = {
-    getState: PropTypes.func,
+    endTime: PropTypes.number,
+    onChange: PropTypes.func,
+    startTime: PropTypes.number,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      daysSwitch: {0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false},
+      daysSwitch: {0: true, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false}, //False pour désactiver par deffaut le jours concerné.
       daysSchedule: {
         0: {start: null, end: null},
         1: {start: null, end: null},
@@ -27,6 +29,15 @@ export default class WeekScheduler extends Component {
     };
   }
 
+  componentDidMount() {
+    //TODO adapté pour la semaine, actuellement n'est effectif que pour un jour.
+    this.setState({
+      daysSchedule: {
+        0: {start: this.props.startTime, end: this.props.endTime}
+      }
+    });
+  }
+
   onSwitchDay = (idDay, isActive) => {
     this.setState({
       daysSwitch: {
@@ -36,56 +47,63 @@ export default class WeekScheduler extends Component {
     });
   }
 
-  onStartTimeChange = (idDay, moment) => {
+  onStartTimeChange = (idDay, time) => {
     if (this.state.daysSchedule[idDay].end != null) {
-      if (moment >= this.state.daysSchedule[idDay].end) {
+      if (time >= this.state.daysSchedule[idDay].end) {
         message.error('L\'horaire d\'allumage doit être plus petit que celui d\'extinction');
         return;
       }
     }
 
-    this.setState({
-      daysSchedule: {
-        ...this.state.daysSchedule,
-        [idDay]: {
-          ...this.state.daysSchedule[idDay],
-          start: moment,
-        }
+    const daysSchedule = {
+      ...this.state.daysSchedule,
+      [idDay]: {
+        ...this.state.daysSchedule[idDay],
+        start: time,
       }
+    };
+
+    this.setState({
+      daysSchedule: daysSchedule,
     });
+
+    this.props.onChange(daysSchedule);
   }
 
-  onEndTimeChange = (idDay, moment) => {
+  onEndTimeChange = (idDay, time) => {
     if (this.state.daysSchedule[idDay].start != null) {
-      if (moment <= this.state.daysSchedule[idDay].start) {
+      if (time <= this.state.daysSchedule[idDay].start) {
         message.error('L\'horaire d\'extinction doit être plus grand que celui d\'allumage');
         return;
       }
     }
 
-    this.setState({
-      daysSchedule: {
-        ...this.state.daysSchedule,
-        [idDay]: {
-          ...this.state.daysSchedule[idDay],
-          end: moment,
-        }
+    const daysSchedule = {
+      ...this.state.daysSchedule,
+      [idDay]: {
+        ...this.state.daysSchedule[idDay],
+        end: time,
       }
+    };
+
+    this.setState({
+      daysSchedule: daysSchedule
     });
+    this.props.onChange(daysSchedule);
   }
 
   render() {
     var days = [];
-    const daysName = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+    const daysName = ['sauvegarder']; //ici, on peut entrée les jours de la semaine pour avoirs un champ pour chaque jours.
     for (let i = 0; i < daysName.length; i++) {
       days.push(
         <LineWeekScheduler key={daysName[i]}
                            defaultChecked={this.state.daysSwitch[i]}
                            lineName={daysName[i]}
-                           startTimeDefault={this.state.daysSchedule[i].start}
-                           endTimeDefault={this.state.daysSchedule[i].end}
-                           onEndTimeChange={(moment) => this.onEndTimeChange(i, moment)}
-                           onStartTimeChange={(moment) => this.onStartTimeChange(i, moment)}
+                           startTime={this.state.daysSchedule[i].start}
+                           endTime={this.state.daysSchedule[i].end}
+                           onEndTimeChange={(time) => this.onEndTimeChange(i, time)}
+                           onStartTimeChange={(time) => this.onStartTimeChange(i, time)}
                            onSwitchDay={(isActive) => this.onSwitchDay(i, isActive)} />
       );
     }
@@ -93,9 +111,9 @@ export default class WeekScheduler extends Component {
       <table className='weekScheduler'>
         <tbody>
           <tr className='headerWeekScheduler'>
-            <th className='colOneWeekScheduler'>jours</th>
-            <th className='colWeekScheduler'>Allumage</th>
-            <th className='colWeekScheduler'>Extinction</th>
+            {/*<th className='colOneWeekScheduler'></th>*/}
+            <th className='colWeekScheduler'>Heure de mise en route</th>
+            <th className='colWeekScheduler'>Heure d'extinction</th>
           </tr>
           {days}
         </tbody>
