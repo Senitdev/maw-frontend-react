@@ -16,14 +16,9 @@ import './MediaList.scss';
 import { MediaTypes } from 'models/displayManagement';
 
 @connect((state) => {
-  const { mediaById, file, scene, agenda } = state[displayManagementName];
+  const { mediaById, file, scene, agenda, clock } = state[displayManagementName];
 
-  const mediaByType = { file, scene, agenda };
-
-  // TODO : Supprimer dès que màj du serveur
-  mediaByType.clock = {...mediaByType.clock};
-  if (mediaByType.agenda.items.length > 0)
-    mediaByType.clock.items = [5];
+  const mediaByType = { file, scene, agenda, clock };
 
   return {
     mediaByType,
