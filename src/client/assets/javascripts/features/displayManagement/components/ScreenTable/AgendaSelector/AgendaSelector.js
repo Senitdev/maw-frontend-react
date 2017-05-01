@@ -25,7 +25,7 @@ export default class AgendaSelector extends Component {
               style={{width: '150px'}}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
               >
-        <Option key="-1" value="null">- vide -</Option>
+        <Option key="-1">- vide -</Option>
         {agendasRender}
       </Select>
     );
