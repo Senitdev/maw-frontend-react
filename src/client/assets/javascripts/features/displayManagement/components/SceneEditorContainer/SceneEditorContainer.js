@@ -269,6 +269,8 @@ export default class SceneEditorContainer extends Component {
         guestTop: relation.guestTop,
         guestWidth: relation.guestWidth,
         guestHeight: relation.guestHeight,
+        endTimeOffset: 0,
+        repetitionDelay: 0,
         zIndex: relation.zIndex,
       };
     });
