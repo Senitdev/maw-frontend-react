@@ -132,7 +132,9 @@ export default class SceneEditorTimeline extends Component {
             <span className='timerDisplayer'>{this.getCurrentFormatedTick()}</span>
           </Col>
           <Col offset='2' span="5">
-            <Button icon='minus-circle-o' onClick={() => this.props.changeScaling(0.9)}/>
+            <Button icon='minus-circle-o' onClick={() =>  {if (!(this.props.scaling <= 16000))
+                                                            this.props.changeScaling(0.9);
+                                                          }}/>
             <span> <Icon type="search" /> {scalingS}[s] </span>
             <Button icon='plus-circle-o' onClick={() => this.props.changeScaling(1.1)}/>
           </Col>
