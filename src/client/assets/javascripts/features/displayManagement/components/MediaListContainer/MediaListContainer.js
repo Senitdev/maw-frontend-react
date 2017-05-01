@@ -21,7 +21,7 @@ import { MediaTypes } from 'models/displayManagement';
   const mediaByType = { file, scene, agenda };
 
   // TODO : Supprimer dès que màj du serveur
-  mediaByType.clock = {...mediaByType.agenda};
+  mediaByType.clock = {...mediaByType.clock};
   if (mediaByType.agenda.items.length > 0)
     mediaByType.clock.items = [5];
 

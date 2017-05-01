@@ -729,25 +729,6 @@ function fetchMediaList(type) {
           }
         }
 
-        // TODO
-        mediaById = {
-          ...mediaById,
-          5: {
-            id: 5,
-            name: "Horloge",
-            ratioNumerator: 16,
-            ratioDenominator: 9,
-            type: "clock",
-            version: 0,
-            createdAt: "2017-03-24 20:19:00",
-            updatedAt: "2017-03-28 13:03:05",
-            relationsWithHosts: [],
-            relationsWithGuests: [],
-            duration: 0,
-            mimetype: 'clock'
-          }
-        };
-
         dispatch(mediaListSuccess(type, mediaById));
       })
       .catch((error) => dispatch(mediaListFailure(type, error)));
@@ -865,7 +846,22 @@ export const actionCreators = {
 // State initial
 
 const initialState: State = {
-  mediaById: {},
+  mediaById: {
+    5: {
+      id: 5,
+      name: "Horloge",
+      ratioNumerator: 16,
+      ratioDenominator: 9,
+      type: "clock",
+      version: 0,
+      createdAt: "2017-03-24 20:19:00",
+      updatedAt: "2017-03-28 13:03:05",
+      relationsWithHosts: [],
+      relationsWithGuests: [],
+      duration: 0,
+      mimetype: 'clock'
+    }
+  },
   relationsById: {},
   agenda: {
     isFetching: false,
@@ -886,6 +882,9 @@ const initialState: State = {
     isFetching: false,
     fetchError: null,
     items: []
+  },
+  clock: {
+    items: [5]
   },
   isDeleting: {},
   isPatching: {},
