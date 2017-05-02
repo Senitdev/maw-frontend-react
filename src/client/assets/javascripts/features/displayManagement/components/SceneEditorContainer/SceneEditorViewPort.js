@@ -8,6 +8,7 @@ export default class SceneEditorViewPort extends Component {
     editorHeight: PropTypes.number.isRequired,
     editorWidth: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    highlight: PropTypes.bool,
     media: PropTypes.object.isRequired,
     mediaControls: PropTypes.string,
     onClick: PropTypes.func.isRequired,
@@ -49,7 +50,7 @@ export default class SceneEditorViewPort extends Component {
         lockAspectRatio={this.props.ratio}
         resizeGrid={[this.props.editorWidth / 100, this.props.editorHeight / 100]}
         moveGrid={[this.props.editorWidth / 100, this.props.editorHeight / 100]}
-        className="editor-position"
+        className={this.props.highlight ? "editor-position selectedItem" : "editor-position"}
         minWidth={1}
         minHeight={1}
         bounds={'parent'}

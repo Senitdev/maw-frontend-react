@@ -12,6 +12,7 @@ export default class SceneEditorTimeline extends Component {
   static propTypes = {
     changeScaling: PropTypes.func.isRequired,
     editorDurationWidth: PropTypes.number.isRequired,
+    highlightSelected: PropTypes.number,
     interval: PropTypes.number.isRequired,
     medias: PropTypes.object.isRequired,
     onChangeScaling: PropTypes.func.isRequired,
@@ -61,6 +62,7 @@ export default class SceneEditorTimeline extends Component {
 
   render() {
 
+    const mediaSelected       = this.props.highlightSelected;
     const sceneDuration       = this.props.scene.duration;
     const scaling             = this.props.scaling;
     const editorDurationWidth = this.props.editorDurationWidth;
@@ -72,7 +74,6 @@ export default class SceneEditorTimeline extends Component {
     var rnd                   = {};
 
     Object.keys(relations).forEach((key) => {
-
       items.push(
         <SceneEditorTimelineItem
           ref={(ref) => rnd[relations[key].idRelation] = ref}
@@ -88,6 +89,7 @@ export default class SceneEditorTimeline extends Component {
           itemsRef={rnd}
           magnetIsActive={this.state.magnetIsActive}
           setCurrentMagnetX={this.updateCurrentMagnetX}
+          isSelected={key == mediaSelected ? true : false}
         />
       );
     });

@@ -6,6 +6,7 @@ export default class SceneEditorTimelineItem extends Component {
 
   static propTypes = {
     editorDurationWidth: PropTypes.number.isRequired,
+    isSelected: PropTypes.bool,
     itemsRef: PropTypes.object.isRequired,
     magnetIsActive: PropTypes.bool.isRequired,
     maxZindex: PropTypes.number.isRequired,
@@ -108,6 +109,7 @@ export default class SceneEditorTimelineItem extends Component {
   getWidthFromRelation = (relation) => Math.max(Math.round(relation.duration / this.props.scaling * this.props.editorDurationWidth), 30);
 
   render() {
+    const isSelected          = this.props.isSelected;
     const relation            = this.props.relation;
     const media               = this.props.media;
     const scaling             = this.props.scaling;
@@ -121,7 +123,7 @@ export default class SceneEditorTimelineItem extends Component {
 
     return (
         <Rnd
-          className="editor-separation-element"
+          className={isSelected ? 'editor-separation-element selectedItem' : 'editor-separation-element'}
           ref={(ref) => this.rnd = ref}
           initial={{
             x: x,

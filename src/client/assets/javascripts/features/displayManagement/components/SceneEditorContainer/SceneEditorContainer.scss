@@ -170,3 +170,7 @@ $randomColor: rgb(random(256)-1,random(256)-1,random(256)-1);
   left: -4px;
   background-color: #f1f1f1;
 }
+
+.selectedItem {
+  border: solid 1px #5194ff;
+}

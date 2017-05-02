@@ -211,7 +211,7 @@ export default class SceneEditorContainer extends Component {
   selecteMediaInScene = (idRelation) => {
     if (idRelation != this.state.mediaSelected) {
       this.setState({
-        mediaSelected: idRelation
+        mediaSelected: Number(idRelation)
       });
     }
   }
@@ -412,6 +412,7 @@ export default class SceneEditorContainer extends Component {
             media={media}
             mediaControls={!isNaN(this.state.mediaControls) ? String((this.state.mediaControls - relation.startTimeOffset) % media.duration) : this.state.mediaControls}
             offset={relation.startTimeOffset}
+            highlight={this.state.mediaSelected == key ? true : false}
            />
          );
        }
@@ -463,6 +464,7 @@ export default class SceneEditorContainer extends Component {
               }
             }}
             updateRelation={this.updateRelation}
+            highlightSelected={this.state.mediaSelected}
 
           />
 
