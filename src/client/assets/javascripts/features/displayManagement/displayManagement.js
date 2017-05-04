@@ -846,6 +846,7 @@ export const actionCreators = {
 // State initial
 
 const initialState: State = {
+  // TODO : Supprimer ces objets temporaires
   mediaById: {
     5: {
       id: 5,
@@ -860,6 +861,34 @@ const initialState: State = {
       relationsWithGuests: [],
       duration: 0,
       mimetype: 'clock'
+    },
+    6: {
+      id: 6,
+      name: "Météo",
+      ratioNumerator: 16,
+      ratioDenominator: 9,
+      type: "meteo",
+      version: 0,
+      createdAt: "2017-03-24 20:19:00",
+      updatedAt: "2017-03-28 13:03:05",
+      relationsWithHosts: [],
+      relationsWithGuests: [],
+      duration: 0,
+      mimetype: 'meteo'
+    },
+    7: {
+      id: 7,
+      name: "20min - Actualités",
+      ratioNumerator: 16,
+      ratioDenominator: 9,
+      type: "news",
+      version: 0,
+      createdAt: "2017-03-24 20:19:00",
+      updatedAt: "2017-03-28 13:03:05",
+      relationsWithHosts: [],
+      relationsWithGuests: [],
+      duration: 0,
+      mimetype: 'news'
     }
   },
   relationsById: {},
@@ -883,8 +912,15 @@ const initialState: State = {
     fetchError: null,
     items: []
   },
+  // TODO : Supprimer ces objets temporaires
   clock: {
     items: [5]
+  },
+  news: {
+    items: [7]
+  },
+  meteo: {
+    items: [6]
   },
   isDeleting: {},
   isPatching: {},
