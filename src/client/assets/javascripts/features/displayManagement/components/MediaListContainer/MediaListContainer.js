@@ -16,9 +16,9 @@ import './MediaList.scss';
 import { MediaTypes } from 'models/displayManagement';
 
 @connect((state) => {
-  const { mediaById, file, scene, agenda, clock } = state[displayManagementName];
+  const { mediaById, file, scene, agenda, clock, news, meteo } = state[displayManagementName];
 
-  const mediaByType = { file, scene, agenda, clock };
+  const mediaByType = { file, scene, agenda, clock, news, meteo };
 
   return {
     mediaByType,
@@ -110,9 +110,12 @@ export default class MediaListContainer extends Component {
       scene: this.props.mediaByType.scene,
       agenda: this.props.mediaByType.agenda,
       clock: this.props.mediaByType.clock,
+      news: this.props.mediaByType.news,
+      meteo: this.props.mediaByType.meteo,
     };
 
     for (let key of Object.keys(MediaTypes)) {
+      if (mediaByType[MediaTypes[key].key])
       medias[MediaTypes[key].key] = mediaByType[MediaTypes[key].key].items.map((id) => {
 
         const tooltipPlacement = count % 3 == 0 ? 'left' : (count % 3 == 2 ? 'right' : 'top');

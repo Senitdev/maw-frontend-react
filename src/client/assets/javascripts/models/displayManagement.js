@@ -66,6 +66,14 @@ export const MediaTypes = {
     key: 'clock',
     name: 'Horloges',
   },
+  NEWS: {
+    key: 'news',
+    name: 'Actualités',
+  },
+  METEO: {
+    key: 'meteo',
+    name: 'Météo',
+  },
 };
 
 export type State = {
