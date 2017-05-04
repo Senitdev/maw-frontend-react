@@ -28,7 +28,7 @@ export class FileViewer extends Component {
       height: this.props.height ? this.props.height : 'auto',
     };
 
-    if(mimetype) {
+    if (mimetype) {
       if (mimetype.search('image') === 0) {
         this.setState({
           mod: `image`,
@@ -41,6 +41,19 @@ export class FileViewer extends Component {
           viewer: <div style={{width: '100%', height: '100%'}} id={idClock} />
         }, () => {
           clockJs(idClock);
+        });
+      } else if (mimetype.search('meteo') === 0) {
+        this.setState({
+          mod: `meteo`,
+          viewer: <img src="http://www.prevision-meteo.ch/uploads/widget/geneve_0.png" {...sizes} />
+        });
+      } else if (mimetype.search('news') === 0) {
+        this.setState({
+          mod: `news`,
+          viewer: <div style={{width: '100%', height: '100%', position: 'relative'}}>
+                    <iframe {...sizes} className="screen-player-preview" name="screen-player-preview" frameBorder="0" scrolling="no" src="http://www.20min.ch/ro/screenplayer/?view=0&preview=true" />
+                    <div style={{top: '0', left: '0', width: '100%', height: '100%', position: 'absolute'}} />
+                  </div>
         });
       } else if (mimetype.search('video') === 0) {
         if (this.props.displayControls)
