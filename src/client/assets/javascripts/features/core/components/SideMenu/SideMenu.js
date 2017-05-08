@@ -199,7 +199,7 @@ export default class SideMenu extends Component {
           key="display-management"
           title={<span><Icon type="video-camera" /><span className="hidden-if-collapsed">Afficheurs</span></span>}>
 
-          <SubMenu key="display-management-media-library" title={<span><Icon type='file' />Médiathèque</span>}>
+          {/*<Menu.ItemGroup key="mediatheque" title="Médias">*/}
 
             <Item key="/display-management/file" isRouterLink>
               <Icon type="picture" />Fichiers
@@ -209,7 +209,7 @@ export default class SideMenu extends Component {
               <Icon type="appstore-o" />Scènes
             </Item>
 
-          </SubMenu>
+          {/*</Menu.ItemGroup>*/}
 
           <Item key="/display-management/screen" isRouterLink>
             <Icon type="desktop" />Écrans
