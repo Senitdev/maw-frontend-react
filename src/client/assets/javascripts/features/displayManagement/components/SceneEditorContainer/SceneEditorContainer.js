@@ -174,7 +174,7 @@ export default class SceneEditorContainer extends Component {
     return duration;
   }
 
-  dropEvent = (event, ui) => {
+  dropEventForViewPort = (event, ui) => {
     const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 60000;
     //const zIndex = this.state.mediaInScene.length > 0 ? Math.max(...this.state.mediaInScene.map((o) => o.zIndex.value)) + 1 : 0;
     this.setState({
@@ -201,10 +201,43 @@ export default class SceneEditorContainer extends Component {
     }, () => this.tmpIdForNewRelation -= 1);
   }
 
+  dropEventForTimeline = (event, ui) => {
+    const duration = this.props.mediaById[ui.draggable.attr("id")].duration ? this.props.mediaById[ui.draggable.attr("id")].duration : 60000;
+    const offsetLeft = ui.offset.left - $(".timeline").offset().left;
+    const offsetTop = ui.offset.top - $(".timeline").offset().top;
+
+    this.setState({
+      mediaInScene: {
+        ...this.state.mediaInScene,
+        [this.tmpIdForNewRelation]: {
+          id: ui.draggable.attr("id"),
+          boxLeft: 0,
+          boxTop: 0,
+          boxWidth: 100,
+          boxHeight: 100,
+          guestLeft: 0,
+          guestTop: 0,
+          guestWidth: 100,
+          guestHeight: 100,
+          startTimeOffset: Math.round(((offsetLeft > 0 ? offsetLeft : 0) / this.editorDurationWidth * this.state.scaling) / 100) * 100,
+          duration: duration,
+          zIndex: Math.round(((offsetTop > 0 ? offsetTop : 0) / 150 * 150) / 50),
+          idRelation: this.tmpIdForNewRelation, // Id le relation déjà existante (négative si aucune)
+          ratio: true,
+        }
+      },
+      scaling: duration > this.state.scaling ? duration : this.state.scaling
+    }, () => this.tmpIdForNewRelation -= 1);
+  }
+
   listDrop = () => {
     $("#scene-editor-list, #editor-positions").unbind('droppable');
     $("#scene-editor-list, #editor-positions").droppable({
-      drop: this.dropEvent,
+      drop: this.dropEventForViewPort,
+    });
+    $(".timeline").unbind('droppable');
+    $(".timeline").droppable({
+      drop: this.dropEventForTimeline,
     });
   }
 
@@ -465,9 +498,7 @@ export default class SceneEditorContainer extends Component {
             }}
             updateRelation={this.updateRelation}
             highlightSelected={this.state.mediaSelected}
-
           />
-
         </Layout.Content>
         <Layout.Sider width={250}>
           <div style={{padding: '0 5px 5px 5px'}}>
