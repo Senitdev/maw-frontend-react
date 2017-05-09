@@ -2,8 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 import { Config } from 'app/config';
 
-import '../../../../utils/clock-js/css/clock-js.css';
-import { clockJs } from '../../../../utils/clock-js/js/clock-js';
+import 'javascripts/utils/clock-js/css/clock-js.css';
+import { clockJs } from 'javascripts/utils/clock-js/js/clock-js';
 
 export class FileViewer extends Component {
   static propTypes = {
@@ -35,12 +35,12 @@ export class FileViewer extends Component {
           viewer: <img {...sizes} src={fileUrl} />,
         });
       } else if (mimetype.search('clock') === 0) {
-        const idClock = "clock-container-" + new Date().getTime();
+        var containerClock;
         this.setState({
           mod: `clock`,
-          viewer: <div style={{width: '100%', height: '100%'}} id={idClock} />
+          viewer: <div ref={(r) => containerClock = r} style={{width: '100%', height: '100%'}} />
         }, () => {
-          clockJs(idClock);
+          clockJs(containerClock);
         });
       } else if (mimetype.search('meteo') === 0) {
         this.setState({
