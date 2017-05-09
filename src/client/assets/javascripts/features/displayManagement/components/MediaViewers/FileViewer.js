@@ -4,6 +4,7 @@ import { Config } from 'app/config';
 
 import 'javascripts/utils/clock-js/css/clock-js.css';
 import { clockJs } from 'javascripts/utils/clock-js/js/clock-js';
+import { news20MinJs } from 'javascripts/utils/news-20min-js/js/news-20min-js';
 
 export class FileViewer extends Component {
   static propTypes = {
@@ -48,12 +49,15 @@ export class FileViewer extends Component {
           viewer: <img src="http://www.prevision-meteo.ch/uploads/widget/geneve_0.png" {...sizes} />
         });
       } else if (mimetype.search('news') === 0) {
+        var containerNews;
         this.setState({
           mod: `news`,
           viewer: <div style={{width: '100%', height: '100%', position: 'relative'}}>
-                    <iframe {...sizes} className="screen-player-preview" name="screen-player-preview" frameBorder="0" scrolling="no" src="http://www.20min.ch/ro/screenplayer/?view=0&preview=true" />
+                    <div ref={(r) => containerNews = r} style={{width: '100%', height: '100%'}} />
                     <div style={{top: '0', left: '0', width: '100%', height: '100%', position: 'absolute'}} />
                   </div>
+        }, () => {
+          news20MinJs(containerNews, 'de');
         });
       } else if (mimetype.search('video') === 0) {
         if (this.props.displayControls)
