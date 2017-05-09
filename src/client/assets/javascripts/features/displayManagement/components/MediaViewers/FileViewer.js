@@ -5,6 +5,7 @@ import { Config } from 'app/config';
 import 'javascripts/utils/clock-js/css/clock-js.css';
 import { clockJs } from 'javascripts/utils/clock-js/js/clock-js';
 import { news20MinJs } from 'javascripts/utils/news-20min-js/js/news-20min-js';
+import { meteoJs } from 'javascripts/utils/meteo-js/js/meteo-js';
 
 export class FileViewer extends Component {
   static propTypes = {
@@ -44,9 +45,12 @@ export class FileViewer extends Component {
           clockJs(containerClock);
         });
       } else if (mimetype.search('meteo') === 0) {
+        var containerMeteo;
         this.setState({
           mod: `meteo`,
-          viewer: <img src="http://www.prevision-meteo.ch/uploads/widget/geneve_0.png" {...sizes} />
+          viewer: <div ref={(r) => containerMeteo = r} style={{width: '100%', height: '100%'}} />
+        }, () => {
+          meteoJs(containerMeteo, 'geneve', 0);
         });
       } else if (mimetype.search('news') === 0) {
         var containerNews;
