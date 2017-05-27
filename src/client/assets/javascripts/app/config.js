@@ -15,6 +15,6 @@ export function logException(ex, context) {
 // Objet global de configuration
 // TODO: config différente selon l'environnement (dev/prod)
 export const Config = {
-  API: 'http://srv.test.maw.abcore.fr/',
-  thumbnailURL: '/modules-static-files/Screens/tenants/'
+  API: 'http://app.myaccessweb.com/api/',
+  thumbnailURL: 'modules-static-files/Screens/tenants/'
 };
