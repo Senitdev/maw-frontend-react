@@ -595,65 +595,124 @@ function fetchMediaDetails(id, type) {
   const url = Config.API + 'entities/1/modules/3/';
 
   return (dispatch) => {
-    dispatch(mediaDetailsRequest(id, type));
-    let promiseArray = [];
+      dispatch(mediaDetailsRequest(id, type));
 
-    promiseArray.push(
-      fetch(url + 'feats/media-inclusion-tree', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({id: id})
+      return fetch(url + 'feats/data-for-media', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({id: id})
       })
-        .then((response) => {
+      .then((response) => {
           if (!response.ok) {
             let error = new Error('mediaDetails fetch fail');
+
+
             error.response = response;
+
             throw error;
           }
+
           return response.json().then((json) => json.data);
-        })
-    );
 
-    if (type == 'screen' || type == 'file') {
-      promiseArray.push(
-        fetch(url + type + 's/' + id)
-          .then((response) => {
-            if (!response.ok) {
-              let error = new Error('mediaDetails fetch fail');
-              error.response = response;
-              throw error;
-            }
-            return response.json().then((json) => json.data);
-          })
-      );
-    }
+      }).then((data) => {
+          var mediasById, relationsById = {};
 
-    return Promise.all(promiseArray)
-      .then((data) => {
-        const [inclusionTree, typeDetails] = data;
+          Object.keys(data).forEach((key) => {
+              mediasById = {
+                  ...mediasById,
+                  [key]: {
+                      id: key,
+                      name: data[key].name,
+                      ratio_numerator: data[key].ratio_numerator,
+                      ratio_denominator: data[key].ratio_denominator,
+                      duration:data[key].duration,
+                      type: data[key].type,
+                      version: data[key].version,
+                      created_at: data[key].created_at,
+                      updated_at: data[key].updated_at,
+                      relations_with_hosts: [],
+                      relations_with_guests: []
+                  }
+              }
 
-        // Tableau de media provenant de l'arbre en objet indexé par id
-        let mediaById = {};
-        for (let id in inclusionTree.medias) {
-          mediaById[Number(id)] = normalize.media(inclusionTree.medias[id]);
-        }
+             if (data[key].type == 'screen') {
+                 mediasById = {
+                     ...mediasById,
+                     [key]: {
+                         ...mediasById[key],
+                         global_screen_id: data[key].screen.global_screen_id,
+                         screen_group_id: data[key].screen.screen_group_id,
+                         power_on: data[key].screen.power_on,
+                         power_off: data[key].screen.power_off,
+                         distant_version: data[key].screen.distant_version,
+                         //last_pull: data[key].screen.last_pull
+                     }
+                 }
+             } else if (data[key].type == 'file') {
+                 mediasById = {
+                     ...mediasById,
+                     [key]: {
+                         ...mediasById[key],
+                         width: data[key].file.width,
+                         height: data[key].file.height,
+                         weight: data[key].file.weight,
+                         mimetype: data[key].file.mimetype
+                     }
+                 }
+             }
+          });
 
-        if (typeDetails) {
-          Object.assign(mediaById[typeDetails.media_id], normalize[type](typeDetails));
-        }
+          Object.keys(data).forEach((key) => {
+              data[key].guest_media_relations.forEach((relation) => {
 
-        // Relations
-        let relationsById = {};
-        for (let id in inclusionTree.relations) {
-          const relation = normalize.relation(inclusionTree.relations[id]);
-          relationsById[relation.id] = relation;
-          mediaById[relation.hostMediaId].relationsWithGuests.push(relation.id);
-          mediaById[relation.guestMediaId].relationsWithHosts.push(relation.id);
-        }
+                  //Associe les relations host-guest au média
+                  if (relation.host_media_id == key) {
+                      mediasById = {
+                          ...mediasById,
+                          [key]: {
+                              ...mediasById[key],
+                              relations_with_guests: mediasById[key].relations_with_guests.concat([relation.id])
+                          }
+                      }
+                  }
 
-        dispatch(mediaDetailsSuccess(mediaById, relationsById));
+                  //Associe les relations guest-host au média
+                  if (relation.guest_media_id == key) {
+                      mediasById = {
+                          ...mediasById,
+                          [key]: {
+                              ...mediasById[key],
+                              relations_with_guests: mediasById[key].relations_with_hosts.concat([relation.id])
+                          }
+                      }
+                  }
+
+                  //Récupére les relations au format frontend.
+                  relationsById = {
+                      ...relationsById,
+                      [relation.id]: {
+                          ...relation
+                      }
+                  }
+
+              });
+          });
+
+          Object.keys(mediasById).forEach((key) => {
+              mediasById = {
+                  ...mediasById,
+                  [key]: normalizeObjectForClient(mediasById[key])
+              }
+          });
+
+          Object.keys(relationsById).forEach((key) => {
+              relationsById = {
+                  ...relationsById,
+                  [key]: normalizeObjectForClient(relationsById[key])
+              }
+          });
+          dispatch(mediaDetailsSuccess(mediasById, relationsById));
       })
-      .catch((error) => dispatch(mediaDetailsFailure(type, error)));
   };
 }
 
